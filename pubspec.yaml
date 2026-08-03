@@ -1,0 +1,100 @@
+name: pip_garden
+description: "Grow a garden by focusing."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+# A pub workspace: one lockfile and one `.dart_tool` for the app and the domain
+# core, so `flutter analyze` at the root covers both packages and neither can
+# drift onto a different version of a shared dependency.
+workspace:
+  - packages/pomodoro_domain
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The pure-Dart domain core. See packages/pomodoro_domain/README.md.
+  pomodoro_domain:
+    path: packages/pomodoro_domain
+
+  # State management and DI. Provider overrides are how tests swap the domain's
+  # ports (starting with Clock) for ones they control.
+  flutter_riverpod: ^3.4.2
+
+  cupertino_icons: ^1.0.8
+  drift: ^2.34.3
+  path_provider: ^2.1.6
+  path: ^1.9.1
+  sqlite3: ^3.5.1
+
+  # Session-end notifications are scheduled with the OS ahead of time, since
+  # the app usually isn't running when a session ends.
+  flutter_local_notifications: ^22.3.0
+  # What `zonedSchedule` takes. Only `tz.UTC` is ever used: a session's end is
+  # an absolute instant, so no location database and no device timezone are
+  # needed to schedule it.
+  timezone: ^0.11.1
+
+  # End sound in the foreground. `audio_session` makes it respect the iOS
+  # silent switch.
+  just_audio: ^0.10.6
+  audio_session: ^0.2.4
+
+  # No in-app purchase packages: the app is free (docs/adr/0005).
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.34.0
+  build_runner: ^2.15.1
+
+flutter:
+  uses-material-design: true
+
+  # End-of-session sounds (scripts/make_synth_end_sounds.py). Android has a
+  # second AAC copy of each in res/raw/, because a notification channel can't
+  # use a Flutter asset. The ambient loops are WAV because lossy formats don't
+  # loop cleanly. See docs/ambience.md.
+  assets:
+    # Asset globbing isn't recursive, so each folder is listed.
+    - assets/audio/
+    - assets/audio/end/
+
+    # UI micro-sounds (scripts/make_synth_micro_sounds.py). AAC is fine here,
+    # they never go through a notification.
+    - assets/audio/micro/
+
+    # Plant and decor art plus its manifest (tool/generate_sprite_art.dart).
+    - assets/art/manifest.json
+    - assets/art/plants/
+    - assets/art/decor/
+
+  # Both families are bundled rather than fetched at runtime, and used on both
+  # platforms, so the two stay at visual parity and first launch works offline.
+  # Both are SIL OFL 1.1; the licences sit beside the files. Static instances
+  # rather than the variable fonts, because Flutter does not drive a variable
+  # font's weight axis from `fontWeight`. See lib/src/design/typography.dart.
+  fonts:
+    # The UI family (Inter 4.1, rsms/inter).
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    # The display face: headings, the timer, plant names (Fraunces 1.000,
+    # undercasetype/Fraunces, the 72pt optical size).
+    - family: Fraunces
+      fonts:
+        - asset: assets/fonts/Fraunces-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Fraunces-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
