@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The only directory the share FileProvider exposes: a folder in the cache
+    holding one exported PNG. Kept narrow on purpose (`path="."` would expose the
+    whole cache). Must match `GardenSharePlugin.SHARE_DIRECTORY`.
+-->
+<paths>
+    <cache-path
+        name="garden-exports"
+        path="garden-exports/" />
+</paths>

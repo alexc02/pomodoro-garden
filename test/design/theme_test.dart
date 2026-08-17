@@ -1,0 +1,211 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:pip_garden/src/design/garden_colors.dart';
+import 'package:pip_garden/src/design/palette.dart';
+import 'package:pip_garden/src/design/theme.dart';
+import 'package:pip_garden/src/design/typography.dart';
+
+void main() {
+  group('both themes resolve', () {
+    for (final (name, theme) in [
+      ('light', AppTheme.light),
+      ('dark', AppTheme.dark),
+    ]) {
+      test('$name carries the garden colours and the type ramp', () {
+        expect(theme.extension<GardenColors>(), isNotNull);
+        expect(theme.textTheme.displayLarge?.fontFamily,
+            GardenTypography.displayFontFamily);
+        expect(theme.textTheme.bodyMedium?.fontFamily,
+            GardenTypography.fontFamily);
+        expect(theme.textTheme.displayLarge?.fontWeight,
+            GardenTypography.headingWeight);
+        expect(theme.textTheme.bodyMedium?.fontWeight,
+            GardenTypography.bodyWeight);
+      });
+
+      test('$name writes no colour of its own outside the palette', () {
+        // Every scheme colour has to be a palette token. A list, not a set,
+        // because several tokens share a value.
+        final tokens = <Color>[
+          Palette.primary,
+          Palette.onPrimary,
+          Palette.moss,
+          Palette.marigold,
+          Palette.mist,
+          Palette.soil,
+          Palette.skyDay,
+          Palette.skyGoldenHour,
+          Palette.accentBloom,
+          Palette.backgroundDark,
+          Palette.backgroundLight,
+          Palette.surfaceLight,
+          Palette.surfaceDark,
+          Palette.textPrimary,
+          Palette.textSecondary,
+          Palette.textPrimaryDark,
+          Palette.textSecondaryDark,
+          Palette.error,
+          Palette.onError,
+          Palette.errorDark,
+          Palette.onErrorDark,
+        ];
+
+        final scheme = theme.colorScheme;
+        for (final colour in [
+          scheme.primary,
+          scheme.onPrimary,
+          scheme.primaryContainer,
+          scheme.onPrimaryContainer,
+          scheme.secondary,
+          scheme.onSecondary,
+          scheme.secondaryContainer,
+          scheme.onSecondaryContainer,
+          scheme.tertiary,
+          scheme.onTertiary,
+          scheme.error,
+          scheme.onError,
+          scheme.surface,
+          scheme.onSurface,
+          scheme.onSurfaceVariant,
+          scheme.outline,
+        ]) {
+          expect(tokens, contains(colour));
+        }
+
+        expect(tokens, contains(theme.scaffoldBackgroundColor));
+      });
+
+      test('$name gives every text style a colour', () {
+        for (final style in [
+          theme.textTheme.displayLarge,
+          theme.textTheme.headlineMedium,
+          theme.textTheme.titleMedium,
+          theme.textTheme.bodyMedium,
+          theme.textTheme.bodySmall,
+          theme.textTheme.labelSmall,
+        ]) {
+          expect(style?.color, isNotNull);
+        }
+      });
+    }
+
+    test('light uses the light canvas, dark uses the dark background', () {
+      expect(AppTheme.light.brightness, Brightness.light);
+      expect(
+        AppTheme.light.scaffoldBackgroundColor,
+        Palette.backgroundLight,
+      );
+
+      expect(AppTheme.dark.brightness, Brightness.dark);
+      expect(
+        AppTheme.dark.scaffoldBackgroundColor,
+        Palette.backgroundDark,
+        reason: 'The dark-mode background is #1C2B1C.',
+      );
+    });
+
+    test('the chrome is moss by day and marigold by night', () {
+      // Moss would be invisible on the dark canvas.
+      expect(AppTheme.light.colorScheme.primary, Palette.moss);
+      expect(AppTheme.dark.colorScheme.primary, Palette.marigold);
+    });
+
+    test('the tab bar is a moss strip in both themes', () {
+      for (final theme in [AppTheme.light, AppTheme.dark]) {
+        expect(theme.navigationBarTheme.backgroundColor, Palette.moss);
+      }
+    });
+  });
+
+  group('the palette', () {
+    test('is reachable in full through the theme', () {
+      // Any new palette colour a screen needs goes on the theme, not inline.
+      const light = GardenColors.light;
+      const dark = GardenColors.dark;
+
+      expect(light.foliage, Palette.primary);
+      expect(light.soil, Palette.soil);
+      expect(light.skyDay, Palette.skyDay);
+      expect(light.skyGoldenHour, Palette.skyGoldenHour);
+      expect(light.bloom, Palette.accentBloom);
+      expect(light.textPrimary, Palette.textPrimary);
+      expect(light.textSecondary, Palette.textSecondary);
+      expect(AppTheme.dark.scaffoldBackgroundColor, Palette.backgroundDark);
+
+      // The illustrated world keeps its colours in dark mode; only text moves.
+      expect(dark.soil, Palette.soil);
+      expect(dark.skyDay, Palette.skyDay);
+      expect(dark.skyGoldenHour, Palette.skyGoldenHour);
+      expect(dark.bloom, Palette.accentBloom);
+      expect(dark.textPrimary, Palette.textPrimaryDark);
+      expect(dark.textSecondary, Palette.textSecondaryDark);
+    });
+
+    test('holds the exact hex values', () {
+      expect(Palette.primary, const Color(0xFF6B8E5A));
+      expect(Palette.soil, const Color(0xFF8B6F47));
+      expect(Palette.skyDay, const Color(0xFFB8D4E8));
+      expect(Palette.skyGoldenHour, const Color(0xFFF5C99B));
+      expect(Palette.accentBloom, const Color(0xFFE89B9B));
+      expect(Palette.backgroundDark, const Color(0xFF1C2B1C));
+      // Both text colours moved to the moss family; the old secondary was under
+      // 4.5:1 on the cream canvas.
+      expect(Palette.textPrimary, const Color(0xFF22361F));
+      expect(Palette.textSecondary, const Color(0xFF4D5E48));
+    });
+  });
+
+  group('GardenColors', () {
+    test('lerps every channel', () {
+      final midpoint = GardenColors.light.lerp(GardenColors.dark, 1);
+
+      expect(midpoint.textPrimary, GardenColors.dark.textPrimary);
+      expect(midpoint.textSecondary, GardenColors.dark.textSecondary);
+    });
+
+    test('copyWith replaces only what it is given', () {
+      final tweaked = GardenColors.light.copyWith(bloom: Palette.soil);
+
+      expect(tweaked.bloom, Palette.soil);
+      expect(tweaked.soil, GardenColors.light.soil);
+      expect(tweaked.textPrimary, GardenColors.light.textPrimary);
+    });
+
+    testWidgets('of(context) throws outside a garden theme', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.light(),
+          home: Builder(
+            builder: (context) {
+              expect(
+                () => GardenColors.of(context),
+                throwsA(isA<StateError>()),
+                reason: 'Falling back to the light palette here would render '
+                    'unreadable text on a dark screen rather than fail.',
+              );
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+    });
+
+    testWidgets('of(context) reads the theme in force', (tester) async {
+      late GardenColors resolved;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.dark,
+          home: Builder(
+            builder: (context) {
+              resolved = GardenColors.of(context);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      expect(resolved.textPrimary, Palette.textPrimaryDark);
+    });
+  });
+}
