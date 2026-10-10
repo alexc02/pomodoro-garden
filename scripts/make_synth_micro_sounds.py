@@ -56,29 +56,36 @@ AAC_BITRATE = '64k'
 def soil_settle() -> tuple[list[float], float]:
     """A seed landing: one soft thud, and the grains it throws up after it.
 
-    The thud is a body — a low sine dropping in pitch as it decays, which is
-    what a small object hitting packed earth does — and the grains are short
-    bursts of filtered noise scattered over the next third of a second, thinning
-    out as they fall back. Peaked at -16 dBFS.
+    The thud is a body — a sine dropping in pitch as it decays, which is what a
+    small object hitting packed earth does — and the grains are short bursts of
+    filtered noise scattered over the next third of a second, thinning out as
+    they fall back. Peaked at -11 dBFS.
+
+    **Pitched for a phone's speaker** (ticket 37, after the owner heard nothing):
+    the first version's thud sat at 140 Hz and the whole sound peaked at -16
+    dBFS, and a phone or laptop speaker reproduces almost nothing below 300 Hz.
+    The thud now starts at 260 Hz with an overtone an octave up, and the grains
+    are louder and brighter, so what a small speaker *can* play carries it.
     """
     length = 0.5
     count = int(SAMPLE_RATE * length)
     samples = [0.0] * count
     grit = random.Random(20260830)
 
-    # The thud. 140 Hz falling to about 90, gone inside 120 ms.
+    # The thud. 260 Hz falling to about 180, with its octave, gone inside 120 ms.
     for index in range(count):
         since = index / SAMPLE_RATE
         envelope = math.exp(-since / 0.055)
         if envelope < 1e-4:
             break
-        frequency = 140.0 * math.exp(-since * 3.4)
-        samples[index] += envelope * math.sin(2 * math.pi * frequency * since)
+        frequency = 260.0 * math.exp(-since * 3.0)
+        phase = 2 * math.pi * frequency * since
+        samples[index] += envelope * (math.sin(phase) + 0.35 * math.sin(2 * phase))
 
     # The grains: eleven ticks of bandpassed noise, scattered and thinning.
     for grain in range(11):
         onset = 0.012 + grit.uniform(0.0, 0.30) ** 1.6 * 0.9
-        strength = 0.22 * (1.0 - onset / 0.32) if onset < 0.32 else 0.03
+        strength = 0.4 * (1.0 - onset / 0.32) if onset < 0.32 else 0.05
         start = int(onset * SAMPLE_RATE)
         span = int(0.018 * SAMPLE_RATE)
         # A one-pole highpass over one-pole lowpassed noise: a band around
@@ -91,12 +98,12 @@ def soil_settle() -> tuple[list[float], float]:
             through = index / span
             envelope = math.exp(-through * 6.0) * (1 - math.exp(-through * 60))
             raw = grit.uniform(-1.0, 1.0)
-            low += 0.35 * (raw - low)
+            low += 0.55 * (raw - low)
             banded = low - previous
             previous = low
             samples[start + index] += strength * envelope * banded * 4.0
 
-    return samples, -16.0
+    return samples, -11.0
 
 
 def growth_shimmer() -> tuple[list[float], float]:
@@ -141,27 +148,33 @@ def growth_shimmer() -> tuple[list[float], float]:
 def button_tap() -> tuple[list[float], float]:
     """A deliberate tap: one soft wooden click, and nothing else.
 
-    Fifty milliseconds, no pitch worth naming, and **the quietest of the four**
-    at -20 dBFS. This is the one that fires most often, and a tap the user
-    notices is a tap they will come to resent — it should read as the button
-    having weight rather than as the app saying something.
+    Short, no pitch worth naming, and **the quietest of the four** at -13 dBFS.
+    This is the one that fires most often, and a tap the user notices is a tap
+    they will come to resent — it should read as the button having weight
+    rather than as the app saying something.
+
+    **Quiet, not inaudible** (ticket 37, after the owner heard nothing): the
+    first version was 320 and 787 Hz at -20 dBFS, below what a phone speaker
+    plays well and too faint to register in 9 ms. The partials are now up where
+    a small speaker is loud, the decay is a little longer, and the file carries
+    trailing silence, so an AAC decoder's priming cannot eat a 50 ms click.
     """
-    length = 0.05
+    length = 0.08
     count = int(SAMPLE_RATE * length)
     samples = [0.0] * count
 
     for index in range(count):
         since = index / SAMPLE_RATE
-        # 9 ms and gone. Any longer and it is a bloop.
-        envelope = (1 - math.exp(-since / 0.0008)) * math.exp(-since / 0.009)
-        # Two low partials rather than one, which is what makes it wood rather
-        # than a sine: a struck block has an inharmonic second mode.
+        # 14 ms and gone. Any longer and it is a bloop.
+        envelope = (1 - math.exp(-since / 0.0008)) * math.exp(-since / 0.014)
+        # Two partials rather than one, which is what makes it wood rather than
+        # a sine: a struck block has an inharmonic second mode.
         samples[index] = envelope * (
-            math.sin(2 * math.pi * 320.0 * since)
-            + 0.45 * math.sin(2 * math.pi * 787.0 * since)
+            math.sin(2 * math.pi * 950.0 * since)
+            + 0.45 * math.sin(2 * math.pi * 2_330.0 * since)
         )
 
-    return samples, -20.0
+    return samples, -13.0
 
 
 def unlock() -> tuple[list[float], float]:

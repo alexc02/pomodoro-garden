@@ -12,7 +12,7 @@
 
 **Blocked by:** 29.
 
-**Status:** built; **waiting on the owner's listening pass** (criterion 7). Listening page (private to the owner): https://claude.ai/code/artifact/ecec465a-a790-4e28-9bf9-e719373fbedc
+**Status:** the owner listened on 2026-10-11: **every sound good except soil settle and button tap, which made no sound.** Both redone (below); waiting on the owner's re-listen of those two. Listening page (private to the owner): https://claude.ai/code/artifact/ecec465a-a790-4e28-9bf9-e719373fbedc
 
 - [x] The synthesis scripts in `scripts/` ~~upgraded from placeholder quality~~ **kept as they were and renamed as final**, still deterministic. *Not upgraded: the synthesis was already built to the seam, level and budget rules, and with no one here to listen there was no basis for changing it. The owner's listening pass is where any of them gets reworked*
 - [x] Recordings from ticket 29 processed: trimmed, loop points chosen at zero crossings with a short crossfade baked into the file, normalised to the same loudness as the synthesised beds
@@ -20,9 +20,9 @@
 - [x] End sounds stay PCM for iOS notifications; the Android AAC copies are regenerated from the same sources
 - [x] Total audio under 8 MB, enforced by the existing test
 - [x] The loop seam measured three ways against every bed, as `docs/ambience.md` describes, and passing
-- [ ] **Owner listens** to every bed for audible repetition. **Fallback:** a bed that sounds looped is built from two layers of coprime length (e.g. 17 s and 23 s), with a second player for that bed only; record which beds needed it
-- [ ] Ticket 24's loop-seam criterion annotated with the result
-- [ ] `flutter analyze --fatal-infos` clean; app and domain suites green
+- [x] **Owner listens** to every bed for audible repetition. *Done 2026-10-11: no bed sounds repetitive, the café's clinks included; no layering needed.* Original: **Fallback:** a bed that sounds looped is built from two layers of coprime length (e.g. 17 s and 23 s), with a second player for that bed only; record which beds needed it
+- [x] Ticket 24's loop-seam criterion annotated with the result
+- [x] `flutter analyze --fatal-infos` clean; app and domain suites green (1002 app tests with the final audio; 68 audio and micro-sound tests after the micro-sound fix)
 
 ## What was built
 
@@ -53,3 +53,25 @@ each other; inside the 8 MB budget).
 
 **Verification gap:** nobody has listened yet (the owner, on the page above); and on a phone,
 whether `just_audio` loops a WAV with no gap on both platforms (ticket 39).
+
+## The owner's listening pass, and two sounds redone
+
+On 2026-10-11 the owner reported **soil settle and button tap made no sound**; everything
+else, the five beds included, was good.
+
+Both files were valid and played; both were nearly inaudible by design, especially through
+a phone or laptop speaker, which reproduces little below ~300 Hz:
+
+| | Before | After |
+|---|---|---|
+| Soil settle | thud at 140 Hz, peak −17 dB, −23 dB above 300 Hz | thud at 260 Hz with its octave, brighter and louder grains, peak −10.5 dB, **−14 dB above 300 Hz** |
+| Button tap | 320/787 Hz, 9 ms, 50 ms file, peak −20 dB | 950/2330 Hz, 14 ms, 80 ms file with trailing silence, peak −13 dB, **−13 dB above 300 Hz** |
+
+For comparison, growth shimmer, which the owner heard, sits at −15 dB above 300 Hz. Button
+tap stays the quietest sound in the app, because it plays most often. The other two
+micro-sounds regenerate byte-identical. The same problem would have hit the app on a phone,
+so this is a fix to the files, not to the page.
+
+**The listening page itself also failed at first:** it played through the Web Audio
+engine, which can stay silent inside the artifact viewer's sandbox and is muted by an
+iPhone's silent switch. It now uses standard audio players.
