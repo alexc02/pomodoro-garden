@@ -1,0 +1,42 @@
+/// The Pomodoro Garden domain core.
+///
+/// Pure Dart: timer state machine, growth model, plot placement and milestone
+/// rules live here, and none of them may import Flutter. See the package README
+/// for why the boundary exists and how it is enforced.
+library;
+
+export 'src/analytics/analytics.dart';
+export 'src/analytics/analytics_event.dart';
+export 'src/analytics/analytics_event_log.dart';
+export 'src/garden/decor.dart';
+export 'src/garden/decor_repository.dart';
+export 'src/garden/garden_layout.dart';
+export 'src/garden/garden_plot.dart';
+export 'src/garden/garden_reset.dart';
+export 'src/garden/garden_theme.dart';
+export 'src/garden/growth_stage.dart';
+export 'src/garden/milestone.dart';
+export 'src/garden/plant.dart';
+export 'src/garden/plant_quote.dart';
+export 'src/garden/plant_repository.dart';
+export 'src/garden/plant_type.dart';
+export 'src/garden/season.dart';
+export 'src/garden/stable_choice.dart';
+export 'src/journal/calendar_day.dart';
+export 'src/journal/day_range.dart';
+export 'src/journal/journal.dart';
+export 'src/journal/journal_repository.dart';
+export 'src/journal/streak.dart';
+export 'src/session/focus_session.dart';
+export 'src/session/id_source.dart';
+export 'src/session/rest_break.dart';
+export 'src/session/session_machine.dart';
+export 'src/session/session_repository.dart';
+export 'src/settings/ambient_sound.dart';
+export 'src/settings/break_preset.dart';
+export 'src/settings/end_sound.dart';
+export 'src/settings/garden_settings.dart';
+export 'src/settings/session_preset.dart';
+export 'src/settings/setting_range.dart';
+export 'src/settings/settings_repository.dart';
+export 'src/time/clock.dart';

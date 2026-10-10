@@ -1,0 +1,18 @@
+name: pomodoro_domain
+description: "Pure-Dart domain core: timer state machine, growth model, plot placement, milestones. Imports no Flutter libraries."
+version: 0.1.0
+publish_to: 'none'
+resolution: workspace
+
+environment:
+  sdk: ^3.12.2
+
+# Intentionally empty. This package must never gain a dependency on `flutter`,
+# and every dependency added here has to be pure Dart — the boundary is what
+# keeps the domain testable without a widget binding. See
+# test/domain_has_no_flutter_imports_test.dart.
+dependencies:
+
+dev_dependencies:
+  test: ^1.26.0
+  lints: ^6.0.0

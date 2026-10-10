@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    What REQ-035's FileProvider is allowed to hand out: one directory inside the
+    app's own cache, holding one exported PNG.
+
+    Deliberately narrow. A provider configured with `<cache-path path="." />`
+    would expose the whole cache — the database's temporary files among them —
+    to any app that could guess a name. The `path` here must match
+    `GardenSharePlugin.SHARE_DIRECTORY`, and nothing else in this app writes to
+    it.
+-->
+<paths>
+    <cache-path
+        name="garden-exports"
+        path="garden-exports/" />
+</paths>

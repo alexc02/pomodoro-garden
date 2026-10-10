@@ -1,0 +1,29 @@
+# Analysis config for the app package. The domain core has its own, which lints
+# against `package:lints` rather than `flutter_lints` because it must not depend
+# on Flutter. See packages/pomodoro_domain/analysis_options.yaml.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  # `scripts/check.sh` runs `flutter analyze --fatal-infos`, so everything the
+  # analyzer reports — infos included — has to be dealt with rather than
+  # accumulated.
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+linter:
+  rules:
+    - always_declare_return_types
+    - avoid_dynamic_calls
+    - avoid_print
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_locals
+    - prefer_single_quotes
+    - sort_child_properties_last
+    - unawaited_futures
+    - use_super_parameters

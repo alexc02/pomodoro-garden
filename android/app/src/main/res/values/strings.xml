@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Ticket 08's live session surface, in the user's own language rather than in
+  Kotlin string literals. The wording follows the same rule ticket 06's
+  notification copy does: it reports, it names the plant so the news is about
+  the garden rather than about the timer, and it asks for nothing.
+-->
+<resources>
+    <string name="live_session_channel_name">Running sessions</string>
+    <string name="live_session_channel_description">Shows the session you are in the middle of, with its countdown and how far along your plant is.</string>
+
+    <!-- The notification's title while the session is counting down. The time
+         itself is the system's chronometer, beside this. -->
+    <string name="live_session_focusing">Focusing</string>
+
+    <!-- And while it is held. The countdown is standing still, so the time is
+         written out here instead of being counted. -->
+    <string name="live_session_paused">Paused · %1$s left</string>
+
+    <!-- The plant: species, then how grown it is. "Sunflower · Sprout". -->
+    <string name="live_session_plant">%1$s · %2$s</string>
+</resources>

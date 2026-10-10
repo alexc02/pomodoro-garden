@@ -1,0 +1,122 @@
+name: pomodoro_garden
+description: "Grow a garden by focusing."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+# A pub workspace: one lockfile and one `.dart_tool` for the app and the domain
+# core, so `flutter analyze` at the root covers both packages and neither can
+# drift onto a different version of a shared dependency.
+workspace:
+  - packages/pomodoro_domain
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The pure-Dart domain core. See packages/pomodoro_domain/README.md.
+  pomodoro_domain:
+    path: packages/pomodoro_domain
+
+  # State management and DI. Provider overrides are how tests swap the domain's
+  # ports (starting with Clock) for ones they control.
+  flutter_riverpod: ^3.4.2
+
+  cupertino_icons: ^1.0.8
+  drift: ^2.34.3
+  path_provider: ^2.1.6
+  path: ^1.9.1
+  sqlite3: ^3.5.1
+
+  # Ticket 06. A backgrounded session is announced by a notification the OS
+  # scheduled, not by code running in the background — see REQ-005 and
+  # `lib/src/notifications/`.
+  flutter_local_notifications: ^22.3.0
+  # What `zonedSchedule` takes. Only `tz.UTC` is ever used: a session's end is
+  # an absolute instant, so no location database and no device timezone are
+  # needed to schedule it.
+  timezone: ^0.11.1
+
+  # The end sound, in the foreground. `audio_session` is what makes the iOS
+  # silent switch win — see `lib/src/feedback/`.
+  just_audio: ^0.10.6
+  audio_session: ^0.2.4
+
+  # There is no purchase dependency here, and that is deliberate rather than
+  # missing: the app is free, so it talks to neither StoreKit nor Play Billing
+  # and ships no code that could. See `docs/adr/0021-…`.
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.34.0
+  build_runner: ^2.15.1
+
+flutter:
+  uses-material-design: true
+
+  # Two sets of sounds, both placeholders in the spirit of the placeholder plant
+  # sprites, and both named in exactly one file each.
+  #
+  # REQ-031's five end-of-session sounds, the wind chime among them as REQ-008's
+  # default. Synthesised by `scripts/make_synth_end_sounds.py` until PRD §9.2's
+  # sound designer delivers the real ones, and named only by
+  # `lib/src/feedback/end_sound_player.dart`.
+  #
+  # Android needs each of them a second time, as a raw resource, because a
+  # notification channel's sound cannot come from a Flutter asset — see
+  # `android/app/src/main/res/raw/`. That copy is AAC where the asset is PCM,
+  # and `docs/ambience.md` explains why iOS leaves no choice about the asset.
+  #
+  # REQ-012's five ambient loops, from `scripts/make_synth_beds.py`,
+  # named only by `lib/src/ambience/ambience.dart`. WAV rather than the AAC §5.4
+  # asks for, because a lossy codec cannot loop without a seam — see
+  # `docs/ambience.md`, which also holds the §5.4 budget these are sized to.
+  assets:
+    # The beds. Listed separately from the end sounds because Flutter's asset
+    # globbing is not recursive, and they are in a folder of their own because
+    # two of them would otherwise collide by name — the ocean bed and REQ-031's
+    # ocean wave are different sounds with the same first word.
+    - assets/audio/
+    - assets/audio/end/
+
+    # §9.2's four UI micro-sounds, from
+    # `scripts/make_synth_micro_sounds.py` and named only by
+    # `lib/src/feedback/micro_sounds.dart`. AAC and one copy each — none of
+    # them ever reaches a notification, so nothing forces them to be PCM the
+    # way the end sounds are, and all four together are 25 KB.
+    - assets/audio/micro/
+
+    # Ticket 23's art, and the manifest that names it. Directories are listed
+    # one by one because Flutter's asset globbing is not recursive.
+    #
+    # The paper-cut art (PRD v2.2 §9.1, ticket 35), painted by
+    # `tool/generate_sprite_art.dart`. See `docs/art-pipeline.md`.
+    - assets/art/manifest.json
+    - assets/art/plants/
+    - assets/art/decor/
+
+  # Nunito is bundled rather than fetched at runtime, and used on both
+  # platforms. PRD §5.1 asks for SF Pro Rounded, which exists only on iOS;
+  # shipping one rounded family keeps the two platforms at visual parity and
+  # keeps the app working offline. See lib/src/design/typography.dart.
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Nunito-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-Bold.ttf
+          weight: 700
+    # §5.1's handwritten face, for plant names only.
+    - family: Caveat
+      fonts:
+        - asset: assets/fonts/Caveat-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Caveat-SemiBold.ttf
+          weight: 600

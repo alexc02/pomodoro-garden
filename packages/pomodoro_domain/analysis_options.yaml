@@ -1,0 +1,28 @@
+# The domain core is pure Dart, so it lints against `package:lints` rather than
+# `flutter_lints` — a Flutter lint set here would imply a Flutter dependency
+# this package must not have.
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    # This is the lint that catches a Flutter import here. Because the app and
+    # the domain share one workspace resolution, `package:flutter` physically
+    # resolves from this directory even though this package does not declare
+    # it — so the import is not an unresolved URI, it is an undeclared
+    # dependency. Promoted to an error so it fails the same way with or without
+    # `--fatal-infos`. `test/domain_has_no_flutter_imports_test.dart` covers
+    # the same ground with a message that explains itself.
+    depend_on_referenced_packages: error
+
+linter:
+  rules:
+    - always_declare_return_types
+    - depend_on_referenced_packages
+    - avoid_dynamic_calls
+    - prefer_final_locals
+    - prefer_single_quotes
+    - unawaited_futures

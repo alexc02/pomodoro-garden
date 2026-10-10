@@ -1,0 +1,130 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:pomodoro_domain/pomodoro_domain.dart';
+import 'package:pomodoro_garden/src/feedback/micro_sounds.dart';
+import 'package:pomodoro_garden/src/features/garden/decor_picker.dart';
+import 'package:pomodoro_garden/src/features/garden/garden_timer_bar.dart';
+import 'package:pomodoro_garden/src/shell/tab.dart';
+
+import '../../support/announcement_fakes.dart';
+import '../../support/app_harness.dart';
+
+/// US-006's single tap from the garden, PRD v2.2 §5.2 (ticket 33).
+void main() {
+  AppTab showing(WidgetTester tester) => AppTab.values[
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex];
+
+  Future<void> startFromTheGarden(WidgetTester tester) async {
+    await tester.tap(find.byKey(GardenTimerBarKeys.start));
+    await settle(tester);
+  }
+
+  group('with nothing counting', () {
+    testWidgets('the garden the app opens on offers a session in one tap',
+        (tester) async {
+      await pumpApp(tester);
+
+      expect(showing(tester), AppTab.garden);
+      expect(find.text('25-minute session'), findsOneWidget);
+
+      await startFromTheGarden(tester);
+
+      // On the timer, where the seed drops, with the session running.
+      expect(showing(tester), AppTab.timer);
+      expect(find.text('Focusing'), findsOneWidget);
+    });
+
+    testWidgets('offers the length chosen in settings', (tester) async {
+      await pumpApp(
+        tester,
+        settings: GardenSettings.defaults
+            .withSessionLength(const Duration(minutes: 50)),
+      );
+
+      expect(find.text('50-minute session'), findsOneWidget);
+    });
+
+    testWidgets('the tap sounds like the timer\'s own START', (tester) async {
+      final sounds = FakeMicroSounds();
+      await pumpApp(tester, microSounds: sounds);
+
+      await startFromTheGarden(tester);
+
+      expect(sounds.countOf(MicroSound.buttonTap), 1);
+    });
+
+    testWidgets('is read out as what the button does', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pumpApp(tester);
+
+      expect(
+        find.bySemanticsLabel('Start a 25-minute session'),
+        findsOneWidget,
+      );
+      semantics.dispose();
+    });
+  });
+
+  group('with something counting', () {
+    testWidgets('a running session shows the time left, and leads back',
+        (tester) async {
+      final clock = FixedClock(testInstant);
+      await pumpApp(tester, clock: clock);
+
+      await startFromTheGarden(tester);
+      await advance(tester, clock, const Duration(minutes: 5));
+      await tapTab(tester, AppTab.garden);
+
+      expect(find.text('Focusing · 20:00 left'), findsOneWidget);
+      expect(find.byKey(GardenTimerBarKeys.start), findsNothing);
+
+      await tester.tap(find.byKey(GardenTimerBarKeys.bar));
+      await settle(tester);
+
+      expect(showing(tester), AppTab.timer);
+    });
+
+    testWidgets('a held session says so', (tester) async {
+      final clock = FixedClock(testInstant);
+      await pumpApp(tester, clock: clock);
+
+      await startFromTheGarden(tester);
+      await advance(tester, clock, const Duration(minutes: 5));
+      await tester.tap(find.text('Pause'));
+      await settle(tester);
+      await tapTab(tester, AppTab.garden);
+
+      expect(find.text('Paused · 20:00 left'), findsOneWidget);
+    });
+
+    testWidgets('a break shows the break', (tester) async {
+      final clock = FixedClock(testInstant);
+      await pumpApp(
+        tester,
+        clock: clock,
+        settings: GardenSettings.defaults.withAutoStartBreak(enabled: true),
+      );
+
+      await startFromTheGarden(tester);
+      await advance(tester, clock, const Duration(minutes: 25));
+      await settle(tester);
+      await tapTab(tester, AppTab.garden);
+
+      expect(find.text('On a break · 05:00 left'), findsOneWidget);
+    });
+  });
+
+  testWidgets('is gone while decor is being arranged', (tester) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.byKey(DecorKeys.arrange));
+    await settle(tester);
+
+    expect(find.byKey(GardenTimerBarKeys.bar), findsNothing);
+
+    await tester.tap(find.byKey(DecorKeys.arrange));
+    await settle(tester);
+
+    expect(find.byKey(GardenTimerBarKeys.bar), findsOneWidget);
+  });
+}

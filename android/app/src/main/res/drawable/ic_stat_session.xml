@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The status-bar icon for the live session notification: a sprout.
+
+  A silhouette, and it has to be. Android draws a small icon as a mask — every
+  non-transparent pixel is painted the system's tint — so anything with colour
+  or shading in it arrives as a white blob. That is why this is a vector path
+  in one opaque colour rather than the launcher icon.
+
+  Placeholder art, in the spirit of the placeholder plant sprites: a stem with
+  two leaves, on the same 24dp grid the Material icons use. Ticket 23's art
+  swap should replace it alongside them.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFFFF">
+    <!-- The stem, from the soil line up to the tip. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11.25,21 L11.25,11.5 L12.75,11.5 L12.75,21 Z" />
+    <!-- The left leaf. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11.5,12.5 C11.5,12.5 4,12 4,7 C4,7 11.5,7 11.5,12.5 Z" />
+    <!-- The right leaf, a little higher, so the pair does not read as a bow. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12.5,11 C12.5,11 12.5,4 19,4 C19,4 19,11 12.5,11 Z" />
+</vector>

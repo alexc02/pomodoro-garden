@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<!-- Ticket 08 (REQ-010). Without this the app may not start a Live
+	     Activity at all, whatever the widget extension declares. -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<!-- Frequent updates are deliberately NOT asked for. This app pushes about
+	     six updates in a twenty-five-minute session — the start, each growth
+	     stage, and a hold or a resume — because the countdown itself is drawn
+	     by the system from an absolute end instant. `NSSupportsLiveActivities
+	     FrequentUpdates` is for apps that push every few seconds, and asking
+	     for a budget this does not need would be asking the user to spend
+	     battery on nothing. -->
+	<!-- What a tap on the surface opens. Never typed by anyone and never
+	     leaves the device; it exists so the app can tell "the user came back
+	     from their session" apart from an ordinary launch. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.pomodorogarden.pomodoroGarden.session</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>pomodorogarden</string>
+			</array>
+		</dict>
+	</array>
+	<!-- Ticket 10 (REQ-012). Without this, iOS suspends the app on the way to
+	     the lock screen and the ambient bed stops with it — the `playback`
+	     audio category `AppAudioSession` asks for is necessary and on its own
+	     not sufficient. Declared for `audio` only: this app plays, it does not
+	     record, fetch or navigate, and every extra background mode here is
+	     something App Review asks about.
+
+	     It costs nothing when no bed is playing. The mode is what the app is
+	     *allowed* to do in the background, not something it does — a session on
+	     Silence opens no audio session at all, so nothing keeps the process
+	     alive and the app suspends exactly as it did before this ticket. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+	<!-- Ticket 21 (REQ-035). **This string is the difference between the export
+	     working and the app being killed.**
+
+	     The app never calls Photos and links nothing from it: the export goes
+	     into a `UIActivityViewController`, and *Save Image* is one of the rows
+	     the system puts in it. But that row writes to the photo library on the
+	     app's behalf, so the app is the one that has to have declared why — and
+	     UIKit terminates a process that reaches an add-to-library prompt with
+	     no description to show. Nothing warns about this at build time and
+	     nothing shows it in a simulator run that never taps Save Image, which
+	     is exactly why it is written out here with a reason.
+
+	     *Add* rather than the full `NSPhotoLibraryUsageDescription`: this app
+	     only ever writes one picture and has no business reading anybody's
+	     photos, and the two keys are different prompts with different scopes. -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Saves a picture of your garden to your photos when you choose Save Image.</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Pomodoro Garden</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Pomodoro Garden</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+</dict>
+</plist>

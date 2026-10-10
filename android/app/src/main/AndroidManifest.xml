@@ -1,0 +1,188 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Ticket 06. A session that ends while the app is not in front is
+         announced by a notification the system was asked to post at a chosen
+         instant — the app is not running to post it itself (REQ-005).
+
+         USE_EXACT_ALARM rather than SCHEDULE_EXACT_ALARM: from Android 14 the
+         latter is denied by default and can only be granted by sending the user
+         to a system settings screen, which would mean interrupting a focus app
+         to ask permission to be punctual. USE_EXACT_ALARM is granted on install
+         and is documented for exactly this case — an app whose core function is
+         a timer — at the cost of being subject to Play review. It applies from
+         Android 13; SCHEDULE_EXACT_ALARM covers 12 and below, where it is
+         granted on install too.
+
+         `LocalSessionNotifications` still falls back to an inexact alarm if the
+         platform says exact ones are not available, so a device or a policy
+         that refuses leaves the notification late rather than absent. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
+    <!-- So a session running across a reboot is still announced. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Ticket 08. Android has no Dynamic Island and no ActivityKit, so the
+         honest counterpart to iOS's Live Activity is a foreground service
+         posting an ongoing notification — which additionally buys the
+         background reliability iOS gets for free (REQ-011).
+
+         FOREGROUND_SERVICE_SPECIAL_USE rather than one of the named types, and
+         the choice is deliberate: from Android 14 every foreground service must
+         declare a type, and none of the named ones describes a focus timer.
+         `shortService` is capped at a few minutes against sessions that run to
+         two hours; `dataSync` and `mediaPlayback` would be lies. `specialUse`
+         is the documented answer for a service the taxonomy does not cover, at
+         the cost of a justification in the Play Console — see the
+         PROPERTY_SPECIAL_USE_FGS_SUBTYPE property on the service below, which
+         is where that justification is declared to the platform. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <!-- Ticket 11 (REQ-014). What lets the app own a Do Not Disturb rule and
+         switch it on for the length of a focus session.
+
+         Declared here and granted nowhere near here: this is one of the few
+         permissions with no runtime dialog at all. The only way to hold it is
+         for the user to find this app in Settings → Do Not Disturb access and
+         turn it on, which is why `QuietModeRule.openAccessSettings` exists and
+         why the app explains where it is sending them before it does. Until
+         then `isNotificationPolicyAccessGranted()` is false, every call is a
+         no-op, and the settings switch shows off rather than claiming a silence
+         it cannot deliver. -->
+    <uses-permission
+        android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
+    <!-- There is no BILLING permission here, and its absence is deliberate: the
+         app is free, asks the user for no money and carries no purchase
+         dependency, so nothing in this build has anything to say to Play's
+         billing service. An earlier draft declared it, and would have gone on
+         getting it from the Play Billing Library's own AAR even unwritten —
+         which is why removing that dependency, rather than this line, is what
+         actually takes the permission off the app. See `docs/adr/0021-…`. -->
+
+    <application
+        android:label="Pomodoro Garden"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <!-- REQ-011's live session surface. Not exported: nothing outside this
+             app has any business starting or stopping it, and the only thing
+             that ever does is `LiveSessionSurfacePlugin` on the other side of
+             the one Dart port.
+
+             `stopWithTask` is false so that the service — and the session it is
+             showing — survives the task being swiped out of Recents, which is
+             not the same gesture as force-quitting the app. A force-quit sends
+             `detached`, and `LiveSurfaceKeeper` takes the surface down on it. -->
+        <service
+            android:name=".LiveSessionService"
+            android:exported="false"
+            android:stopWithTask="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="A focus timer the user started, counting down in
+                    an ongoing notification for the length of the session they
+                    chose. It keeps no wake lock and does no work while it
+                    runs: the countdown is rendered by the system from an
+                    absolute end instant. Android offers no foreground service
+                    type for a user-visible timer." />
+        </service>
+
+        <!-- REQ-014's deadline on quiet mode. Woken by an alarm set when a
+             session starts, and the only thing that can take the silence off a
+             phone whose app was killed mid-session — see QuietModeReceiver.kt.
+
+             Not exported: the alarm this answers is one this app set, and
+             nothing outside it has any business ending a user's Do Not
+             Disturb. -->
+        <receiver
+            android:name=".QuietModeReceiver"
+            android:exported="false" />
+
+        <!-- What actually posts a scheduled notification when its moment comes,
+             with the app not running. Declared by the app rather than by the
+             plugin since the plugin's version 16. -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false" />
+        <!-- And what puts the schedule back after a reboot. A session cannot
+             outlive a reboot — the process is gone and the row is voided or
+             restored on the next launch — but the alarm can, and an alarm with
+             no session behind it would announce a plant that never grew. The
+             plugin reschedules only what is still in the future, and
+             `SessionAnnouncer` cancels on the next launch either way. -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- REQ-035's export, on its way to another app.
+
+             Android has not let a `file://` URI cross an app boundary since
+             Nougat, so the exported PNG is handed to the chooser as a
+             `content://` URI this provider vends. What it exposes is one
+             directory inside this app's own cache and nothing else — see
+             `res/xml/garden_share_paths.xml`.
+
+             Not exported and not granting anything by default: the read is
+             granted per-intent, to the one app the user picked, for as long as
+             the chooser lives. `authorities` must match
+             `GardenSharePlugin.authorityFor`. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.gardenshare"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/garden_share_paths" />
+        </provider>
+
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
+</manifest>

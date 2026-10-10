@@ -1,0 +1,513 @@
+# Pomodoro Garden
+
+A focus timer that grows a garden. Finish a session, get a plant; the garden is
+the record of the work.
+
+Flutter, one codebase, iOS and Android at parity. See `PRD.md` for the product
+and `.scratch/pomodoro-garden/issues/` for the ticket breakdown.
+
+## Check
+
+One command runs everything CI runs — analysis and both test suites:
+
+```sh
+./scripts/check.sh
+```
+
+It is the whole gate: `flutter analyze --fatal-infos` across the workspace, then
+`flutter test` for the app, then `dart test` for the domain core. `--fatal-infos`
+is deliberate — the lints in `analysis_options.yaml` report at info level, so
+without it "analysis passes" would mean only "nothing is badly broken".
+
+To run pieces of it:
+
+```sh
+flutter test test/design/typography_test.dart   # one file
+cd packages/pomodoro_domain && dart test        # domain core only
+```
+
+## Generated assets
+
+The audio is placeholder, synthesised rather than recorded, the same way the
+plant sprites are drawn rather than painted. All three scripts are deterministic,
+so a regenerated file that differs is a change to the synthesis.
+
+```sh
+# REQ-031's five end-of-session sounds, in both the copies each of them ships
+# in: a PCM Flutter asset and an AAC Android raw resource. Needs ffmpeg for the
+# second — see docs/ambience.md for why the two are different formats.
+python3 scripts/make_synth_end_sounds.py
+
+# §9.2's four UI micro-sounds: soil settle, growth shimmer, button tap, unlock.
+# AAC and one copy each — these never reach a notification, so nothing forces
+# them to be PCM. Also needs ffmpeg.
+python3 scripts/make_synth_micro_sounds.py
+
+# REQ-012's five ambient loops. Seamless by construction, and PCM on purpose —
+# see docs/ambience.md.
+python3 scripts/make_synth_beds.py
+```
+
+## Generated code
+
+Drift generates `lib/src/data/database.g.dart` from the table definitions in
+`database.dart`. It is checked in, so `check.sh` does not need to run codegen —
+but after changing a table or adding one, regenerate it:
+
+```sh
+dart run build_runner build
+```
+
+## Run
+
+```sh
+flutter run
+```
+
+Requires an iOS simulator (Xcode, macOS only) or an Android emulator. Platform
+minimums are iOS 17.0 and Android API 26 — see `docs/platforms.md`.
+
+## Onboarding, and how to see it again
+
+A first launch opens on REQ-003's three steps — welcome, session length, start — laid over
+the app rather than in front of it, and the third one starts the user's first session.
+Three coach marks follow, over the running session. Every step has a **Skip**, and
+skipping leaves the whole of onboarding including the coach marks.
+
+It is shown once per install: the flow writes `onboardingCompleted` to the settings row on
+the way out, whether it was finished or skipped.
+
+**To see it again**, in a debug build: **Settings → Onboarding (debug) → Show onboarding
+again**. It puts the flow back on screen and writes the flag, so relaunching lands on the
+welcome too — the same thing a fresh install does. The section is compiled out of release
+builds. Deleting the app works as well and is the only way to check a truly first launch,
+database and all.
+
+`docs/adr/0013-onboarding-is-a-layer-over-the-running-app.md` has the reasoning, including
+what the under-a-minute test does and does not prove.
+
+## Analytics, and where to look at them
+
+PRD §7.1's events are recorded — every one of them whose feature exists — and PRD §7.2's
+promise is that they stay here. There is no SDK, no network call and no account: an event
+is a row in the same SQLite file the sessions are in, written through one typed port, and
+the table is capped at 500 rows with the oldest dropped as new ones arrive.
+
+**To look at them**, in a debug build: **Settings → Event log (debug) → Show the event
+log**. Newest first, with every parameter each event carried and the instant it was
+recorded. The section is compiled out of release builds.
+
+Recording is fire-and-forget by contract — it returns before anything touches a disk and
+it never throws — so no user action ever waits on the log or can be failed by one. Adding
+an event is a class in `packages/pomodoro_domain/lib/src/analytics/analytics_event.dart`
+and a call site; `test/analytics/nothing_leaves_the_device_test.dart` is what keeps the
+privacy promise from quietly expiring.
+
+## The app is free, and there is nothing to buy
+
+REQ-038 used to sell a $4.99 one-time unlock. It does not: **every feature in this
+app is available to every user**, there is no paywall, no entitlement and no
+purchase code — `in_app_purchase` is not a dependency and the Play `BILLING`
+permission is not declared.
+
+What that removed, and what it deliberately did not, is
+`docs/adr/0021-the-app-is-free-and-sells-nothing.md`. The short version: the
+themes, the decor, all six ambient beds and the unmarked export are simply part
+of the app now, and the machinery behind the paywall was **deleted rather than
+switched on** — an `isPremiumProvider` hard-wired to `true` would have left a
+gate in front of every one of those features with no false case left to read.
+
+Two things it left standing that look like leftovers and are not:
+
+- **The migration step that creates `entitlements`.** Schema version 15 creates
+  the table and version 18 drops it, so an old enough database walks through
+  both. A step describes the version it introduces and cannot be edited to
+  describe a later one; deleting it would break every step after it.
+- **The decor, the themes and the arranging mode.** The paywall went; the
+  features it gated did not.
+
+## Garden themes, and how they compose with the seasons
+
+REQ-034's three biomes — Zen Garden, Tropical Greenhouse and Wildflower Meadow —
+reskin the garden's background, soil tiles and decor. Each one still turns with
+REQ-019's seasons, so what is actually drawn is a **skin**: one
+theme in one season, and there are twelve of them written out as a table in
+`lib/src/design/theme_palette.dart`. `docs/adr/0016-…` says why a table rather
+than a transform, and why `decor` sits outside it.
+
+Everything downstream of `SeasonalGarden` is unchanged from ticket 14: one
+`ThemeExtension` substituted over the garden's subtree, so no painter,
+projection, layout or sprite knows that either a theme or a season exists. A
+theme change and a season change are the same event to it — the skin being
+arrived at has changed — and both crossfade over three seconds on one clock.
+
+**What the user picked is what the garden is drawn in.** `gardenThemeProvider`
+reads the stored choice and nothing stands between the two — an earlier draft
+filtered it through an entitlement and fell back to Zen for a device that had
+bought nothing, and that filter went with the paywall.
+
+## Decor, and what it may never cost
+
+REQ-040 lets the user stand four objects — a stone lantern, a bench, a birdbath,
+a pond — in the empty plots of their garden and rearrange them. Three things are
+worth knowing before touching it.
+
+**A plot holds a plant or an object, never both**, so the two are drawn, sorted
+and hit-tested in one pass over one ordered list. Anything that walked the
+furniture separately would put every object in front of every plant or behind
+every plant; the atlas bakes both into one texture for the same reason.
+
+**A plant is never turned away for furniture.** `GardenPlots.sow` steps over an
+object rather than pushing it aside, and only in a garden whose two hundred plots
+all hold something does an object give way — the outermost one, and it is removed
+rather than kept. `docs/adr/0017-…` has the whole rule and why an object is
+deleted where a plant would be kept.
+
+**Nothing asks who owns anything.** `decorProvider` and `GardenLayout` read the
+arrangement out of the table and draw it; the arranging control is on the
+garden's app bar for every user, on the first frame. The entitlement checks that
+used to sit on `DecorArranger.begin`, `place`, `move` and `remove` are gone with
+the thing they consulted.
+
+## Layout
+
+```
+lib/
+  main.dart                  ProviderScope + the app
+  src/
+    app.dart                 MaterialApp: themes, then the shell
+    design/                  the §5.1 design tokens
+      palette.dart             raw colour literals — the only place hexes live
+      typography.dart          the type ramp, incl. tabular timer digits
+      spacing.dart             spacing and corner-radius scales
+      garden_colors.dart       soil/sky/bloom/foliage, as a ThemeExtension
+      season_palette.dart      one season's colours, in one theme
+      theme_palette.dart       REQ-034's twelve: three biomes × four seasons
+      garden_skin.dart         the pair the garden is painted from
+      theme.dart               light and dark ThemeData
+    shell/                   the four-tab shell
+    features/                one directory per tab
+      timer/                   the focus timer: ring, countdown, START
+        ambience_picker.dart     REQ-012's six beds, on the session's own screen
+      garden/                  the garden tab: the camera and the gestures
+        garden_screen.dart       the tab — mostly garden, and a word when needed
+        garden_view.dart         pan, zoom, tap, §5.3's entry, and the atlas's life
+        seasonal_garden.dart     REQ-019 + REQ-034: the skin, and the three seconds it turns over
+        theme_picker.dart        REQ-034's three biomes, every one of them applicable
+        decor_picker.dart        REQ-040: the picker, the arranging bar, one object drawn small
+        export_garden.dart       REQ-035's two doors: the app bar, and a row in settings
+        plant_card.dart          REQ-020: what one plant says about itself
+        milestone_card.dart      REQ-021: what the app says when one is reached
+      onboarding/              REQ-003's first run, over the app rather than before it
+        onboarding_overlay.dart  the layer: three steps, then three coach marks
+        onboarding_steps.dart    welcome, session length, start — and Skip on each
+        garden_preview.dart      the flourishing garden a first-run user has not grown
+        coach_marks.dart         US-003's three, anchored to the real widgets
+      journal/                 the botanical journal: REQ-025 to REQ-029
+        journal_screen.dart      the tab: three cards on a paper page
+        journal_heatmap.dart     REQ-027: a month of days, shaded by what grew
+        journal_paper.dart       the page itself — a wash and a scatter of fibres
+      settings/                the settings screen: presets and the sliders
+        end_sound_picker.dart    REQ-031's six sounds, each one played when it is picked
+        reset_garden.dart        REQ-036's two confirmations, and nothing between them
+        event_log_screen.dart    §7.2's debug-only viewer: the events, newest first
+    audio/                   the app's one audio session, and what it is for
+      app_audio_session.dart   two uses, one configuration — see ADR 0009
+    ambience/                REQ-012's bed under a focus session
+      ambience.dart            the port, and the only place a loop is named
+      bundled_ambience.dart    two just_audio players, crossfaded
+      audio_interruptions.dart what a call or a yanked cable does to the bed
+      ambience_keeper.dart     keeps the bed in step with the session
+    feedback/                the chime and the haptics: ports, then platform
+      end_sound_player.dart    the port, and the only place the files are named
+      bundled_end_sound_player.dart  just_audio, on the shared session
+      micro_sounds.dart        §9.2's four, and the four moments they answer to
+      bundled_micro_sounds.dart      a player per sound, made when first asked for
+      haptics.dart             REQ-037's two taps
+    notifications/           the scheduled completion notice
+      session_notifications.dart      the port, and the copy
+      local_session_notifications.dart  flutter_local_notifications
+    garden/                  the plant: sprites, the registry, the widget
+      plant_sprite.dart        PlantSprite + PlantSpriteRegistry — the seam
+      placeholder_plant_sprites.dart  thirty plants drawn from shapes
+      plant_painter.dart       one plant in a pose, on its soil
+      plant_palettes.dart      a species' colours, from the theme's own
+      growing_plant.dart       the §5.3 animations, driven by a session
+      decor_sprite.dart        DecorSprite + DecorSpriteRegistry — the same seam
+      placeholder_decor_sprites.dart  four objects drawn from shapes
+      garden_atlas.dart        every sprite — plants and decor — in one texture
+      garden_projection.dart   plot ↔ screen, both ways, and the pan bounds
+      garden_painter.dart      the whole garden as one drawAtlas batch
+      garden_hit_test.dart     a tap ↦ the plant, object or plot under it
+      plant_providers.dart     the registry, and the garden's plants
+      decor_providers.dart     REQ-040: the arrangement, and what is in hand
+      garden_providers.dart    the garden's layout: plots, and what is in them
+      season_providers.dart    REQ-019: which season it is, and when it turns
+      season_weather.dart      the blossom, the leaves and the snow
+      garden_transition.dart   the garden partway between two skins
+      theme_providers.dart     the theme chosen, the theme allowed, and the skin
+      milestone_providers.dart REQ-021's awarding: the catch-up and the queue
+      milestone_keeper.dart    when an award may be celebrated, and how long it waits
+      garden_reset_providers.dart  REQ-036: when a reset may run, and what it republishes
+    onboarding/              where the user is in REQ-003's first run
+      onboarding.dart          the steps, the coach marks, and the progress
+      onboarding_providers.dart  the controller: the flow, and the reset
+    journal/                 the journal's figures, and the day it is read on
+      journal_providers.dart   todayProvider (turns at midnight) and journalProvider
+    analytics/               §7.1's events, on this device and nowhere else
+      local_analytics.dart     the port's only implementation: write, and let go
+      analytics_providers.dart the seam a real sink would arrive at
+      app_open_keeper.dart     records app_opened, once per launch
+    data/                    SQLite — the Drift schema and the repositories
+      drift_journal_repository.dart  the journal's figures, counted by SQLite
+      drift_analytics_event_log.dart the event table, pruned as it is written
+      drift_garden_reset.dart        REQ-036: four tables emptied, or none of them
+    session/                 the providers that drive the session machine
+      session_gate.dart        holds the app back until the in-flight session is read
+      session_lifecycle.dart   backgrounding vs. force-quitting — REQ-013
+      session_announcer.dart   how a session says it ended — REQ-031, REQ-037
+    settings/                settingsProvider, its controller, and the gate
+    time/                    clockProvider — the domain's Clock, injected
+test/
+  support/app_harness.dart   pumpApp / tapTab / advance — every widget test
+packages/
+  pomodoro_domain/           pure Dart. No Flutter. See its README.
+```
+
+Vocabulary lives in `CONTEXT.md`, and the decisions behind the shape of the
+code in `docs/adr/`. Both are worth reading before adding to the session
+lifecycle.
+
+## Decisions this scaffold fixes
+
+Everything downstream inherits these.
+
+**Riverpod for state and DI.** Dependencies reach widgets as providers, and a
+test replaces one with `overrideWithValue`. `clockProvider` exists at this
+ticket purely to prove that path works end to end — container-level and through
+a real screen — before ticket 02's state machine depends on it.
+
+**A pure-Dart domain core.** `packages/pomodoro_domain` holds the timer state
+machine, growth model, placement and milestone rules, and imports no Flutter.
+That is what makes them testable with an injected clock and no widget binding.
+Enforced by an analyzer error *and* a test; both verified to fail on a real
+violation. See the package README.
+
+**Design tokens, not literals.** Colours, type, spacing and radii live in
+`lib/src/design/`. No later ticket should write a hex code or a font size. The
+timer numerals are tabular by contract — a countdown must not shift width as
+its digits change — and that is measured in `test/design/typography_test.dart`
+against the real bundled font, not the test stand-in.
+
+**Fonts bundled, not fetched.** PRD §5.1 asks for SF Pro Rounded, which exists
+only on iOS; the app ships **Nunito** and uses it on both platforms, so they
+stay visually identical and first launch works offline. §5.1's handwritten face
+for plant names is **Caveat**, exposed as one token — `botanicalLabel` — and
+used for plant names only.
+
+**Tabs keep their state.** The shell is an `IndexedStack`, so every tab's
+subtree stays alive. A session runs on the timer tab while the user wanders to
+the garden and back.
+
+**Time is anchored, never counted.** A session stores the instant it began and
+derives everything from `now - anchor`. The one-second timer in
+`SessionController` exists to repaint, and nothing else — dropping its ticks
+costs a stale frame, not a wrong session. See
+`docs/adr/0001-elapsed-time-is-derived-from-a-wall-clock-anchor.md`.
+
+**Sessions are written when they start.** `sessions` therefore holds rows that
+never completed, and anything counting sessions filters on `completed`. See
+`docs/adr/0002-sessions-are-recorded-when-they-start.md`.
+
+**A session outlives the app unless the user quit it.** An unfinished row found
+at launch is restored and carries on from where the wall clock says it is; a
+force-quit closes the row as voided before the process goes, so there is nothing
+left to restore. The distinction is recorded when it happens — `detached` — not
+inferred afterwards, because nothing measurable at launch can tell a force-quit
+from the system reclaiming memory. See
+`docs/adr/0005-a-session-outlives-the-app-unless-the-user-quit-it.md`, which is
+also where the iOS caveat lives.
+
+**A session ends with an outcome, not a flag.** `completed`, `cancelled` and
+`voided`, with null meaning still in flight — and "in flight" is `outcome IS
+NULL`, never `endedAt IS NULL`. Cancelled and voided earn the same nothing and
+are still told apart, because the user's intent differs.
+
+**Pausing holds the countdown and not the plant.** Elapsed time is the gap to
+the anchor *less* the time spent paused, so it is still a subtraction of two
+clock readings and never a counter — and while a pause is open it does not read
+the clock at all, which is what makes a device clock corrected mid-pause unable
+to move the countdown. The plant meanwhile keeps growing at half rate (REQ-009),
+which is why `SessionSnapshot` carries both `progress` and `growthProgress`.
+
+**Settings are one value, read through one accessor.** Everything the user has
+chosen lives in a single `GardenSettings`, and every consumer reads it as
+`ref.watch(settingsProvider).sessionLength` rather than looking a key up. A
+ticket adding a setting adds a field to `GardenSettings`, a column and two lines
+of mapping in `DriftSettingsRepository`, and a row on the settings screen — and
+touches no existing call site. The accessor is synchronous because
+`SettingsGate` reads the stored settings before the shell is built; see
+`docs/adr/0004-settings-are-read-once-before-the-app-opens.md`.
+
+**Plant art is reached through a registry, never named by a screen.** Every
+plant on screen comes from `PlantSpriteRegistry.spriteFor(type:, stage:)` —
+thirty sprites, six types by five stages. Until ticket 23 delivers the
+watercolour illustrations those sprites are circles and lines; that ticket
+supplies a different registry and changes no growth, timer or layout logic. A
+sprite paints itself *and* says how much of its box it fills — `footprintIn`,
+which ticket 12's hit-test decides on — so a real drawing arrives with the
+tight bounds of its own ink. The
+rule is enforced by `test/garden/sprites_are_the_only_art_test.dart`, which
+fails on any view code that names an image, and which was verified to go red on
+a real violation.
+
+**A plant is decided by its session, not rolled for.** The type comes from the
+planned duration and the species from a hash of the session's id, so the plant
+the user watched grow for ninety minutes is the plant that gets written down —
+no state is carried between the two, and nothing can re-roll it. The hash is
+written out in `stable_choice.dart` rather than taken from `hashCode`, because
+the same session has to choose the same species on both platforms and in every
+future version of Dart.
+
+**Growth is a function, not a position.** `GrowthStage.forProgress` answers from
+progress alone, the same way elapsed time is answered from the anchor. Nothing
+advances a stage and nothing fires at a threshold, so a plant looks right
+whether the app watched the whole session or has just been reopened.
+
+**A mature plant never stops moving, so `pumpAndSettle` cannot be used on one.**
+REQ-023's ambient sway is a continuous loop by design. Tests that reach a
+completed session use `settle(tester)` from the harness, which pumps a bounded
+number of frames instead.
+
+**Three gates open the app, not one.** `ArtGate`, then `SettingsGate`, then
+`SessionGate`, all showing the same `OpeningFrame` so three reads look like one
+wait. Below them `settingsProvider` and `sessionControllerProvider` are plain
+synchronous values and no screen carries a loading branch — in particular, no
+user who is eleven minutes into a session ever sees a frame that says **Ready to
+focus**.
+
+**A completion is announced once, by whichever of the two can be heard.** In
+front of the user that is the wind chime and a haptic, played at the instant the
+session ends; away from them it is a notification the operating system was
+handed when the app left the foreground, because nothing of this app is running
+to play anything and REQ-005 forbids depending on anything that would be. The
+notification exists *only* while the app is away — scheduled on the way out,
+cancelled on the way back in — so there is never a moment when both could sound
+and never one when neither could. The corollary is the behaviour that looks like
+a bug: a session that finished while the app was away is not chimed at when the
+user opens it, because they were told when it happened. See
+`session_announcer.dart`.
+
+A break is announced by the same rule and through the same two channels, and it
+is the case the rule was worth having for: a break is the one countdown the user
+is *meant* to be away from. A break they skipped says nothing, because they
+already know.
+
+**The cycle advances when the app is awake to advance it.** REQ-032's auto-start
+anchors the break — or the next session — to the instant the ending is noticed,
+never to the instant that earned it. Replaying a cycle that "ran" during an hour
+in a pocket would mean replaying a *focus session* nobody sat through, and
+dropping a plant in the garden for it. What survives backgrounding is the user's
+position in the cycle, not legs of it that ran with no one there. Both switches
+default to off, and auto-start reacts to something *ending* rather than to the
+phase the timer is sitting in — so turning the switch on while looking at a
+completed session does not start a break the user never accepted. See
+`docs/adr/0008-the-cycle-advances-when-the-app-is-awake-to-advance-it.md`.
+
+The design's corollary is that a backgrounded session should cost approximately
+no battery — one alarm, no background execution, no polling. That is a
+falsifiable claim and it has not been measured, because it needs a device to
+drain; `docs/battery-baseline.md` holds the method and the empty table, and
+ticket 24 inherits both.
+
+**There is one audio session, and the silent switch wins unless the user asked
+for a bed.** iOS has one `AVAudioSession` per process and Android one audio
+focus request per app, so the chime and REQ-012's ambient bed are not two
+configurations — they are one, and whichever feature set it last would win.
+`AppAudioSession` owns it and the two players ask for a *use*: `ambient` and
+mixing when nothing but the chime plays, `playback` and full focus while a bed
+does. A bed also needs `UIBackgroundModes: audio`, because the category alone
+does not stop iOS suspending the app at the lock screen. See
+`docs/adr/0009-one-audio-session-with-two-uses.md`.
+
+**The loops are WAV because the seam is a property of the format.** Every lossy
+codec pads what it encodes, so an AAC loop joins itself with tens of
+milliseconds of silence — ten times §4.4's budget — unless the encoder and the
+player agree on gapless metadata, which AVPlayer and ExoPlayer do not. PCM has
+nothing to pad. The real recordings have to arrive lossless for the same reason,
+and the join is measured against the files rather than trusted: see
+`docs/ambience.md` and `test/ambience/bundled_audio_test.dart`.
+
+**The garden is two hundred quads, not two hundred widgets.** Every plot and
+every plant on it is one entry in a single `Canvas.drawAtlas` batch, cut from
+one texture baked out of the sprite registry — so ticket 23's art swap still
+works, and the per-frame cost does not grow with the garden. Depth ordering and
+hit-testing are arithmetic in isometric space (`garden_projection.dart`), not
+delegated to the widget tree, because nothing in the widget tree can be
+*inverted*: turning a tap back into a plot is the half ticket 12 needs and the
+half this ticket unit-tests on its own. The measured numbers, and the method for
+the device readings this ticket could not take, are in
+`docs/garden-performance-baseline.md`.
+
+**A tap finds the plant the user can see, not the plot under their finger.** The two
+differ because a plant stands *on* its plot and grows upwards: a large tree is drawn over
+the two plots behind it, so a tap on its canopy lands on somebody else's soil.
+`garden_hit_test.dart` walks the garden front to back and takes the first plant whose
+picture covers the point, falling back to the plot underneath when the tap was on bare
+ground — which is also how "tapping empty soil does nothing" and "tapping a locked plot
+does nothing" come out as the same line of code. Testing the box instead would hand a
+wildflower every tap meant for the tree standing behind it.
+
+How much of its square a plant's picture fills is the sprite's own answer
+(`PlantSprite.footprintIn`), because only the picture knows — ticket 23's real art answers
+with the tight bounds of its own ink. It is asked of the **atlas** rather than of the
+registry, though: `PlantAtlas.bake` is the one place that decides which sprite goes in a
+plant's cell, and a hit-test that picked its own would be a second copy of that decision,
+wrong the first time a garden holds a plant that is not mature. The atlas bakes each
+cell's footprint beside its picture and hands out both.
+
+**Unlocked plots are a floor, not a ceiling.** REQ-018 unlocks four plots per
+ten completed sessions and a session earns one plant, so from the twenty-first
+session a user has more plants than unlocked plots. The unlock schedule is
+therefore how much *empty soil* the garden shows, and the garden is never
+smaller than what is planted in it. Past two hundred, a plant is recorded
+without a plot and counted rather than dropped. See
+`docs/adr/0006-the-garden-has-a-plot-for-every-plant-it-can-hold.md`.
+
+**The season is derived and never stored, and it reaches one theme extension.**
+REQ-019's garden reads the device's local date — three whole months a season,
+turning at midnight on the first of March, June, September and December — and
+the whole of what it changes is the `GardenColors` in the theme the garden tab
+is built under. Nothing writes a season down, no plant records the one it grew
+in, and there is no code path from the season to the code that decides what a
+session grows: a plant's type comes from its planned duration and its species
+from a hash of its session's id, and neither has a month in it. The hemisphere
+is guessed from the device's time zone rather than asked for or located, which
+gets Sydney right and falls back to the northern calendar in the many zones that
+keep no daylight saving to read. See
+`docs/adr/0011-the-season-is-derived-from-the-device-date.md`, which is also
+where the southern hemisphere's limits are written down.
+
+The corollary is a floor on how often the plant atlas may be rebaked. A season
+crossfades over three seconds and the soil colour moves every frame of it; a
+bake is an offscreen render of every sprite in the registry. `GardenView`
+therefore steps the texture through the change — see `rebakeInterval` — while
+the sky crossfades smoothly over it. In debug builds the settings screen has a
+**Season (debug)** section that forces any of the four, so none of this needs
+waiting for March.
+
+**A plant's plot is chosen once and written down.** Not recomputed on the way
+out of the database, for the same reason its species is not: the garden has to
+look the same on every launch, and a rule change or a single deletion would
+otherwise re-lay a garden the user has been keeping for a year.
+
+**The schema migrates one version at a time.** `AppDatabase.migration` walks
+from the version on disk to the current one, a step per version, and throws on a
+version it has no step out of. Bumping `schemaVersion` means adding that step
+and a case to `test/data/database_migration_test.dart`, which upgrades a
+database built by raw SQL at the old version — the only way to prove an
+installed app's rows survive. A step that creates a table writes the SQL out
+rather than calling `Migrator.createTable`, which builds the table as it is
+defined *today*: the step that first created `settings` was quietly creating a
+version-5 table, and the step that adds version 5's column to it then failed on
+a duplicate.
