@@ -93,8 +93,8 @@ The gap review (`../prd-gap-report.md`, 2026-10-10) checked every PRD requiremen
 | 34 | The break runs while the phone is locked (REQ-032), with an ADR amending 0008. **Done** | 33 |
 | 35 | The full art set, scenery restyle, icon and feature graphic. **Done:** approved by the owner | 28 |
 | 36 | The willow glows and the golden garden shimmers (REQ-021). **Done** | 35 |
-| 37 | The final audio. **Built; waiting on the owner's listening pass** | 29 |
+| 37 | The final audio. **Done:** approved by the owner | 29 |
 | 38 | Store-compliance drafts in `docs/store/`. **Done** | 37 |
 | 39 | Hand-off: iOS build, device checks and screenshots. **Owner's ticket** | 30–38 |
 
-On the frontier now: **37** (the owner listening) and **39** (the owner's).
+On the frontier now: **39**, the owner's: the iOS build, device checks, screenshots and the store checklist.

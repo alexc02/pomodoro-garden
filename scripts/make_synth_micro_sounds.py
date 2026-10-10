@@ -53,57 +53,79 @@ SAMPLE_RATE = 44_100
 AAC_BITRATE = '64k'
 
 
+def _biquad(samples: list[float], kind: str, freq: float, q: float = 0.707) -> list[float]:
+    """An RBJ biquad over [samples]: 'lp', 'hp' or 'bp' (constant peak gain)."""
+    w = 2 * math.pi * freq / SAMPLE_RATE
+    cw, sw = math.cos(w), math.sin(w)
+    alpha = sw / (2 * q)
+    if kind == 'lp':
+        b0, b1, b2 = (1 - cw) / 2, 1 - cw, (1 - cw) / 2
+    elif kind == 'hp':
+        b0, b1, b2 = (1 + cw) / 2, -(1 + cw), (1 + cw) / 2
+    else:
+        b0, b1, b2 = alpha, 0.0, -alpha
+    a0, a1, a2 = 1 + alpha, -2 * cw, 1 - alpha
+    b0, b1, b2, a1, a2 = b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0
+    x1 = x2 = y1 = y2 = 0.0
+    out = []
+    for x in samples:
+        y = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+        x2, x1, y2, y1 = x1, x, y1, y
+        out.append(y)
+    return out
+
+
 def soil_settle() -> tuple[list[float], float]:
-    """A seed landing: one soft thud, and the grains it throws up after it.
+    """A seed landing in soft earth: a muffled pat, a few crumbs falling back,
+    and the short warmth of a small space. Peaked at -11 dBFS.
 
-    The thud is a body — a sine dropping in pitch as it decays, which is what a
-    small object hitting packed earth does — and the grains are short bursts of
-    filtered noise scattered over the next third of a second, thinning out as
-    they fall back. Peaked at -11 dBFS.
-
-    **Pitched for a phone's speaker** (ticket 37, after the owner heard nothing):
-    the first version's thud sat at 140 Hz and the whole sound peaked at -16
-    dBFS, and a phone or laptop speaker reproduces almost nothing below 300 Hz.
-    The thud now starts at 260 Hz with an overtone an octave up, and the grains
-    are louder and brighter, so what a small speaker *can* play carries it.
+    **No pitch anywhere** — the owner's choice ("A · Soft pat") of three takes
+    in ticket 37. The two versions before it were built on a falling sine, which
+    reads as a cartoon *bloop*, and the first sat at 140 Hz, below what a phone
+    speaker plays. This one is band-passed noise centred on 420 Hz with a fast
+    attack and a 45 ms decay; the crumbs are duller noise around 1.1 kHz, each
+    quieter than the last; and four early reflections give it a body without an
+    echo. Pitchless, it cannot clash with whatever bed is playing under it.
     """
-    length = 0.5
-    count = int(SAMPLE_RATE * length)
-    samples = [0.0] * count
-    grit = random.Random(20260830)
+    grit = random.Random(1)
+    count = int(0.42 * SAMPLE_RATE)
 
-    # The thud. 260 Hz falling to about 180, with its octave, gone inside 120 ms.
-    for index in range(count):
-        since = index / SAMPLE_RATE
-        envelope = math.exp(-since / 0.055)
-        if envelope < 1e-4:
-            break
-        frequency = 260.0 * math.exp(-since * 3.0)
-        phase = 2 * math.pi * frequency * since
-        samples[index] += envelope * (math.sin(phase) + 0.35 * math.sin(2 * phase))
+    # The pat.
+    body = _biquad(
+        _biquad([grit.uniform(-1, 1) for _ in range(count)], 'bp', 420, 0.9),
+        'lp',
+        1_800,
+    )
+    samples = [
+        3.0 * x * min(1.0, (i / SAMPLE_RATE) / 0.003)
+        * math.exp(-(i / SAMPLE_RATE) / 0.045)
+        for i, x in enumerate(body)
+    ]
 
-    # The grains: eleven ticks of bandpassed noise, scattered and thinning.
-    for grain in range(11):
-        onset = 0.012 + grit.uniform(0.0, 0.30) ** 1.6 * 0.9
-        strength = 0.4 * (1.0 - onset / 0.32) if onset < 0.32 else 0.05
-        start = int(onset * SAMPLE_RATE)
-        span = int(0.018 * SAMPLE_RATE)
-        # A one-pole highpass over one-pole lowpassed noise: a band around
-        # 1.5 kHz, which is where a grain of soil lives.
-        low = 0.0
-        previous = 0.0
-        for index in range(span):
-            if start + index >= count:
-                break
-            through = index / span
-            envelope = math.exp(-through * 6.0) * (1 - math.exp(-through * 60))
-            raw = grit.uniform(-1.0, 1.0)
-            low += 0.55 * (raw - low)
-            banded = low - previous
-            previous = low
-            samples[start + index] += strength * envelope * banded * 4.0
+    # The crumbs: five, falling back after it, each quieter than the last.
+    for crumb in range(5):
+        at = int((0.06 + 0.05 * crumb + grit.uniform(0, 0.02)) * SAMPLE_RATE)
+        span = int(0.012 * SAMPLE_RATE)
+        grain = _biquad(
+            _biquad([grit.uniform(-1, 1) for _ in range(span)], 'bp', 1_100, 1.2),
+            'lp',
+            2_500,
+        )
+        strength = 0.55 * 0.7**crumb
+        for i in range(span):
+            if at + i < count:
+                samples[at + i] += (
+                    grain[i] * strength * math.exp(-i / (0.004 * SAMPLE_RATE))
+                )
 
-    return samples, -11.0
+    # A small space: four early reflections, and room for them to ring out.
+    roomed = samples + [0.0] * int(0.06 * SAMPLE_RATE)
+    for delay, gain in ((0.011, 0.22), (0.019, 0.15), (0.031, 0.09), (0.047, 0.05)):
+        offset = int(delay * SAMPLE_RATE)
+        for i, x in enumerate(samples):
+            roomed[i + offset] += x * gain
+
+    return roomed, -11.0
 
 
 def growth_shimmer() -> tuple[list[float], float]:

@@ -12,7 +12,7 @@
 
 **Blocked by:** 29.
 
-**Status:** the owner listened on 2026-10-11: **every sound good except soil settle and button tap, which made no sound.** Both redone (below); waiting on the owner's re-listen of those two. Listening page (private to the owner): https://claude.ai/code/artifact/ecec465a-a790-4e28-9bf9-e719373fbedc
+**Status:** done. The owner listened to every sound on 2026-10-11 and approved them, after two rounds on soil settle (below). Listening page (private to the owner): https://claude.ai/code/artifact/ecec465a-a790-4e28-9bf9-e719373fbedc
 
 - [x] The synthesis scripts in `scripts/` ~~upgraded from placeholder quality~~ **kept as they were and renamed as final**, still deterministic. *Not upgraded: the synthesis was already built to the seam, level and budget rules, and with no one here to listen there was no basis for changing it. The owner's listening pass is where any of them gets reworked*
 - [x] Recordings from ticket 29 processed: trimmed, loop points chosen at zero crossings with a short crossfade baked into the file, normalised to the same loudness as the synthesised beds
@@ -75,3 +75,16 @@ so this is a fix to the files, not to the page.
 **The listening page itself also failed at first:** it played through the Web Audio
 engine, which can stay silent inside the artifact viewer's sandbox and is muted by an
 iPhone's silent switch. It now uses standard audio players.
+
+## Soil settle, a third time
+
+The owner found the louder second version still "doesn't sound so good". Rather than guess
+again, three takes were offered side by side: **A · Soft pat** (pitchless band-passed noise
+with crumbs and a short room), **B · Puff of earth** (a breathy puff darkening as it fades)
+and **C · Wooden seed** (a soft muted pluck). **The owner chose A.**
+
+The probable fault in the first two was the pitched sine at their core, which reads as a
+cartoon *bloop*. A has no pitch, so it also cannot clash with the bed playing under it. It
+now lives in `scripts/make_synth_micro_sounds.py` (`soil_settle`, with an RBJ biquad
+helper); the shipped file decodes sample-for-sample identical to the take the owner heard,
+and the other three micro-sounds are unchanged. Peak −11 dB, −11.8 dB above 300 Hz.
