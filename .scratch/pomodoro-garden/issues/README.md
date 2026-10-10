@@ -54,7 +54,11 @@ Still open, and now recorded in PRD §12: **#3** live-surface tutorial · **#6**
 
 ## Version control
 
-**This is not a git repository, and nothing is to be committed.** `/implement` ends by instructing you to commit your work to the current branch — that step is overridden here. Do not run `git init`, `git add` or `git commit`. Leave changes in the working tree.
+**Since 2026-10-11 this is a git repository**, pushed to the private GitHub repo
+`alexc02/pomodoro-garden` (branch `main`) at the owner's request. Tickets 01–39 were worked
+without version control, and their issue files remain the record of what each did; from
+here on, work is committed. Build output, caches and the regenerated art previews are in
+`.gitignore`.
 
 ## Order
 
