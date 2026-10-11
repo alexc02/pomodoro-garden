@@ -16,7 +16,8 @@ and `.scratch/pomodoro-garden/issues/` for the ticket breakdown.
 | Python 3 and ffmpeg | only to regenerate sounds | — |
 
 Then `flutter pub get`. Everything the app needs at runtime — code, art, sounds, fonts,
-the Drift-generated database code — is in the repository.
+the Drift-generated database code — is in the repository. Full per-platform requirements
+and steps are in **Building the apps** below.
 
 ## Check
 
@@ -87,6 +88,199 @@ flutter run
 
 Requires an iOS simulator (Xcode, macOS only) or an Android emulator. Platform
 minimums are iOS 17.0 and Android API 26 — see `docs/platforms.md`.
+
+## Building the apps
+
+One Flutter codebase builds both apps. **Android builds on macOS, Linux or Windows; iOS
+builds only on macOS with Xcode.** Everything both builds need is in this repository
+(checked on 2026-10-11 from a fresh clone: analyzer clean, all tests pass, Android release
+builds). The pieces Flutter, Gradle and Xcode regenerate for themselves —
+`android/local.properties`, the Gradle wrapper, `ios/Flutter/Generated.xcconfig`, the
+plugin registrants, `ios/Pods/` — are deliberately not committed.
+
+**Why** each platform value is what it is lives in `docs/platforms.md`. This section is
+**how** to build.
+
+### Before the first store build
+
+Three things in the project are not ready for a store upload yet, and one needs a decision.
+None of them stops a debug build.
+
+| | What | Status |
+|---|---|---|
+| Android | **Release builds are signed with the debug key** (`android/app/build.gradle.kts` still has Flutter's template `TODO`). Google Play rejects an upload signed this way | **Blocking for Play.** Steps under *Android → Release signing* |
+| iOS | **No development team is set** on either target (`DEVELOPMENT_TEAM` is empty for `Runner` and `LiveSessionWidget`) | Each developer sets their own in Xcode; see *iOS → One-time setup* |
+| Both | **The app identifiers are permanent once published:** Android `com.pomodorogarden.pomodoro_garden`, iOS `com.pomodorogarden.pomodoroGarden` (and `….LiveSessionWidget` for the Live Activity) | Confirm or change them **before** the first upload; afterwards they can never change |
+| iOS | **The app is set to run on iPad as well as iPhone, and in landscape** (`TARGETED_DEVICE_FAMILY = "1,2"`, landscape in `UISupportedInterfaceOrientations`). The PRD defers tablet and landscape layouts to Phase 2, and an iPad-capable app needs iPad screenshots on the App Store | **Decision for the owner:** iPhone-only and portrait-only for v1.0, or provide iPad screenshots and accept the phone layout on iPad |
+
+### Versioning (both platforms)
+
+The version lives in one place, `pubspec.yaml`:
+
+```yaml
+version: 1.0.0+1   # <version name>+<build number>
+```
+
+Flutter writes it into Android's `versionName`/`versionCode` and iOS's
+`CFBundleShortVersionString`/`CFBundleVersion`. **Raise the build number for every upload**:
+both stores reject a build number they have already seen. Or override it per build with
+`--build-name=1.0.1 --build-number=7`.
+
+### Android
+
+**What you need**
+
+| | Version | Notes |
+|---|---|---|
+| Flutter | 3.44.8 (stable) or newer with Dart ≥ 3.12.2 | `pubspec.yaml` requires `sdk: ^3.12.2` |
+| JDK | 17 or newer (21 used here) | Gradle and the Kotlin compiler target Java 17 |
+| Android SDK | Platform **36** and its build tools | `compileSdk` and `targetSdk` are 36 |
+| Android NDK | 28.2.13676358 | Flutter's default; Gradle downloads it on the first build |
+| Gradle / AGP / Kotlin | 9.1.0 / 9.0.1 / 2.3.20 | Pinned in `android/gradle/wrapper/gradle-wrapper.properties` and `android/settings.gradle.kts`; the wrapper downloads Gradle |
+| Memory | ~8 GB free for Gradle | `android/gradle.properties` gives the Gradle daemon `-Xmx8G`. On a smaller machine, lower it there if the build runs out of memory |
+
+Run `flutter doctor --android-licenses` once to accept the SDK licences.
+
+**The app, as Android sees it:** application ID `com.pomodorogarden.pomodoro_garden`;
+`minSdk` 26 (Android 8.0), `targetSdk` and `compileSdk` 36; native code in Kotlin under
+`android/app/src/main/kotlin/` (the live-session foreground service, the quiet-mode zen
+rule, the export share sheet); core-library desugaring on, which
+`flutter_local_notifications` needs.
+
+**Build and run**
+
+```sh
+flutter pub get                               # also writes android/local.properties
+flutter run                                   # debug, on a running emulator or a USB device
+
+flutter build appbundle --release             # what Google Play wants
+#   → build/app/outputs/bundle/release/app-release.aab
+
+flutter build apk --release --split-per-abi   # installable APKs, one per CPU type
+#   → build/app/outputs/flutter-apk/app-arm64-v8a-release.apk   (30.6 MB; what most phones use)
+#     app-armeabi-v7a-release.apk (28.0 MB) · app-x86_64-release.apk (32.0 MB, emulators)
+```
+
+A first release build takes 7–9 minutes (Gradle and the NDK download); later ones take
+about 2. Install an APK on a phone or emulator with `adb install <file>.apk`.
+
+**Release signing (not done yet; required before uploading to Play)**
+
+1. Create an upload key, once, and keep it and its passwords somewhere safe outside the
+   repository:
+   ```sh
+   keytool -genkey -v -keystore ~/pomodoro-garden-upload.jks -keyalg RSA \
+     -keysize 2048 -validity 10000 -alias upload
+   ```
+2. Create `android/key.properties`. It is git-ignored (`android/.gitignore` ignores
+   `key.properties` and `*.jks`), so it never reaches the repository:
+   ```properties
+   storePassword=<the keystore password>
+   keyPassword=<the key password>
+   keyAlias=upload
+   storeFile=/Users/<you>/pomodoro-garden-upload.jks
+   ```
+3. In `android/app/build.gradle.kts`, load it and use it for release builds in place of
+   the debug key:
+   ```kotlin
+   import java.util.Properties
+
+   val keystoreProperties = Properties().apply {
+       val file = rootProject.file("key.properties")
+       if (file.exists()) file.inputStream().use { load(it) }
+   }
+
+   android {
+       signingConfigs {
+           create("release") {
+               keyAlias = keystoreProperties["keyAlias"] as String?
+               keyPassword = keystoreProperties["keyPassword"] as String?
+               storeFile = (keystoreProperties["storeFile"] as String?)?.let { file(it) }
+               storePassword = keystoreProperties["storePassword"] as String?
+           }
+       }
+       buildTypes {
+           release {
+               signingConfig = signingConfigs.getByName("release")
+           }
+       }
+   }
+   ```
+4. Build the app bundle and upload it in Play Console. Enrol in **Play App Signing** when
+   asked: Google then holds the key that signs what users install, and the key above is
+   only your *upload* key, which Google can reset if it is ever lost.
+
+**Play Console extras this app needs:** the exact-alarm and special-use
+foreground-service declarations, the Data safety form and the content rating. All are
+drafted in `docs/store/`; start at `docs/store/README.md`.
+
+### iOS
+
+**What you need**
+
+| | Notes |
+|---|---|
+| A Mac with **Xcode** | Use the Xcode version App Store Connect currently requires for uploads (Apple's "Upcoming requirements" page says which). Install an iOS Simulator runtime from Xcode → Settings → Components |
+| **CocoaPods** | `brew install cocoapods` (or `sudo gem install cocoapods`). Flutter runs `pod install` for you during a build |
+| Flutter | Same as Android: 3.44.8 or newer with Dart ≥ 3.12.2 |
+| An **Apple Developer Program** membership | Needed to run on a physical iPhone beyond 7-day free provisioning, and for TestFlight and the App Store |
+
+**The app, as Xcode sees it.** Open **`ios/Runner.xcworkspace`**, not the `.xcodeproj`:
+the workspace includes the CocoaPods dependencies.
+
+| Target | Bundle ID | What it is |
+|---|---|---|
+| `Runner` | `com.pomodorogarden.pomodoroGarden` | The app. Also holds the Shortcuts App Intent (`StartFocusSessionIntent.swift`) and the native plugins for the live session, quiet mode and the share sheet |
+| `LiveSessionWidget` | `com.pomodorogarden.pomodoroGarden.LiveSessionWidget` | A widget extension holding the Live Activity and the Dynamic Island (`ios/LiveSession/`), embedded in the app |
+
+Both targets deploy to **iOS 17.0**, set in `project.pbxproj` and forced onto every pod by
+the `post_install` hook in `ios/Podfile`. Swift 5. **No entitlements file and no
+capabilities to add**: Live Activities are enabled by `NSSupportsLiveActivities` in
+`Info.plist`, and every notification is local, so there is no push. `Info.plist` also
+declares the `audio` background mode (ambient sounds keep playing when the phone is locked),
+the `pomodorogarden://` URL scheme (a tap on the Live Activity opens the timer) and the
+photo-library *add* permission (saving a garden picture).
+
+**One-time setup**
+
+1. `flutter pub get` (writes `ios/Flutter/Generated.xcconfig`, which the Podfile reads).
+2. `open ios/Runner.xcworkspace`.
+3. For **both** targets, `Runner` and `LiveSessionWidget`: Signing & Capabilities → tick
+   *Automatically manage signing* and choose your **Team**. Xcode registers both bundle IDs
+   in your developer account the first time.
+
+**Build and run**
+
+```sh
+open -a Simulator                     # an iPhone 15 Pro or newer simulator shows the Dynamic Island
+flutter run                           # debug, on the simulator or a connected iPhone
+
+flutter build ipa --release           # signed archive and IPA for App Store Connect
+#   → build/ios/archive/Runner.xcarchive
+#   → build/ios/ipa/*.ipa
+```
+
+Upload the IPA with Apple's **Transporter** app, or open the `.xcarchive` in Xcode →
+Window → Organizer → *Distribute App*. It then appears in TestFlight. A physical iPhone
+needs **Developer Mode** on (Settings → Privacy & Security) before `flutter run` can install
+to it.
+
+**Expect a first round of compile errors.** The Swift in `ios/` (the Live Activity, the
+App Intent and three plugins) has never been compiled: this project was developed on Linux.
+Its wiring is checked by the tests in `test/platform/`, but only Xcode can compile it. Fix
+or report what Xcode flags, then check the Live Activity, the Dynamic Island and the App
+Intent on a device or simulator (ticket 39).
+
+**App Store Connect extras:** the App Privacy answers ("Data Not Collected"), the age
+rating and review notes are drafted in `docs/store/app-store-privacy.md`. Optional: add
+`ITSAppUsesNonExemptEncryption` = `NO` to `ios/Runner/Info.plist` to skip the
+export-compliance question on every upload.
+
+### On a build server
+
+`./scripts/check.sh` (analysis and both test suites) and the Android builds run on Linux.
+iOS builds need a macOS runner with Xcode and CocoaPods, and the signing identity and
+provisioning installed on it.
 
 ## Onboarding, and how to see it again
 
