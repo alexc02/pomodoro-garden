@@ -38,6 +38,19 @@ the code and the release build's merged `AndroidManifest.xml`, not copied from t
 - [ ] App Privacy: as `app-store-privacy.md`
 - [ ] Age rating: as `iarc-questionnaire.md`
 - [ ] Privacy policy URL
-- [ ] Optional: add `ITSAppUsesNonExemptEncryption = NO` to `ios/Runner/Info.plist`
 - [ ] Review notes: as `app-store-privacy.md`
 - [ ] Screenshots, description, keywords (PRD §6.1–6.2)
+
+## Building the iOS upload
+
+The team has no registered devices, so archive unsigned and let the export sign with the
+distribution certificate (an App Store profile needs no device):
+
+```
+flutter build ipa --release --no-codesign
+xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive \
+  -exportPath build/ios/ipa -exportOptionsPlist ios/ExportOptions.plist -allowProvisioningUpdates
+```
+
+Upload `build/ios/ipa/Pip Garden.ipa` with Transporter. Bump the build number after `+` in
+`pubspec.yaml` for every upload.
