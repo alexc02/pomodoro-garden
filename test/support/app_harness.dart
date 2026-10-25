@@ -6,23 +6,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/ambience/ambience_providers.dart';
-import 'package:pomodoro_garden/src/app.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/database_providers.dart';
-import 'package:pomodoro_garden/src/data/drift_settings_repository.dart';
-import 'package:pomodoro_garden/src/export/export_providers.dart';
-import 'package:pomodoro_garden/src/export/garden_share.dart';
-import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/feedback/feedback_providers.dart';
-import 'package:pomodoro_garden/src/garden/art_bundle.dart';
-import 'package:pomodoro_garden/src/garden/art_providers.dart';
-import 'package:pomodoro_garden/src/live/live_session_providers.dart';
-import 'package:pomodoro_garden/src/notifications/notification_providers.dart';
-import 'package:pomodoro_garden/src/quiet/quiet_mode_providers.dart';
-import 'package:pomodoro_garden/src/session/session_providers.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
-import 'package:pomodoro_garden/src/time/clock_provider.dart';
+import 'package:pip_garden/src/ambience/ambience_providers.dart';
+import 'package:pip_garden/src/app.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/database_providers.dart';
+import 'package:pip_garden/src/data/drift_settings_repository.dart';
+import 'package:pip_garden/src/export/export_providers.dart';
+import 'package:pip_garden/src/export/garden_share.dart';
+import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/feedback/feedback_providers.dart';
+import 'package:pip_garden/src/garden/art_bundle.dart';
+import 'package:pip_garden/src/garden/art_providers.dart';
+import 'package:pip_garden/src/live/live_session_providers.dart';
+import 'package:pip_garden/src/notifications/notification_providers.dart';
+import 'package:pip_garden/src/quiet/quiet_mode_providers.dart';
+import 'package:pip_garden/src/session/session_providers.dart';
+import 'package:pip_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/time/clock_provider.dart';
 
 import 'ambience_fake.dart';
 import 'announcement_fakes.dart';
@@ -184,7 +184,7 @@ Future<void> pumpApp(
         // this harness supplies for it.
         ...overrides,
       ],
-      child: const PomodoroGardenApp(),
+      child: const PipGardenApp(),
     ),
   );
   // [settle] rather than [WidgetTester.pumpAndSettle]: from ticket 05 a launch

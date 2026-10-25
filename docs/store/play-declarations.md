@@ -13,7 +13,7 @@ or timer**, or a calendar app. A focus timer is a timer.
 
 **Suggested answer:**
 
-> Pomodoro Garden is a focus timer. Its core function is a countdown the user starts: a
+> Pip Garden is a focus timer. Its core function is a countdown the user starts: a
 > focus session of a length they choose, followed by an optional break. When the user leaves
 > the app during a session, the app schedules one notification for the exact moment the
 > session (and, if enabled, the break) ends. That notification is the timer's alarm. It must

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/database_providers.dart';
-import 'package:pomodoro_garden/src/data/drift_decor_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
-import 'package:pomodoro_garden/src/features/garden/decor_picker.dart';
-import 'package:pomodoro_garden/src/features/garden/milestone_card.dart';
-import 'package:pomodoro_garden/src/features/settings/reset_garden.dart';
-import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/database_providers.dart';
+import 'package:pip_garden/src/data/drift_decor_repository.dart';
+import 'package:pip_garden/src/data/drift_plant_repository.dart';
+import 'package:pip_garden/src/features/garden/decor_picker.dart';
+import 'package:pip_garden/src/features/garden/milestone_card.dart';
+import 'package:pip_garden/src/features/settings/reset_garden.dart';
+import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../../support/analytics_fakes.dart';
 import '../../support/app_harness.dart';
@@ -290,7 +290,7 @@ void main() {
       // A first-run user meets the welcome step. A user who has just reset
       // their garden is not one, and greeting them as a stranger would be the
       // app forgetting them rather than forgetting their garden.
-      expect(find.text('Welcome to Pomodoro Garden'), findsNothing);
+      expect(find.text('Welcome to Pip Garden'), findsNothing);
     });
   });
 

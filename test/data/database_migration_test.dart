@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_analytics_event_log.dart';
-import 'package:pomodoro_garden/src/data/drift_cycle_store.dart';
-import 'package:pomodoro_garden/src/data/drift_decor_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_journal_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_session_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_settings_repository.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_analytics_event_log.dart';
+import 'package:pip_garden/src/data/drift_cycle_store.dart';
+import 'package:pip_garden/src/data/drift_decor_repository.dart';
+import 'package:pip_garden/src/data/drift_journal_repository.dart';
+import 'package:pip_garden/src/data/drift_plant_repository.dart';
+import 'package:pip_garden/src/data/drift_session_repository.dart';
+import 'package:pip_garden/src/data/drift_settings_repository.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 /// The upgrade path, exercised against a database file that really is at the
@@ -24,8 +24,8 @@ void main() {
   late File file;
 
   setUp(() {
-    directory = Directory.systemTemp.createTempSync('pomodoro_garden_test');
-    file = File('${directory.path}/pomodoro_garden.sqlite');
+    directory = Directory.systemTemp.createTempSync('pip_garden_test');
+    file = File('${directory.path}/pip_garden.sqlite');
   });
 
   tearDown(() => directory.deleteSync(recursive: true));

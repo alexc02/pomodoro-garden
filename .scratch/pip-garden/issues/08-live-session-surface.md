@@ -54,7 +54,7 @@ checkmark where the countdown was. It stops claiming to be a countdown at the ri
 instant; it is ended for real on the next foreground.
 
 **One port, one channel, no branch.** `LiveSessionSurface` has three methods and one
-implementation, `ChannelLiveSessionSurface`, over `pomodoro_garden/live_session`. Swift and
+implementation, `ChannelLiveSessionSurface`, over `pip_garden/live_session`. Swift and
 Kotlin answer the same three methods against the same map. `test/live/one_port_test.dart`
 fails if any view, session or live-surface code reaches for `Platform.is…`,
 `defaultTargetPlatform` or `TargetPlatform`, and fails if a second implementation of the
@@ -100,7 +100,7 @@ anywhere, in Swift or in Dart, and a branch is the only thing that could glitch.
 
 **Tapping either surface lands on the timer, from cold or warm.** Android's notification
 carries an intent with `ACTION_OPEN_SESSION`; the Live Activity carries
-`pomodorogarden://session`. Both arrive at the same `opened` stream on the port. The cold
+`pipgarden://session`. Both arrive at the same `opened` stream on the port. The cold
 case is the one worth knowing about: the tap happens before there is any Dart alive to hear
 it, so each platform holds it and Dart takes it once, at first listen — hence
 `takeLaunchTap` as a third method rather than a stream that would have missed it.

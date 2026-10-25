@@ -63,7 +63,7 @@
          actually takes the permission off the app. See `docs/adr/0021-…`. -->
 
     <application
-        android:label="Pomodoro Garden"
+        android:label="Pip Garden"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

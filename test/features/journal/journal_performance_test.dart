@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart' show Value, Variable;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_journal_repository.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_journal_repository.dart';
 
 /// Ticket 15: "aggregates are computed by query rather than by loading every
 /// session into memory, and stay responsive with several years of history".

@@ -1,10 +1,10 @@
-# Pomodoro Garden
+# Pip Garden
 
 A focus timer that grows a garden. Finish a session, get a plant; the garden is
 the record of the work.
 
 Flutter, one codebase, iOS and Android at parity. See `PRD.md` for the product
-and `.scratch/pomodoro-garden/issues/` for the ticket breakdown.
+and `.scratch/pip-garden/issues/` for the ticket breakdown.
 
 ## What you need
 
@@ -110,7 +110,7 @@ None of them stops a debug build.
 |---|---|---|
 | Android | **Release builds are signed with the debug key** (`android/app/build.gradle.kts` still has Flutter's template `TODO`). Google Play rejects an upload signed this way | **Blocking for Play.** Steps under *Android → Release signing* |
 | iOS | **No development team is set** on either target (`DEVELOPMENT_TEAM` is empty for `Runner` and `LiveSessionWidget`) | Each developer sets their own in Xcode; see *iOS → One-time setup* |
-| Both | **The app identifiers are permanent once published:** Android `com.pomodorogarden.pomodoro_garden`, iOS `com.pomodorogarden.pomodoroGarden` (and `….LiveSessionWidget` for the Live Activity) | Confirm or change them **before** the first upload; afterwards they can never change |
+| Both | **The app identifiers are permanent once published:** Android `com.pipgarden.pip_garden`, iOS `com.pipgarden.pipGarden` (and `….LiveSessionWidget` for the Live Activity) | Confirm or change them **before** the first upload; afterwards they can never change |
 | iOS | **The app is set to run on iPad as well as iPhone, and in landscape** (`TARGETED_DEVICE_FAMILY = "1,2"`, landscape in `UISupportedInterfaceOrientations`). The PRD defers tablet and landscape layouts to Phase 2, and an iPad-capable app needs iPad screenshots on the App Store | **Decision for the owner:** iPhone-only and portrait-only for v1.0, or provide iPad screenshots and accept the phone layout on iPad |
 
 ### Versioning (both platforms)
@@ -141,7 +141,7 @@ both stores reject a build number they have already seen. Or override it per bui
 
 Run `flutter doctor --android-licenses` once to accept the SDK licences.
 
-**The app, as Android sees it:** application ID `com.pomodorogarden.pomodoro_garden`;
+**The app, as Android sees it:** application ID `com.pipgarden.pip_garden`;
 `minSdk` 26 (Android 8.0), `targetSdk` and `compileSdk` 36; native code in Kotlin under
 `android/app/src/main/kotlin/` (the live-session foreground service, the quiet-mode zen
 rule, the export share sheet); core-library desugaring on, which
@@ -169,7 +169,7 @@ about 2. Install an APK on a phone or emulator with `adb install <file>.apk`.
 1. Create an upload key, once, and keep it and its passwords somewhere safe outside the
    repository:
    ```sh
-   keytool -genkey -v -keystore ~/pomodoro-garden-upload.jks -keyalg RSA \
+   keytool -genkey -v -keystore ~/pip-garden-upload.jks -keyalg RSA \
      -keysize 2048 -validity 10000 -alias upload
    ```
 2. Create `android/key.properties`. It is git-ignored (`android/.gitignore` ignores
@@ -178,7 +178,7 @@ about 2. Install an APK on a phone or emulator with `adb install <file>.apk`.
    storePassword=<the keystore password>
    keyPassword=<the key password>
    keyAlias=upload
-   storeFile=/Users/<you>/pomodoro-garden-upload.jks
+   storeFile=/Users/<you>/pip-garden-upload.jks
    ```
 3. In `android/app/build.gradle.kts`, load it and use it for release builds in place of
    the debug key:
@@ -230,15 +230,15 @@ the workspace includes the CocoaPods dependencies.
 
 | Target | Bundle ID | What it is |
 |---|---|---|
-| `Runner` | `com.pomodorogarden.pomodoroGarden` | The app. Also holds the Shortcuts App Intent (`StartFocusSessionIntent.swift`) and the native plugins for the live session, quiet mode and the share sheet |
-| `LiveSessionWidget` | `com.pomodorogarden.pomodoroGarden.LiveSessionWidget` | A widget extension holding the Live Activity and the Dynamic Island (`ios/LiveSession/`), embedded in the app |
+| `Runner` | `com.pipgarden.pipGarden` | The app. Also holds the Shortcuts App Intent (`StartFocusSessionIntent.swift`) and the native plugins for the live session, quiet mode and the share sheet |
+| `LiveSessionWidget` | `com.pipgarden.pipGarden.LiveSessionWidget` | A widget extension holding the Live Activity and the Dynamic Island (`ios/LiveSession/`), embedded in the app |
 
 Both targets deploy to **iOS 17.0**, set in `project.pbxproj` and forced onto every pod by
 the `post_install` hook in `ios/Podfile`. Swift 5. **No entitlements file and no
 capabilities to add**: Live Activities are enabled by `NSSupportsLiveActivities` in
 `Info.plist`, and every notification is local, so there is no push. `Info.plist` also
 declares the `audio` background mode (ambient sounds keep playing when the phone is locked),
-the `pomodorogarden://` URL scheme (a tap on the Live Activity opens the timer) and the
+the `pipgarden://` URL scheme (a tap on the Live Activity opens the timer) and the
 photo-library *add* permission (saving a garden picture).
 
 **One-time setup**

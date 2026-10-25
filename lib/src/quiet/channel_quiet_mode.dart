@@ -28,7 +28,7 @@ final class ChannelQuietMode implements QuietMode {
 
   /// The channel both native implementations register against. Named for what
   /// crosses it rather than for either platform's mechanism.
-  static const String channelName = 'pomodoro_garden/quiet_mode';
+  static const String channelName = 'pip_garden/quiet_mode';
 
   /// Dart → platform.
   static const String accessMethod = 'access';
@@ -144,7 +144,7 @@ final class ChannelQuietMode implements QuietMode {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription(what),
       ));
       return null;

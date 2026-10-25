@@ -1,4 +1,4 @@
-# Pomodoro Garden
+# Pip Garden
 
 A focus timer whose reward is a garden. The user runs focus sessions; each completed
 session plants something that stays. This file is the project's glossary — the words the

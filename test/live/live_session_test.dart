@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/live/live_session.dart';
+import 'package:pip_garden/src/live/live_session.dart';
 
 /// What the platform is handed, worked out from what the timer says.
 ///

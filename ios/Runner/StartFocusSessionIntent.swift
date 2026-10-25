@@ -30,7 +30,7 @@ struct StartFocusSessionIntent: AppIntent {
     /// is expressible by a string *literal*, and a concatenation is not one.
     static var description = IntentDescription(
         """
-        Starts a focus session of the length set in Pomodoro Garden. \
+        Starts a focus session of the length set in Pip Garden. \
         Put it after Set Focus in a Shortcut, and turning your phone quiet \
         and starting your session become one step.
         """
@@ -49,7 +49,7 @@ struct StartFocusSessionIntent: AppIntent {
 /// What puts [StartFocusSessionIntent] in front of the user without their
 /// having to go looking for it: the Shortcuts app's list of this app's actions,
 /// and a phrase Siri will take.
-struct PomodoroGardenShortcuts: AppShortcutsProvider {
+struct PipGardenShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
             intent: StartFocusSessionIntent(),

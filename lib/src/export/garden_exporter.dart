@@ -31,7 +31,7 @@ final class GardenExport {
   /// Fixed rather than stamped with a date: it is a suggestion the share sheet
   /// shows, and two exports on the same day are two files the platform names
   /// apart itself.
-  String get filename => 'pomodoro-garden.png';
+  String get filename => 'pip-garden.png';
 }
 
 /// Draws the whole garden into an image. REQ-035.

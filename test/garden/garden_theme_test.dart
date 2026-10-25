@@ -3,9 +3,9 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/design/garden_colors.dart';
-import 'package:pomodoro_garden/src/design/garden_skin.dart';
-import 'package:pomodoro_garden/src/design/theme_palette.dart';
+import 'package:pip_garden/src/design/garden_colors.dart';
+import 'package:pip_garden/src/design/garden_skin.dart';
+import 'package:pip_garden/src/design/theme_palette.dart';
 
 /// REQ-034's twelve combinations: three biomes, four seasons, and the two
 /// criteria that are about what they look like rather than how they are picked.

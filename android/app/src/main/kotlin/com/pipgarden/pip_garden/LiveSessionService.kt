@@ -1,4 +1,4 @@
-package com.pomodorogarden.pomodoro_garden
+package com.pipgarden.pip_garden
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -60,7 +60,7 @@ class LiveSessionService : Service() {
          */
         const val CHANNEL_ID = "session_live"
 
-        const val ACTION_SHOW = "com.pomodorogarden.pomodoro_garden.SHOW_LIVE_SESSION"
+        const val ACTION_SHOW = "com.pipgarden.pip_garden.SHOW_LIVE_SESSION"
 
         const val EXTRA_PAUSED = "paused"
         const val EXTRA_ENDS_AT = "endsAt"

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/features/timer/countdown.dart';
+import 'package:pip_garden/src/features/timer/countdown.dart';
 
 void main() {
   test('a whole number of minutes reads as MM:00', () {

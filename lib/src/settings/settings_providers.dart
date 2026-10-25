@@ -60,7 +60,7 @@ class SettingsController extends AsyncNotifier<GardenSettings> {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription('loading settings'),
       ));
       // The defaults, except for the one field where "we could not read it" and
@@ -118,7 +118,7 @@ class SettingsController extends AsyncNotifier<GardenSettings> {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription('saving settings $settings'),
       ));
     }

@@ -1,9 +1,9 @@
-# Pomodoro Garden — Privacy Policy
+# Pip Garden — Privacy Policy
 
 *Effective date: **[DATE YOU PUBLISH THIS]***
 *Developer: **[YOUR NAME OR STUDIO NAME]** · Contact: **[YOUR CONTACT EMAIL]***
 
-Pomodoro Garden is a focus timer that grows a garden on your device. This policy explains
+Pip Garden is a focus timer that grows a garden on your device. This policy explains
 what the app does with information about you. The short version: **nothing leaves your
 device.**
 

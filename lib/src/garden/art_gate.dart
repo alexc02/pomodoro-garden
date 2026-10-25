@@ -48,7 +48,7 @@ class ArtGate extends ConsumerWidget {
       FlutterError.reportError(FlutterErrorDetails(
         exception: art.error!,
         stack: art.stackTrace,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription('loading the art set'),
       ));
     }

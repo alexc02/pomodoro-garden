@@ -1,8 +1,8 @@
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/feedback/end_sound_player.dart';
-import 'package:pomodoro_garden/src/feedback/haptics.dart';
-import 'package:pomodoro_garden/src/feedback/micro_sounds.dart';
-import 'package:pomodoro_garden/src/notifications/session_notifications.dart';
+import 'package:pip_garden/src/feedback/end_sound_player.dart';
+import 'package:pip_garden/src/feedback/haptics.dart';
+import 'package:pip_garden/src/feedback/micro_sounds.dart';
+import 'package:pip_garden/src/notifications/session_notifications.dart';
 
 /// Stand-ins for the three things a session end reaches out to, none of which
 /// leaves a mark on screen.

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/features/timer/potted_plant.dart';
-import 'package:pomodoro_garden/src/features/timer/progress_strip.dart';
-import 'package:pomodoro_garden/src/features/timer/timer_screen.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/features/timer/potted_plant.dart';
+import 'package:pip_garden/src/features/timer/progress_strip.dart';
+import 'package:pip_garden/src/features/timer/timer_screen.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../../support/app_harness.dart';
 

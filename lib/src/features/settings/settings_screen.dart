@@ -422,7 +422,7 @@ class _QuietModeSection extends ConsumerWidget {
       ),
       if (revoked)
         const _Note(
-          'Pomodoro Garden doesn\'t have permission to silence your phone, so '
+          'Pip Garden doesn\'t have permission to silence your phone, so '
           'sessions run with the sound on. Turn the switch on again to grant '
           'it.',
         )
@@ -493,8 +493,8 @@ class _QuietModeSection extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('One thing to switch on'),
         content: const Text(
-          'Your phone has to give Pomodoro Garden permission first, and that '
-          'happens in system settings.\n\nFind Pomodoro Garden in the list that '
+          'Your phone has to give Pip Garden permission first, and that '
+          'happens in system settings.\n\nFind Pip Garden in the list that '
           'opens and turn it on, then come straight back.',
         ),
         actions: [
@@ -531,7 +531,7 @@ class _QuietModeSection extends ConsumerWidget {
             '1. Open Shortcuts and create a new shortcut.\n'
             '2. Add "Set Focus". Choose Do Not Disturb, turn it on, and set it '
             'to last until the time your session will end.\n'
-            '3. Add "Start a focus session" — it is under Pomodoro Garden.\n'
+            '3. Add "Start a focus session" — it is under Pip Garden.\n'
             '4. Name it, then run it instead of tapping Start. It works from '
             'the Home Screen, from the share sheet, or by asking Siri.\n\n'
             'Do Not Disturb turns itself off at the time you chose, so your '

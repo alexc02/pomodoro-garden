@@ -4,19 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_settings_repository.dart';
-import 'package:pomodoro_garden/src/features/onboarding/coach_marks.dart';
-import 'package:pomodoro_garden/src/features/onboarding/garden_preview.dart';
-import 'package:pomodoro_garden/src/features/onboarding/onboarding_steps.dart';
-import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/garden/garden_painter.dart';
-import 'package:pomodoro_garden/src/garden/growing_plant.dart';
-import 'package:pomodoro_garden/src/garden/plant_painter.dart';
-import 'package:pomodoro_garden/src/onboarding/onboarding.dart';
-import 'package:pomodoro_garden/src/session/session_providers.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_plant_repository.dart';
+import 'package:pip_garden/src/data/drift_settings_repository.dart';
+import 'package:pip_garden/src/features/onboarding/coach_marks.dart';
+import 'package:pip_garden/src/features/onboarding/garden_preview.dart';
+import 'package:pip_garden/src/features/onboarding/onboarding_steps.dart';
+import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/garden/garden_painter.dart';
+import 'package:pip_garden/src/garden/growing_plant.dart';
+import 'package:pip_garden/src/garden/plant_painter.dart';
+import 'package:pip_garden/src/onboarding/onboarding.dart';
+import 'package:pip_garden/src/session/session_providers.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../../support/announcement_fakes.dart';
 import '../../support/app_harness.dart';
@@ -302,8 +302,8 @@ void main() {
     late File file;
 
     setUp(() {
-      directory = Directory.systemTemp.createTempSync('pomodoro_garden_test');
-      file = File('${directory.path}/pomodoro_garden.sqlite');
+      directory = Directory.systemTemp.createTempSync('pip_garden_test');
+      file = File('${directory.path}/pip_garden.sqlite');
     });
 
     tearDown(() => directory.deleteSync(recursive: true));

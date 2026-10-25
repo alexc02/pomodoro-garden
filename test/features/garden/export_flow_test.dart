@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/design/garden_colors.dart';
-import 'package:pomodoro_garden/src/export/garden_exporter.dart';
-import 'package:pomodoro_garden/src/export/garden_share.dart';
-import 'package:pomodoro_garden/src/features/garden/export_garden.dart';
-import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/garden/decor_providers.dart';
-import 'package:pomodoro_garden/src/garden/garden_atlas_recipe.dart';
-import 'package:pomodoro_garden/src/garden/garden_painter.dart';
-import 'package:pomodoro_garden/src/garden/plant_providers.dart';
-import 'package:pomodoro_garden/src/garden/theme_providers.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/design/garden_colors.dart';
+import 'package:pip_garden/src/export/garden_exporter.dart';
+import 'package:pip_garden/src/export/garden_share.dart';
+import 'package:pip_garden/src/features/garden/export_garden.dart';
+import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/garden/decor_providers.dart';
+import 'package:pip_garden/src/garden/garden_atlas_recipe.dart';
+import 'package:pip_garden/src/garden/garden_painter.dart';
+import 'package:pip_garden/src/garden/plant_providers.dart';
+import 'package:pip_garden/src/garden/theme_providers.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../../support/app_harness.dart';
 import '../../support/celebrations.dart';
@@ -102,7 +102,7 @@ void main() {
       expect(share.shared, hasLength(1));
       expect(share.last.png.sublist(0, 8), [137, 80, 78, 71, 13, 10, 26, 10]);
       expect(share.last.width, greaterThan(0));
-      expect(share.last.filename, 'pomodoro-garden.png');
+      expect(share.last.filename, 'pip-garden.png');
     });
 
     testWidgets('and the picture is of the whole garden, not the screen',

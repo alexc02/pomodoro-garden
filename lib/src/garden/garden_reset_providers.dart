@@ -151,7 +151,7 @@ class GardenResetController extends Notifier<Resetting> {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription('resetting the garden'),
       ));
       if (ref.mounted) state = Resetting.idle;

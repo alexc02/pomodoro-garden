@@ -24,7 +24,7 @@ import Foundation
 /// rather than a `FlutterMethodNotImplemented` reported as a failure.
 final class QuietModePlugin: NSObject {
 
-    static let channelName = "pomodoro_garden/quiet_mode"
+    static let channelName = "pip_garden/quiet_mode"
 
     /// The registered plugin, for the App Intent to hand a request to.
     ///

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/export/channel_garden_share.dart';
+import 'package:pip_garden/src/export/channel_garden_share.dart';
 
 /// The platform half of ticket 21, asserted from the only side that can be run
 /// here.
@@ -33,8 +33,8 @@ void main() {
   late String plist;
 
   setUpAll(() {
-    androidPlugin = File('android/app/src/main/kotlin/com/pomodorogarden/'
-            'pomodoro_garden/GardenSharePlugin.kt')
+    androidPlugin = File('android/app/src/main/kotlin/com/pipgarden/'
+            'pip_garden/GardenSharePlugin.kt')
         .readAsStringSync();
     manifest =
         File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
@@ -49,7 +49,7 @@ void main() {
     test('is named the same in Dart, Kotlin and Swift', () {
       const name = ChannelGardenShare.channelName;
 
-      expect(name, 'pomodoro_garden/garden_share');
+      expect(name, 'pip_garden/garden_share');
       expect(androidPlugin, contains('"$name"'));
       expect(iosPlugin, contains('"$name"'));
     });
@@ -186,7 +186,7 @@ void main() {
       // A plugin nothing constructs answers nothing, and the failure looks
       // exactly like a device with nowhere to send an image.
       expect(
-        File('android/app/src/main/kotlin/com/pomodorogarden/pomodoro_garden/'
+        File('android/app/src/main/kotlin/com/pipgarden/pip_garden/'
                 'MainActivity.kt')
             .readAsStringSync(),
         contains('GardenSharePlugin('),

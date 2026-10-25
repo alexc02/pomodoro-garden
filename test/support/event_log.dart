@@ -1,6 +1,6 @@
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_analytics_event_log.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_analytics_event_log.dart';
 
 /// Reading PRD §7.1's events back out of the app, for the tests that assert on
 /// them.

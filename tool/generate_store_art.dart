@@ -4,13 +4,13 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/design/garden_colors.dart';
-import 'package:pomodoro_garden/src/design/garden_skin.dart';
-import 'package:pomodoro_garden/src/export/garden_exporter.dart';
-import 'package:pomodoro_garden/src/features/journal/journal_paper.dart';
-import 'package:pomodoro_garden/src/garden/art_bundle.dart';
-import 'package:pomodoro_garden/src/garden/garden_atlas.dart';
-import 'package:pomodoro_garden/src/garden/garden_atlas_recipe.dart';
+import 'package:pip_garden/src/design/garden_colors.dart';
+import 'package:pip_garden/src/design/garden_skin.dart';
+import 'package:pip_garden/src/export/garden_exporter.dart';
+import 'package:pip_garden/src/design/paper_painter.dart';
+import 'package:pip_garden/src/garden/art_bundle.dart';
+import 'package:pip_garden/src/garden/garden_atlas.dart';
+import 'package:pip_garden/src/garden/garden_atlas_recipe.dart';
 
 /// The Play Store feature graphic (PRD §6.1, §9.1), 1024 × 500.
 ///

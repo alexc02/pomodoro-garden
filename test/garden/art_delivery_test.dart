@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/garden/art_bundle.dart';
+import 'package:pip_garden/src/garden/art_bundle.dart';
 
 /// **Is this delivery any good?** — as far as arithmetic can answer it.
 ///

@@ -29,7 +29,7 @@ import UIKit
 /// out as a recompressed JPEG would lose exactly the flat colour it is made of.
 final class GardenSharePlugin: NSObject, FlutterPlugin {
 
-    static let channelName = "pomodoro_garden/garden_share"
+    static let channelName = "pip_garden/garden_share"
 
     /// The directory exports are written into: the app's own temporary space,
     /// which iOS empties on its own terms.
@@ -104,7 +104,7 @@ final class GardenSharePlugin: NSObject, FlutterPlugin {
     private func present(_ file: URL) throws {
         guard let presenter = Self.topViewController() else {
             throw NSError(
-                domain: "pomodoro_garden.garden_share",
+                domain: "pip_garden.garden_share",
                 code: 1,
                 userInfo: [
                     NSLocalizedDescriptionKey:

@@ -379,7 +379,7 @@ final class LocalSessionNotifications implements SessionNotifications {
     FlutterError.reportError(FlutterErrorDetails(
       exception: error,
       stack: stack,
-      library: 'pomodoro_garden',
+      library: 'pip_garden',
       context: ErrorDescription(what),
     ));
   }

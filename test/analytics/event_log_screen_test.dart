@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_analytics_event_log.dart';
-import 'package:pomodoro_garden/src/data/drift_garden_reset.dart';
-import 'package:pomodoro_garden/src/features/settings/event_log_screen.dart';
-import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_analytics_event_log.dart';
+import 'package:pip_garden/src/data/drift_garden_reset.dart';
+import 'package:pip_garden/src/features/settings/event_log_screen.dart';
+import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../support/app_harness.dart';
 

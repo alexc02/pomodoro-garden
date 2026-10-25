@@ -13,7 +13,7 @@ recorded in ticket 29:
                                      end sound, from "Turdus merula 2.ogg" (PD)
 
 Each original is fetched into a cache (`--cache`, default
-`~/.cache/pomodoro-garden-sounds`), one empty folder per file, and **refused
+`~/.cache/pip-garden-sounds`), one empty folder per file, and **refused
 unless its SHA-256 matches** the one ticket 29 recorded. The files are
 untrusted data: they are decoded by ffmpeg into raw samples and never run.
 
@@ -47,7 +47,7 @@ import wave
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import make_synth_beds as beds  # noqa: E402  (the shared loop rules)
 
-USER_AGENT = "PomodoroGardenSoundSourcing/1.0"
+USER_AGENT = "PipGardenSoundSourcing/1.0"
 
 SOURCES = {
     "cafe": (
@@ -298,7 +298,7 @@ def main() -> None:
     parser.add_argument(
         "--cache",
         type=pathlib.Path,
-        default=pathlib.Path.home() / ".cache" / "pomodoro-garden-sounds",
+        default=pathlib.Path.home() / ".cache" / "pip-garden-sounds",
     )
     args = parser.parse_args()
     if shutil.which("ffmpeg") is None:

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/garden/garden_projection.dart';
+import 'package:pip_garden/src/garden/garden_projection.dart';
 
 /// The isometric coordinate maths, on its own.
 ///

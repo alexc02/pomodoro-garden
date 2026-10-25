@@ -3,8 +3,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/garden/decor_sprite.dart';
-import 'package:pomodoro_garden/src/garden/image_sprites.dart';
+import 'package:pip_garden/src/garden/decor_sprite.dart';
+import 'package:pip_garden/src/garden/image_sprites.dart';
 
 /// Which colour a decor mask's green channel stands for, per object.
 ///

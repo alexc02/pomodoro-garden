@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/design/garden_colors.dart';
-import 'package:pomodoro_garden/src/design/palette.dart';
-import 'package:pomodoro_garden/src/design/theme.dart';
-import 'package:pomodoro_garden/src/design/typography.dart';
+import 'package:pip_garden/src/design/garden_colors.dart';
+import 'package:pip_garden/src/design/palette.dart';
+import 'package:pip_garden/src/design/theme.dart';
+import 'package:pip_garden/src/design/typography.dart';
 
 void main() {
   group('both themes resolve', () {

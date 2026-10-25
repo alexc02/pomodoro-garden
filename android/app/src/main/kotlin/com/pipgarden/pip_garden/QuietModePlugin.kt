@@ -1,4 +1,4 @@
-package com.pomodorogarden.pomodoro_garden
+package com.pipgarden.pip_garden
 
 import android.content.Context
 import io.flutter.plugin.common.BinaryMessenger
@@ -26,7 +26,7 @@ class QuietModePlugin(
 ) : MethodChannel.MethodCallHandler {
 
     companion object {
-        const val CHANNEL = "pomodoro_garden/quiet_mode"
+        const val CHANNEL = "pip_garden/quiet_mode"
 
         private const val METHOD_ACCESS = "access"
         private const val METHOD_REQUEST_ACCESS = "requestAccess"

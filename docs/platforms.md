@@ -42,7 +42,7 @@ level surface as compile errors rather than runtime surprises.
 | | What | Where |
 |---|---|---|
 | iOS | A widget extension target, `LiveSessionWidget`, holding the Live Activity | `ios/LiveSession/`, and the target in `ios/Runner.xcodeproj/project.pbxproj` |
-| iOS | `NSSupportsLiveActivities`, and the `pomodorogarden://` scheme a tap on the surface opens | `ios/Runner/Info.plist` |
+| iOS | `NSSupportsLiveActivities`, and the `pipgarden://` scheme a tap on the surface opens | `ios/Runner/Info.plist` |
 | Android | A foreground service and its ongoing notification | `android/app/src/main/kotlin/.../LiveSessionService.kt` |
 | Both | The one method channel behind `LiveSessionSurface` | `lib/src/live/`, `LiveSessionSurfacePlugin.{kt,swift}` |
 

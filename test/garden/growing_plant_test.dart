@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/design/theme.dart';
-import 'package:pomodoro_garden/src/garden/growing_plant.dart';
-import 'package:pomodoro_garden/src/garden/plant_painter.dart';
-import 'package:pomodoro_garden/src/garden/plant_sway.dart';
+import 'package:pip_garden/src/design/theme.dart';
+import 'package:pip_garden/src/garden/growing_plant.dart';
+import 'package:pip_garden/src/garden/plant_painter.dart';
+import 'package:pip_garden/src/garden/plant_sway.dart';
 
 /// §5.3's four plant animations, asserted on the pose the painter is handed
 /// rather than on pixels: whether the plant overshoots is a question about a

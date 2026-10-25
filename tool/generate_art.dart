@@ -5,10 +5,10 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/garden/decor_sprite.dart';
-import 'package:pomodoro_garden/src/garden/placeholder_decor_sprites.dart';
-import 'package:pomodoro_garden/src/garden/placeholder_plant_sprites.dart';
-import 'package:pomodoro_garden/src/garden/plant_sprite.dart';
+import 'package:pip_garden/src/garden/decor_sprite.dart';
+import 'package:pip_garden/src/garden/placeholder_decor_sprites.dart';
+import 'package:pip_garden/src/garden/placeholder_plant_sprites.dart';
+import 'package:pip_garden/src/garden/plant_sprite.dart';
 
 /// **Retired (ticket 35).** Built the stand-in art set under `assets/art/`,
 /// and the manifest beside it, until the paper-cut set replaced it. Its one

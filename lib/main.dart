@@ -7,6 +7,6 @@ void main() {
   runApp(
     // The one ProviderScope for the running app. Tests build their own, with
     // overrides in place of the production dependencies.
-    const ProviderScope(child: PomodoroGardenApp()),
+    const ProviderScope(child: PipGardenApp()),
   );
 }

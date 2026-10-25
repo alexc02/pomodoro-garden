@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/live/channel_live_session_surface.dart';
+import 'package:pip_garden/src/live/channel_live_session_surface.dart';
 
 /// The platform half of ticket 08, asserted from the only side that can be run
 /// here.
@@ -22,8 +22,8 @@ void main() {
     late String iosPlugin;
 
     setUpAll(() {
-      androidPlugin = File('android/app/src/main/kotlin/com/pomodorogarden/'
-              'pomodoro_garden/LiveSessionSurfacePlugin.kt')
+      androidPlugin = File('android/app/src/main/kotlin/com/pipgarden/'
+              'pip_garden/LiveSessionSurfacePlugin.kt')
           .readAsStringSync();
       iosPlugin =
           File('ios/Runner/LiveSessionSurfacePlugin.swift').readAsStringSync();
@@ -32,7 +32,7 @@ void main() {
     test('is named the same in Dart, Kotlin and Swift', () {
       const name = ChannelLiveSessionSurface.channelName;
 
-      expect(name, 'pomodoro_garden/live_session');
+      expect(name, 'pip_garden/live_session');
       expect(androidPlugin, contains('"$name"'));
       expect(iosPlugin, contains('"$name"'));
     });

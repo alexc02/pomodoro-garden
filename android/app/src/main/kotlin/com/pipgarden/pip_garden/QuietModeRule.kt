@@ -1,4 +1,4 @@
-package com.pomodorogarden.pomodoro_garden
+package com.pipgarden.pip_garden
 
 import android.app.AlarmManager
 import android.app.AutomaticZenRule
@@ -70,7 +70,7 @@ class QuietModeRule(private val context: Context) {
          * of their own schedules, so it says what it is rather than what made
          * it.
          */
-        const val RULE_NAME = "Pomodoro Garden focus session"
+        const val RULE_NAME = "Pip Garden focus session"
 
         /**
          * The rule's condition id, and the app's handle on it.
@@ -81,7 +81,7 @@ class QuietModeRule(private val context: Context) {
          * carries on existing. That is how an app ends up with four copies of
          * its own rule in somebody's settings.
          */
-        val CONDITION_ID: Uri = Uri.parse("pomodorogarden://quiet-mode/focus-session")
+        val CONDITION_ID: Uri = Uri.parse("pipgarden://quiet-mode/focus-session")
 
         /**
          * How long after a session is due the failsafe lets the phone speak

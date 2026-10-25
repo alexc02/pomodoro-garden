@@ -29,7 +29,7 @@ final class ChannelLiveSessionSurface implements LiveSessionSurface {
 
   /// The channel both native implementations register against. Named for what
   /// crosses it rather than for either platform's mechanism.
-  static const String channelName = 'pomodoro_garden/live_session';
+  static const String channelName = 'pip_garden/live_session';
 
   /// Dart → platform.
   static const String showMethod = 'show';
@@ -122,7 +122,7 @@ final class ChannelLiveSessionSurface implements LiveSessionSurface {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription(what),
       ));
     }

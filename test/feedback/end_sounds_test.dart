@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/feedback/end_sound_player.dart';
+import 'package:pip_garden/src/feedback/end_sound_player.dart';
 
 /// The part of REQ-031 that is about the *files* rather than about the code.
 ///

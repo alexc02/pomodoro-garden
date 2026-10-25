@@ -1,6 +1,6 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/ambience/audio_interruptions.dart';
+import 'package:pip_garden/src/ambience/audio_interruptions.dart';
 
 /// Two of ticket 10's criteria are about things that cannot be made to happen
 /// in a test: a phone call arriving mid-session, and a Bluetooth speaker
