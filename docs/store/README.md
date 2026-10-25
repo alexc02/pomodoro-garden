@@ -13,7 +13,7 @@ the code and the release build's merged `AndroidManifest.xml`, not copied from t
 | `iarc-questionnaire.md` | Content rating (Play) and age rating (App Store), plus the target-audience choice |
 | `app-store-privacy.md` | App Store Connect's App Privacy, export compliance and review notes |
 | `feature-graphic.png` | Play's 1024 × 500 feature graphic (`tool/generate_store_art.dart`) |
-| `screenshots/iphone-6.9/`, `screenshots/ipad-13/` | App Store screenshots, 1320 × 2868 and 2064 × 2752, captioned per PRD §6.3 |
+| `screenshots/` | App Store screenshots, captioned per PRD §6.3: `iphone-6.3` (1206 × 2622, required), `iphone-6.9` (1320 × 2868, optional), `ipad-13` (2064 × 2752, required) |
 
 ## Your checklist
 
@@ -67,4 +67,10 @@ python3 tool/screenshots/compose.py  # captioned store images (needs Pillow)
 `capture.sh` launches the app through `tool/screenshots/main.dart`, which seeds an 80-session
 garden in memory, so your own data on the simulator is never touched. Shot 3 stands in for
 PRD §6.3's Dynamic Island shot: the simulator can't capture an expanded Live Activity.
-Upload the `iphone-6.9` set to the 6.9" display slot and `ipad-13` to the 13" iPad slot.
+Which set goes in which App Store Connect slot:
+
+| Folder | Slot | |
+|---|---|---|
+| `iphone-6.3` | iPhone, Dynamic Island (medium) — 1206 × 2622 | **Required** |
+| `iphone-6.9` | iPhone, Dynamic Island (large) — 1320 × 2868 | Optional; falls back to medium |
+| `ipad-13` | iPad 13" — 2064 × 2752 | **Required** |

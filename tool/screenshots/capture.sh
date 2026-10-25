@@ -6,16 +6,19 @@
 # saves what the simulator shows to docs/store/screenshots/raw/<device>/.
 # tool/screenshots/compose.py turns those into the captioned store images.
 #
-#   tool/screenshots/capture.sh
+#   tool/screenshots/capture.sh                  every device
+#   tool/screenshots/capture.sh iphone-6.3       just the ones named
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 OUT=docs/store/screenshots/raw
 BUNDLE=com.pipgarden.pipGarden
 
-# The two sizes App Store Connect asks for: 6.9" iPhone (1320 x 2868) and
-# 13" iPad (2064 x 2752). Every smaller size is scaled from these.
+# App Store Connect's required slots are the medium Dynamic Island iPhone
+# (1206 x 2622) and the 13" iPad (2064 x 2752); the large iPhone (1320 x 2868)
+# is optional and falls back to the medium set when left empty.
 DEVICES=(
+  "iphone-6.3|iPhone 18 Pro"
   "iphone-6.9|iPhone 18 Pro Max"
   "ipad-13|iPad Pro 13-inch (M5)"
 )
@@ -41,6 +44,7 @@ flutter build ios --simulator --debug -t tool/screenshots/main.dart
 for device in "${DEVICES[@]}"; do
   folder=${device%%|*}
   name=${device#*|}
+  if (($#)) && [[ " $* " != *" $folder "* ]]; then continue; fi
   udid=$(xcrun simctl list devices available |
     grep -F "    $name (" | head -1 | grep -oE '[0-9A-F-]{36}')
   echo "== $name ($udid)"

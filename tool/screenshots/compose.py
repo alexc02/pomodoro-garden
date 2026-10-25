@@ -25,6 +25,7 @@ LABEL = (0xFF, 0xF8, 0xEA)  # Palette.surfaceLight
 # Where the garden sits in a garden-tab capture, as fractions of the screen:
 # what the season and theme composites crop to.
 GARDEN_BAND = {
+    "iphone-6.3": (0.30, 0.65),
     "iphone-6.9": (0.30, 0.65),
     "ipad-13": (0.20, 0.74),
 }
@@ -32,6 +33,7 @@ GARDEN_BAND = {
 # The composites' layout per device: (columns, rows) for four seasons and for
 # three themes. Bands on the narrow phone, a grid where the iPad has room.
 GRIDS = {
+    "iphone-6.3": {"seasons": (1, 4), "themes": (1, 3)},
     "iphone-6.9": {"seasons": (1, 4), "themes": (1, 3)},
     "ipad-13": {"seasons": (2, 2), "themes": (1, 3)},
 }
