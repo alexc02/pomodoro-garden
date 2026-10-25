@@ -1,5 +1,5 @@
-import 'package:pomodoro_garden/src/export/garden_exporter.dart';
-import 'package:pomodoro_garden/src/export/garden_share.dart';
+import 'package:pip_garden/src/export/garden_exporter.dart';
+import 'package:pip_garden/src/export/garden_share.dart';
 
 /// A share sheet that remembers what it was handed instead of opening.
 ///

@@ -6,8 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/garden/art_bundle.dart';
-import 'package:pomodoro_garden/src/garden/plant_sprite.dart';
+import 'package:pip_garden/src/garden/art_bundle.dart';
+import 'package:pip_garden/src/garden/plant_sprite.dart';
 
 /// Ticket 23's pipeline: art that arrives as files, decoded once, painted
 /// through the seam ticket 04 built for it.

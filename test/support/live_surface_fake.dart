@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:pomodoro_garden/src/live/live_session.dart';
+import 'package:pip_garden/src/live/live_session.dart';
 
 /// A [LiveSessionSurface] that remembers what the lock screen was asked to
 /// show.

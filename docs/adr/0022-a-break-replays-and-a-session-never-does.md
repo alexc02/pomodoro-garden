@@ -18,7 +18,7 @@ plant is the app's only reward.
 
 0008 also said the break could not be replayed without the session after it being replayed
 too, "because they are the same rule applied twice". That was the part the gap review
-(`.scratch/pomodoro-garden/prd-gap-report.md`, finding B2) questioned. The two legs are not
+(`.scratch/pip-garden/prd-gap-report.md`, finding B2) questioned. The two legs are not
 alike:
 
 | | Earns anything? | Safe to anchor in the past? |

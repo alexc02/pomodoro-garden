@@ -98,7 +98,7 @@ final class GardenColors extends ThemeExtension<GardenColors> {
   /// The [GardenColors] for the enclosing theme.
   ///
   /// Throws if the theme has no [GardenColors] — that means the widget is
-  /// outside `PomodoroGardenApp`, which is a wiring bug, not a case to paper
+  /// outside `PipGardenApp`, which is a wiring bug, not a case to paper
   /// over with a default that silently renders the light palette on a dark
   /// screen. Throws in release too, for the same reason `MediaQuery.of` does:
   /// an assert would let the broken build ship.

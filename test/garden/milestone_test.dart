@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_session_repository.dart';
-import 'package:pomodoro_garden/src/features/garden/garden_view.dart';
-import 'package:pomodoro_garden/src/features/garden/milestone_card.dart';
-import 'package:pomodoro_garden/src/features/garden/plant_card.dart';
-import 'package:pomodoro_garden/src/garden/garden_painter.dart';
-import 'package:pomodoro_garden/src/garden/placeholder_plant_sprites.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_plant_repository.dart';
+import 'package:pip_garden/src/data/drift_session_repository.dart';
+import 'package:pip_garden/src/features/garden/garden_view.dart';
+import 'package:pip_garden/src/features/garden/milestone_card.dart';
+import 'package:pip_garden/src/features/garden/plant_card.dart';
+import 'package:pip_garden/src/garden/garden_painter.dart';
+import 'package:pip_garden/src/garden/placeholder_plant_sprites.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 import '../support/app_harness.dart';

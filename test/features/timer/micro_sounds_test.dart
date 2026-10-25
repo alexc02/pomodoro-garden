@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/feedback/micro_sounds.dart';
-import 'package:pomodoro_garden/src/features/garden/milestone_card.dart';
-import 'package:pomodoro_garden/src/features/onboarding/onboarding_steps.dart';
-import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/features/timer/ambience_picker.dart';
-import 'package:pomodoro_garden/src/garden/growing_plant.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/feedback/micro_sounds.dart';
+import 'package:pip_garden/src/features/garden/milestone_card.dart';
+import 'package:pip_garden/src/features/onboarding/onboarding_steps.dart';
+import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/features/timer/ambience_picker.dart';
+import 'package:pip_garden/src/garden/growing_plant.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../../support/announcement_fakes.dart';
 import '../../support/app_harness.dart';
@@ -73,9 +73,9 @@ void main() {
       // this ticket's business — and the sound follows the picture, because the
       // picture is the rule: the soil settle is the particle burst's sound, and
       // a burst drawn in silence would be the odder of the two outcomes.
-      final directory = Directory.systemTemp.createTempSync('pomodoro_garden');
+      final directory = Directory.systemTemp.createTempSync('pip_garden');
       addTearDown(() => directory.deleteSync(recursive: true));
-      final file = File('${directory.path}/pomodoro_garden.sqlite');
+      final file = File('${directory.path}/pip_garden.sqlite');
 
       final clock = FixedClock(testInstant);
       final firstLaunch = AppDatabase.inFile(file);

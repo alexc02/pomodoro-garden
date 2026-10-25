@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_session_repository.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_session_repository.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../../support/app_harness.dart';
 
@@ -20,8 +20,8 @@ void main() {
   late File file;
 
   setUp(() {
-    directory = Directory.systemTemp.createTempSync('pomodoro_garden_test');
-    file = File('${directory.path}/pomodoro_garden.sqlite');
+    directory = Directory.systemTemp.createTempSync('pip_garden_test');
+    file = File('${directory.path}/pip_garden.sqlite');
   });
 
   tearDown(() => directory.deleteSync(recursive: true));

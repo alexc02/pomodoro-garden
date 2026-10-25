@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/audio/app_audio_session.dart';
+import 'package:pip_garden/src/audio/app_audio_session.dart';
 
 /// REQ-012 asks for a bed that goes on playing behind a locked screen, and on
 /// iOS that is two things that live nowhere near each other: an `Info.plist`

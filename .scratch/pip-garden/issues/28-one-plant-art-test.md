@@ -28,7 +28,7 @@ There is no illustrator (PRD v2.2 changelog). The art comes from code in this re
 | `tool/sprite_art/wash.dart` | The engine, with three finishes (`Finish`): **paper-cut** (the app's style: flat layers, cut edges, a shadow cast wherever one layer lies on another, fibre texture), and the rejected watercolour and flat, kept for comparison. Shape helpers; a pure-Dart PNG encoder (the drawing must stay unpremultiplied) |
 | `tool/sprite_art/flower.dart` | The flower at five stages. Leaves keep fixed places and seeds across stages, so the stages read as one plant |
 | `tool/generate_sprite_art.dart` | `flutter test tool/generate_sprite_art.dart`: paints the types it owns in paper-cut (`FINISH=watercolour` or `flat` for the others) and rewrites only their manifest rows |
-| `tool/render_art_preview.dart` | `flutter test tool/render_art_preview.dart`: close-up, stage strip and garden renders for each season, through the real tint, atlas and export path, into `.scratch/pomodoro-garden/art-preview/` (or `PREVIEW_OUT`) |
+| `tool/render_art_preview.dart` | `flutter test tool/render_art_preview.dart`: close-up, stage strip and garden renders for each season, through the real tint, atlas and export path, into `.scratch/pip-garden/art-preview/` (or `PREVIEW_OUT`) |
 
 No app code changed. The full suites pass with the paper-cut flower, `art_delivery_test.dart` included. The PRD's §5.1, §6.2, §9.1 and REQ-022 now say paper-cut.
 

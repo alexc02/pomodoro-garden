@@ -18,13 +18,13 @@ import 'shell/app_shell.dart';
 ///
 /// Deliberately below `ProviderScope` rather than containing it, so a widget
 /// test can wrap this in its own scope with overrides.
-class PomodoroGardenApp extends StatelessWidget {
-  const PomodoroGardenApp({super.key});
+class PipGardenApp extends StatelessWidget {
+  const PipGardenApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pomodoro Garden',
+      title: 'Pip Garden',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,

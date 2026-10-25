@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_session_repository.dart';
-import 'package:pomodoro_garden/src/design/garden_colors.dart';
-import 'package:pomodoro_garden/src/design/page_header.dart';
-import 'package:pomodoro_garden/src/design/sky_band_backdrop.dart';
-import 'package:pomodoro_garden/src/design/typography.dart';
-import 'package:pomodoro_garden/src/features/journal/journal_heatmap.dart';
-import 'package:pomodoro_garden/src/features/journal/journal_screen.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_plant_repository.dart';
+import 'package:pip_garden/src/data/drift_session_repository.dart';
+import 'package:pip_garden/src/design/garden_colors.dart';
+import 'package:pip_garden/src/design/page_header.dart';
+import 'package:pip_garden/src/design/sky_band_backdrop.dart';
+import 'package:pip_garden/src/design/typography.dart';
+import 'package:pip_garden/src/features/journal/journal_heatmap.dart';
+import 'package:pip_garden/src/features/journal/journal_screen.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../../support/app_harness.dart';
 

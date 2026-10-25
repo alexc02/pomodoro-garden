@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/garden/garden_reset_providers.dart';
-import 'package:pomodoro_garden/src/session/session_providers.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/garden/garden_reset_providers.dart';
+import 'package:pip_garden/src/session/session_providers.dart';
 
 import '../support/app_harness.dart';
 

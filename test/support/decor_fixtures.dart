@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/garden/decor_sprite.dart';
-import 'package:pomodoro_garden/src/garden/placeholder_decor_sprites.dart';
+import 'package:pip_garden/src/garden/decor_sprite.dart';
+import 'package:pip_garden/src/garden/placeholder_decor_sprites.dart';
 
 /// What the tests around REQ-036 bake, place and expect.
 ///

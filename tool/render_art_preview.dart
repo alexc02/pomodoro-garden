@@ -5,23 +5,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/design/garden_colors.dart';
-import 'package:pomodoro_garden/src/design/garden_skin.dart';
-import 'package:pomodoro_garden/src/design/season_palette.dart';
-import 'package:pomodoro_garden/src/export/garden_exporter.dart';
-import 'package:pomodoro_garden/src/garden/art_bundle.dart';
-import 'package:pomodoro_garden/src/garden/decor_sprite.dart';
-import 'package:pomodoro_garden/src/garden/garden_atlas.dart';
-import 'package:pomodoro_garden/src/garden/garden_atlas_recipe.dart';
-import 'package:pomodoro_garden/src/garden/placeholder_plant_sprites.dart';
-import 'package:pomodoro_garden/src/garden/plant_palettes.dart';
-import 'package:pomodoro_garden/src/garden/season_weather.dart';
+import 'package:pip_garden/src/design/garden_colors.dart';
+import 'package:pip_garden/src/design/garden_skin.dart';
+import 'package:pip_garden/src/design/season_palette.dart';
+import 'package:pip_garden/src/export/garden_exporter.dart';
+import 'package:pip_garden/src/garden/art_bundle.dart';
+import 'package:pip_garden/src/garden/decor_sprite.dart';
+import 'package:pip_garden/src/garden/garden_atlas.dart';
+import 'package:pip_garden/src/garden/garden_atlas_recipe.dart';
+import 'package:pip_garden/src/garden/placeholder_plant_sprites.dart';
+import 'package:pip_garden/src/garden/plant_palettes.dart';
+import 'package:pip_garden/src/garden/season_weather.dart';
 
 /// Renders the art as the app will show it, for a person to judge (ticket 28).
 ///
 ///     flutter test tool/render_art_preview.dart
 ///
-/// Writes to `.scratch/pomodoro-garden/art-preview/`, outside the bundle: for
+/// Writes to `.scratch/pip-garden/art-preview/`, outside the bundle: for
 /// every theme and season, every type at every stage (`types-…`), the decor
 /// (`decor-…`), a garden (`garden-…`) and that garden with its weather
 /// (`weather-…`); and, for the Zen theme only, the flower's own sheets:
@@ -33,7 +33,7 @@ import 'package:pomodoro_garden/src/garden/season_weather.dart';
 ///   export path (`GardenExporter`), so the new flowers stand among the
 ///   placeholder types on today's soil and sky.
 final String _out = Platform.environment['PREVIEW_OUT'] ??
-    '.scratch/pomodoro-garden/art-preview';
+    '.scratch/pip-garden/art-preview';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

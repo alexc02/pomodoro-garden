@@ -1,8 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/feedback/end_sound_player.dart';
-import 'package:pomodoro_garden/src/notifications/local_session_notifications.dart';
+import 'package:pip_garden/src/feedback/end_sound_player.dart';
+import 'package:pip_garden/src/notifications/local_session_notifications.dart';
 
 /// How REQ-031's choice reaches the notification, on both platforms.
 ///

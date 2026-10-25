@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/garden/image_sprites.dart';
+import 'package:pip_garden/src/garden/image_sprites.dart';
 
 import 'sprite_art/plants.dart';
 import 'sprite_art/wash.dart';

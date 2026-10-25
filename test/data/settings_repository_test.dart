@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_settings_repository.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_settings_repository.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 /// Tested against real SQLite, in memory, for the same reason the session

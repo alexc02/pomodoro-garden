@@ -1,4 +1,4 @@
-package com.pomodorogarden.pomodoro_garden
+package com.pipgarden.pip_garden
 
 import android.content.Context
 import android.content.Intent
@@ -22,7 +22,7 @@ class LiveSessionSurfacePlugin(
 ) : MethodChannel.MethodCallHandler {
 
     companion object {
-        const val CHANNEL = "pomodoro_garden/live_session"
+        const val CHANNEL = "pip_garden/live_session"
 
         private const val METHOD_SHOW = "show"
         private const val METHOD_HIDE = "hide"

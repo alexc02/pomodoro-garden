@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/feedback/micro_sounds.dart';
-import 'package:pomodoro_garden/src/features/garden/decor_picker.dart';
-import 'package:pomodoro_garden/src/features/garden/garden_timer_bar.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/feedback/micro_sounds.dart';
+import 'package:pip_garden/src/features/garden/decor_picker.dart';
+import 'package:pip_garden/src/features/garden/garden_timer_bar.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../../support/announcement_fakes.dart';
 import '../../support/app_harness.dart';

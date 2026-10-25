@@ -18,7 +18,7 @@ import Foundation
 /// rather than one this class keeps.
 final class LiveSessionSurfacePlugin: NSObject {
 
-    static let channelName = "pomodoro_garden/live_session"
+    static let channelName = "pip_garden/live_session"
 
     /// The registered plugin, for the scene delegate to hand a URL to.
     ///

@@ -60,7 +60,7 @@ read:
 ```bash
 adb shell dumpsys batterystats --reset
 # unplug; start a session in the app; lock the screen; wait
-adb shell dumpsys batterystats --charged com.pomodorogarden.pomodoro_garden
+adb shell dumpsys batterystats --charged com.pipgarden.pip_garden
 ```
 
 **Attribution — tethered.** `dumpsys battery unplug` makes the framework account as
@@ -71,7 +71,7 @@ matter are not:
 ```bash
 adb shell dumpsys battery unplug
 # run the session, then:
-adb shell dumpsys batterystats --charged com.pomodorogarden.pomodoro_garden
+adb shell dumpsys batterystats --charged com.pipgarden.pip_garden
 adb shell dumpsys battery reset   # hand the framework back its real state
 ```
 

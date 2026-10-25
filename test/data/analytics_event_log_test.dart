@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_analytics_event_log.dart';
-import 'package:pomodoro_garden/src/data/drift_garden_reset.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_analytics_event_log.dart';
+import 'package:pip_garden/src/data/drift_garden_reset.dart';
 
 /// PRD §7.2's local table: what goes in, what comes back, and what falls off
 /// the end.

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
-import 'package:pomodoro_garden/src/shell/tab_glyph.dart';
-import 'package:pomodoro_garden/src/shell/torn_edge.dart';
+import 'package:pip_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/shell/tab_glyph.dart';
+import 'package:pip_garden/src/shell/torn_edge.dart';
 
 void main() {
   group('the tab glyphs', () {

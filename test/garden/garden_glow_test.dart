@@ -3,13 +3,13 @@ import 'dart:ui' as ui;
 import 'package:flutter/animation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/garden/garden_atlas.dart';
-import 'package:pomodoro_garden/src/garden/garden_painter.dart';
-import 'package:pomodoro_garden/src/garden/garden_projection.dart';
-import 'package:pomodoro_garden/src/garden/golden_shimmer.dart';
-import 'package:pomodoro_garden/src/garden/placeholder_plant_sprites.dart';
-import 'package:pomodoro_garden/src/garden/plant_sprite.dart';
-import 'package:pomodoro_garden/src/garden/plant_sway.dart';
+import 'package:pip_garden/src/garden/garden_atlas.dart';
+import 'package:pip_garden/src/garden/garden_painter.dart';
+import 'package:pip_garden/src/garden/garden_projection.dart';
+import 'package:pip_garden/src/garden/golden_shimmer.dart';
+import 'package:pip_garden/src/garden/placeholder_plant_sprites.dart';
+import 'package:pip_garden/src/garden/plant_sprite.dart';
+import 'package:pip_garden/src/garden/plant_sway.dart';
 
 import '../support/decor_fixtures.dart';
 

@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/drift_analytics_event_log.dart';
-import 'package:pomodoro_garden/src/data/drift_cycle_store.dart';
-import 'package:pomodoro_garden/src/data/drift_decor_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_garden_reset.dart';
-import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_session_repository.dart';
-import 'package:pomodoro_garden/src/data/drift_settings_repository.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/drift_analytics_event_log.dart';
+import 'package:pip_garden/src/data/drift_cycle_store.dart';
+import 'package:pip_garden/src/data/drift_decor_repository.dart';
+import 'package:pip_garden/src/data/drift_garden_reset.dart';
+import 'package:pip_garden/src/data/drift_plant_repository.dart';
+import 'package:pip_garden/src/data/drift_session_repository.dart';
+import 'package:pip_garden/src/data/drift_settings_repository.dart';
 
 import '../support/garden_seed.dart';
 

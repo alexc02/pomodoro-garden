@@ -650,7 +650,7 @@ class AppDatabase extends _$AppDatabase {
               // default is false, because false is what a *fresh install*
               // means — but a settings row that exists before this version
               // belongs to somebody who has been running sessions for weeks,
-              // and greeting them with "welcome to Pomodoro Garden" and three
+              // and greeting them with "welcome to Pip Garden" and three
               // steps to their first session would be the upgrade telling them
               // they had never been here.
               //
@@ -863,7 +863,7 @@ class AppDatabase extends _$AppDatabase {
 QueryExecutor _openOnDevice() {
   return LazyDatabase(() async {
     final directory = await getApplicationDocumentsDirectory();
-    final file = File(p.join(directory.path, 'pomodoro_garden.sqlite'));
+    final file = File(p.join(directory.path, 'pip_garden.sqlite'));
     // Opened on a background isolate: a query that touches a large garden must
     // not be able to drop a frame on the UI thread.
     return NativeDatabase.createInBackground(file);

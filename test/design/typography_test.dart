@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart' show FontLoader;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/design/typography.dart';
+import 'package:pip_garden/src/design/typography.dart';
 
 /// Widget tests render with a stand-in font whose glyphs are all the same
 /// width, which would make any width assertion below pass for the wrong reason.

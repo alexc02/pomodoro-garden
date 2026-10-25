@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/data/database_providers.dart';
-import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/data/database_providers.dart';
+import 'package:pip_garden/src/data/drift_plant_repository.dart';
 
 import '../support/analytics_fakes.dart';
 import '../support/app_harness.dart';

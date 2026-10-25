@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.pomodorogarden.pomodoro_garden"
+    namespace = "com.pipgarden.pip_garden"
 
     // Compile against the same API level we target, so the compiler flags
     // behaviour changes rather than leaving them to surface at runtime.
@@ -24,7 +24,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.pomodorogarden.pomodoro_garden"
+        applicationId = "com.pipgarden.pip_garden"
 
         // Android 8.0. Below this there are no notification channels and no
         // modern foreground-service model, both of which ticket 08 needs to

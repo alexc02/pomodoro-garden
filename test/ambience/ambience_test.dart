@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/data/database.dart';
-import 'package:pomodoro_garden/src/features/timer/ambience_picker.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/data/database.dart';
+import 'package:pip_garden/src/features/timer/ambience_picker.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../support/ambience_fake.dart';
 import '../support/announcement_fakes.dart';

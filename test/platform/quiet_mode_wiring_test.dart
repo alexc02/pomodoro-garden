@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/quiet/channel_quiet_mode.dart';
+import 'package:pip_garden/src/quiet/channel_quiet_mode.dart';
 
 /// The platform half of ticket 11, asserted from the only side that can be run
 /// here.
@@ -23,11 +23,11 @@ void main() {
   late String iosIntent;
 
   setUpAll(() {
-    androidPlugin = File('android/app/src/main/kotlin/com/pomodorogarden/'
-            'pomodoro_garden/QuietModePlugin.kt')
+    androidPlugin = File('android/app/src/main/kotlin/com/pipgarden/'
+            'pip_garden/QuietModePlugin.kt')
         .readAsStringSync();
-    androidRule = File('android/app/src/main/kotlin/com/pomodorogarden/'
-            'pomodoro_garden/QuietModeRule.kt')
+    androidRule = File('android/app/src/main/kotlin/com/pipgarden/'
+            'pip_garden/QuietModeRule.kt')
         .readAsStringSync();
     iosPlugin = File('ios/Runner/QuietModePlugin.swift').readAsStringSync();
     iosIntent =
@@ -38,7 +38,7 @@ void main() {
     test('is named the same in Dart, Kotlin and Swift', () {
       const name = ChannelQuietMode.channelName;
 
-      expect(name, 'pomodoro_garden/quiet_mode');
+      expect(name, 'pip_garden/quiet_mode');
       expect(androidPlugin, contains('"$name"'));
       expect(iosPlugin, contains('"$name"'));
     });
@@ -166,7 +166,7 @@ void main() {
       expect(androidRule, contains('QuietModeReceiver'));
       expect(manifest, contains('android:name=".QuietModeReceiver"'));
       expect(
-        File('android/app/src/main/kotlin/com/pomodorogarden/pomodoro_garden/'
+        File('android/app/src/main/kotlin/com/pipgarden/pip_garden/'
                 'QuietModeReceiver.kt')
             .readAsStringSync(),
         contains('QuietModeRule(context.applicationContext).end()'),
@@ -177,7 +177,7 @@ void main() {
       // A plugin nothing constructs answers nothing, and the failure looks
       // exactly like a platform that cannot do quiet mode.
       expect(
-        File('android/app/src/main/kotlin/com/pomodorogarden/pomodoro_garden/'
+        File('android/app/src/main/kotlin/com/pipgarden/pip_garden/'
                 'MainActivity.kt')
             .readAsStringSync(),
         contains('QuietModePlugin('),

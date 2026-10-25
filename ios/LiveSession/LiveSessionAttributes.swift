@@ -71,7 +71,7 @@ struct LiveSessionAttributes: ActivityAttributes {
 /// apart from an ordinary launch. Declared in `Runner/Info.plist` under
 /// `CFBundleURLTypes`.
 enum LiveSessionDeepLink {
-    static let scheme = "pomodorogarden"
+    static let scheme = "pipgarden"
     static let host = "session"
 
     static let url = URL(string: "\(scheme)://\(host)")!

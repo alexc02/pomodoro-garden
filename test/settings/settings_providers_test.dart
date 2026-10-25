@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/analytics/analytics_providers.dart';
-import 'package:pomodoro_garden/src/data/database_providers.dart';
-import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/settings/settings_providers.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/analytics/analytics_providers.dart';
+import 'package:pip_garden/src/data/database_providers.dart';
+import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/settings/settings_providers.dart';
+import 'package:pip_garden/src/shell/tab.dart';
 
 import '../support/app_harness.dart';
 

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/features/garden/garden_header.dart';
-import 'package:pomodoro_garden/src/features/garden/garden_screen.dart';
-import 'package:pomodoro_garden/src/features/journal/journal_screen.dart';
-import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/features/timer/timer_screen.dart';
-import 'package:pomodoro_garden/src/shell/tab.dart';
-import 'package:pomodoro_garden/src/shell/tab_glyph.dart';
-import 'package:pomodoro_garden/src/shell/torn_edge.dart';
+import 'package:pip_garden/src/features/garden/garden_header.dart';
+import 'package:pip_garden/src/features/garden/garden_screen.dart';
+import 'package:pip_garden/src/features/journal/journal_screen.dart';
+import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/features/timer/timer_screen.dart';
+import 'package:pip_garden/src/shell/tab.dart';
+import 'package:pip_garden/src/shell/tab_glyph.dart';
+import 'package:pip_garden/src/shell/torn_edge.dart';
 
 import '../support/app_harness.dart';
 

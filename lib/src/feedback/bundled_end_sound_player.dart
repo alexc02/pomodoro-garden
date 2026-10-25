@@ -90,7 +90,7 @@ final class BundledEndSoundPlayer implements EndSoundPlayer {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription('playing the end-of-session sound'),
       ));
     }

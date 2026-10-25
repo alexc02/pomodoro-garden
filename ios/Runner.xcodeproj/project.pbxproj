@@ -522,7 +522,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LiveSession/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pomodoro Garden Session";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pip Garden Session";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -531,7 +531,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden.LiveSessionWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden.LiveSessionWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -550,7 +550,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LiveSession/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pomodoro Garden Session";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pip Garden Session";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -559,7 +559,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden.LiveSessionWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden.LiveSessionWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -577,7 +577,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LiveSession/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pomodoro Garden Session";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pip Garden Session";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -586,7 +586,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden.LiveSessionWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden.LiveSessionWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -661,7 +661,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -678,7 +678,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -696,7 +696,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -712,7 +712,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -843,7 +843,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -865,7 +865,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.pomodorogarden.pomodoroGarden;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipgarden.pipGarden;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

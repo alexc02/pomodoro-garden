@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/design/garden_colors.dart';
-import 'package:pomodoro_garden/src/features/journal/journal_heatmap.dart';
-import 'package:pomodoro_garden/src/design/paper_painter.dart';
-import 'package:pomodoro_garden/src/features/journal/journal_screen.dart';
+import 'package:pip_garden/src/design/garden_colors.dart';
+import 'package:pip_garden/src/features/journal/journal_heatmap.dart';
+import 'package:pip_garden/src/design/paper_painter.dart';
+import 'package:pip_garden/src/features/journal/journal_screen.dart';
 
 /// The two decisions the journal makes that are neither a query nor a layout:
 /// how long a stretch of focus is written, and how green a day is drawn.

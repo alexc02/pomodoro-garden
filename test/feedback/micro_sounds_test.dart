@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/audio/app_audio_session.dart';
-import 'package:pomodoro_garden/src/feedback/micro_sounds.dart';
+import 'package:pip_garden/src/audio/app_audio_session.dart';
+import 'package:pip_garden/src/feedback/micro_sounds.dart';
 
 /// Ticket 26's files and its one platform rule, checked where a workstation can
 /// check them.

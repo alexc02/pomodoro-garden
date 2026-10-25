@@ -136,7 +136,7 @@ class GardenExportController extends Notifier<Exporting> {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription('exporting the garden as an image'),
       ));
       state = const ExportFailed(false);

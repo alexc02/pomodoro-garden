@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_garden/src/garden/growing_plant.dart';
-import 'package:pomodoro_garden/src/garden/plant_painter.dart';
+import 'package:pip_garden/src/garden/growing_plant.dart';
+import 'package:pip_garden/src/garden/plant_painter.dart';
 
 /// How far through §5.3's bloom the timer screen's plant is: 0 before it, 1
 /// once it has run.

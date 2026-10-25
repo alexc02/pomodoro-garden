@@ -1,4 +1,4 @@
-package com.pomodorogarden.pomodoro_garden
+package com.pipgarden.pip_garden
 
 import android.content.Context
 import android.content.Intent
@@ -36,7 +36,7 @@ class GardenSharePlugin(
 ) : MethodChannel.MethodCallHandler {
 
     companion object {
-        const val CHANNEL_NAME = "pomodoro_garden/garden_share"
+        const val CHANNEL_NAME = "pip_garden/garden_share"
 
         /**
          * The subdirectory of the cache the provider exposes, and the only path

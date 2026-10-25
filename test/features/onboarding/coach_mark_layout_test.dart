@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show FontLoader;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/design/typography.dart';
-import 'package:pomodoro_garden/src/features/onboarding/coach_marks.dart';
-import 'package:pomodoro_garden/src/features/onboarding/onboarding_steps.dart';
+import 'package:pip_garden/src/design/typography.dart';
+import 'package:pip_garden/src/features/onboarding/coach_marks.dart';
+import 'package:pip_garden/src/features/onboarding/onboarding_steps.dart';
 
 import '../../support/app_harness.dart';
 

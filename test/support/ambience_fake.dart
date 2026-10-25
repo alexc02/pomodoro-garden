@@ -1,5 +1,5 @@
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/ambience/ambience.dart';
+import 'package:pip_garden/src/ambience/ambience.dart';
 
 /// An [Ambience] that remembers what it was asked to play instead of playing.
 ///

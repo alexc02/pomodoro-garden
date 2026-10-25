@@ -1,4 +1,4 @@
-/// The Pomodoro Garden domain core.
+/// The Pip Garden domain core.
 ///
 /// Pure Dart: timer state machine, growth model, plot placement and milestone
 /// rules live here, and none of them may import Flutter. See the package README

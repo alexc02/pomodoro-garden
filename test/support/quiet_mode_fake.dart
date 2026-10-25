@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:pomodoro_garden/src/quiet/quiet_mode.dart';
+import 'package:pip_garden/src/quiet/quiet_mode.dart';
 
 /// A [QuietMode] that remembers how quiet the phone is instead of silencing
 /// one.

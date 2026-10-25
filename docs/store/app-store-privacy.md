@@ -33,7 +33,7 @@ Required by App Store Connect too. Use the same hosted page as Play. **[TO DO: t
 
 **Suggested App Review notes:**
 
-> Pomodoro Garden is a free focus timer with no account and no network access. To see its
+> Pip Garden is a free focus timer with no account and no network access. To see its
 > main features: tap Start on the garden screen; the session's countdown appears in a Live
 > Activity on the lock screen and in the Dynamic Island. Choose an ambient sound on the timer
 > screen; it keeps playing with the screen locked, which is why the app declares the audio

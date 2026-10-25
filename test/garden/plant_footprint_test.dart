@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/garden/placeholder_plant_sprites.dart';
-import 'package:pomodoro_garden/src/garden/plant_sprite.dart';
+import 'package:pip_garden/src/garden/placeholder_plant_sprites.dart';
+import 'package:pip_garden/src/garden/plant_sprite.dart';
 
 /// What a sprite says it covers, checked against what it actually inks.
 ///

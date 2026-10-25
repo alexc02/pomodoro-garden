@@ -43,7 +43,7 @@ final restoredSessionProvider = FutureProvider<FocusSession?>((ref) async {
     FlutterError.reportError(FlutterErrorDetails(
       exception: error,
       stack: stack,
-      library: 'pomodoro_garden',
+      library: 'pip_garden',
       context: ErrorDescription('restoring the session in flight'),
     ));
     return null;
@@ -61,7 +61,7 @@ final restoredCyclePositionProvider = FutureProvider<int>((ref) async {
     FlutterError.reportError(FlutterErrorDetails(
       exception: error,
       stack: stack,
-      library: 'pomodoro_garden',
+      library: 'pip_garden',
       context: ErrorDescription('restoring the cycle position'),
     ));
     return 0;
@@ -552,7 +552,7 @@ class SessionController extends Notifier<SessionSnapshot> {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription(what),
       ));
     }

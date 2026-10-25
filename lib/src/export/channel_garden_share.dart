@@ -27,7 +27,7 @@ final class ChannelGardenShare implements GardenShare {
       : _channel = channel ?? const MethodChannel(channelName);
 
   /// The channel both native implementations register against.
-  static const String channelName = 'pomodoro_garden/garden_share';
+  static const String channelName = 'pip_garden/garden_share';
 
   /// Dart → platform: here is an image, open the sheet on it.
   static const String shareMethod = 'share';
@@ -59,7 +59,7 @@ final class ChannelGardenShare implements GardenShare {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription('opening the share sheet on a garden export'),
       ));
       return ShareOutcome.unavailable;

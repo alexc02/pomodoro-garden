@@ -1,6 +1,6 @@
 # pomodoro_domain
 
-The rules of Pomodoro Garden, in pure Dart: the focus-session state machine,
+The rules of Pip Garden, in pure Dart: the focus-session state machine,
 the growth model, plot placement and milestones.
 
 ## The one rule

@@ -1,4 +1,4 @@
-package com.pomodorogarden.pomodoro_garden
+package com.pipgarden.pip_garden
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -23,7 +23,7 @@ import android.content.Intent
 class QuietModeReceiver : BroadcastReceiver() {
 
     companion object {
-        const val ACTION_END = "com.pomodorogarden.pomodoro_garden.END_QUIET_MODE"
+        const val ACTION_END = "com.pipgarden.pip_garden.END_QUIET_MODE"
     }
 
     override fun onReceive(context: Context, intent: Intent?) {

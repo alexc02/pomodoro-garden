@@ -6,8 +6,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/design/theme.dart';
-import 'package:pomodoro_garden/src/garden/growing_plant.dart';
+import 'package:pip_garden/src/design/theme.dart';
+import 'package:pip_garden/src/garden/growing_plant.dart';
 
 /// The one boundary the plant is captured from — the tree has several.
 const Key _plantBoundary = Key('plant');

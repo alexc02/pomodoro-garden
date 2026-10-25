@@ -75,7 +75,7 @@ class _AppOpenKeeperState extends ConsumerState<AppOpenKeeper> {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription('recording that the app was opened'),
       ));
     }

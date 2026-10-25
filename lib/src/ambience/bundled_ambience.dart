@@ -321,7 +321,7 @@ final class BundledAmbience implements Ambience {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
-        library: 'pomodoro_garden',
+        library: 'pip_garden',
         context: ErrorDescription(what),
       ));
     }

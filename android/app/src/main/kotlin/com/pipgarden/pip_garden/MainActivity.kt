@@ -1,4 +1,4 @@
-package com.pomodorogarden.pomodoro_garden
+package com.pipgarden.pip_garden
 
 import android.content.Intent
 import io.flutter.embedding.android.FlutterActivity
@@ -13,7 +13,7 @@ class MainActivity : FlutterActivity() {
          * ordinary launch from the home screen.
          */
         const val ACTION_OPEN_SESSION =
-            "com.pomodorogarden.pomodoro_garden.OPEN_SESSION"
+            "com.pipgarden.pip_garden.OPEN_SESSION"
     }
 
     private var liveSession: LiveSessionSurfacePlugin? = null

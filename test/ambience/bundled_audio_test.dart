@@ -4,9 +4,9 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/ambience/ambience.dart';
-import 'package:pomodoro_garden/src/feedback/end_sound_player.dart';
-import 'package:pomodoro_garden/src/feedback/micro_sounds.dart';
+import 'package:pip_garden/src/ambience/ambience.dart';
+import 'package:pip_garden/src/feedback/end_sound_player.dart';
+import 'package:pip_garden/src/feedback/micro_sounds.dart';
 
 /// The two of ticket 10's criteria that are about the *files* rather than about
 /// the code, asserted against the files.

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
-import 'package:pomodoro_garden/src/features/garden/milestone_card.dart';
-import 'package:pomodoro_garden/src/garden/milestone_keeper.dart';
+import 'package:pip_garden/src/features/garden/milestone_card.dart';
+import 'package:pip_garden/src/garden/milestone_keeper.dart';
 
 import 'app_harness.dart';
 
