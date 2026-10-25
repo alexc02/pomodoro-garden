@@ -1,3 +1,4 @@
+import '../garden/growth_stage.dart';
 import '../garden/plant.dart';
 import '../time/clock.dart';
 import 'focus_session.dart';
@@ -192,7 +193,10 @@ final class SessionMachine {
   /// Both collaborators are positional because the analyzer will not let a
   /// named parameter initialise a private field, and these two fields have no
   /// business being public.
-  SessionMachine(this._clock, this._ids);
+  ///
+  /// [cyclePosition] is where a previous launch left the cycle, so that a
+  /// relaunch does not start it over.
+  SessionMachine(this._clock, this._ids, {this._cyclePosition = 0});
 
   /// REQ-009: while a session is paused its plant keeps growing, at this
   /// fraction of the rate it grows at while the user is actually focusing. Half
@@ -208,7 +212,7 @@ final class SessionMachine {
 
   Break? _break;
 
-  int _cyclePosition = 0;
+  int _cyclePosition;
 
   /// Starts a session of [plannedDuration], anchored to the current instant,
   /// and returns the record of it for the caller to store.
@@ -330,6 +334,10 @@ final class SessionMachine {
 
     return _session = session;
   }
+
+  /// Puts the cycle back at session one — a garden that has been reset has
+  /// no completed sessions left to count towards a long break.
+  void resetCycle() => _cyclePosition = 0;
 
   /// Holds the countdown from the current instant, and returns the session to
   /// be recorded.
@@ -461,8 +469,9 @@ final class SessionMachine {
 
     // REQ-009's half-rate growth, and the only place the plant parts company
     // with the countdown. Clamped at the top for the same reason elapsed is:
-    // a session paused for long enough grows its plant all the way to mature
-    // before its own countdown runs out, and mature is as grown as a plant gets.
+    // a session paused for long enough grows its plant as far as it can go
+    // before its own countdown runs out. REQ-016 keeps the last stage for the
+    // completion itself, so an unfinished plant stops at maturing.
     final growth = elapsed + paused * SessionMachine.pausedGrowthRate;
     final growthProgress =
         (growth.inMicroseconds / planned.inMicroseconds).clamp(0.0, 1.0);
@@ -481,7 +490,12 @@ final class SessionMachine {
       // the clock to a subtraction from it, so it slides by however long the
       // caller took to ask.
       dueAt: session.startedAt.add(planned + paused),
-      growing: PlantGrowth.forSession(session, progress: growthProgress),
+      growing: PlantGrowth.forSession(
+        session,
+        progress: phase == SessionPhase.completed
+            ? growthProgress
+            : growthProgress.clamp(0.0, GrowthStage.maturing.threshold).toDouble(),
+      ),
       cyclePosition: _cyclePosition,
     );
   }

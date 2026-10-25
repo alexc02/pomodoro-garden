@@ -24,7 +24,8 @@ class SessionGate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final read = ref.watch(restoredSessionProvider).hasValue;
+    final read = ref.watch(restoredSessionProvider).hasValue &&
+        ref.watch(restoredCyclePositionProvider).hasValue;
     return read ? child : const OpeningFrame();
   }
 }

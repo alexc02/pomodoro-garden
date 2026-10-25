@@ -583,4 +583,41 @@ void main() {
       );
     });
   });
+
+  group('a machine handed the cycle a previous launch left', () {
+    test('picks up where it was, so the long break still falls due', () {
+      machine = SessionMachine(clock, SequentialIdSource(), cyclePosition: 3);
+      expect(machine.snapshot.cyclePosition, 3);
+
+      completeASession();
+
+      expect(machine.snapshot.cyclePosition, 4);
+      expect(
+        BreakOffer.at(
+          machine.snapshot.cyclePosition,
+          settings: GardenSettings.defaults,
+        ).kind,
+        BreakKind.long,
+      );
+    });
+
+    test('starts at session one when handed nothing', () {
+      expect(machine.snapshot.cyclePosition, 0);
+    });
+  });
+
+  group('resetting the cycle', () {
+    test('puts it back at session one', () {
+      completeASession();
+      completeASession();
+      completeASession();
+      expect(machine.snapshot.cyclePosition, 3);
+
+      machine.resetCycle();
+
+      expect(machine.snapshot.cyclePosition, 0);
+      completeASession();
+      expect(machine.snapshot.cyclePosition, 1);
+    });
+  });
 }

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'package:pomodoro_garden/src/data/database.dart';
 import 'package:pomodoro_garden/src/data/drift_analytics_event_log.dart';
+import 'package:pomodoro_garden/src/data/drift_cycle_store.dart';
 import 'package:pomodoro_garden/src/data/drift_decor_repository.dart';
 import 'package:pomodoro_garden/src/data/drift_garden_reset.dart';
 import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
@@ -53,6 +54,16 @@ void main() {
     expect(await countOf('sessions'), 0);
     expect(await countOf('decor'), 0);
     expect(await countOf('analytics_events'), 0);
+  });
+
+  test('puts the cycle back at session one (BUG-02)', () async {
+    final cycle = DriftCycleStore(database);
+    await cycle.save(3);
+
+    await reset.clear();
+
+    expect(await countOf('cycle'), 0);
+    expect(await cycle.load(), 0);
   });
 
   test('leaves the settings row where it is', () async {

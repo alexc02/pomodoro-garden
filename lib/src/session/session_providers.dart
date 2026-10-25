@@ -51,6 +51,23 @@ final restoredSessionProvider = FutureProvider<FocusSession?>((ref) async {
 });
 
 /// The live timer.
+/// Where the last launch left the Pomodoro cycle. Read once, before
+/// [SessionGate] opens, for the same reason [restoredSessionProvider] is; a
+/// store that cannot answer starts the cycle over rather than the app.
+final restoredCyclePositionProvider = FutureProvider<int>((ref) async {
+  try {
+    return await ref.watch(cycleStoreProvider).load();
+  } catch (error, stack) {
+    FlutterError.reportError(FlutterErrorDetails(
+      exception: error,
+      stack: stack,
+      library: 'pomodoro_garden',
+      context: ErrorDescription('restoring the cycle position'),
+    ));
+    return 0;
+  }
+});
+
 final sessionControllerProvider =
     NotifierProvider<SessionController, SessionSnapshot>(SessionController.new);
 
@@ -117,6 +134,7 @@ class SessionController extends Notifier<SessionSnapshot> {
       machine = _cachedMachine = SessionMachine(
         ref.read(clockProvider),
         ref.read(idSourceProvider),
+        cyclePosition: ref.read(restoredCyclePositionProvider).value ?? 0,
       );
       _restore(machine);
     }
@@ -174,6 +192,12 @@ class SessionController extends Notifier<SessionSnapshot> {
     // this tap still has to be written down. The machine refuses to start over
     // an unrecorded session, and it is right to.
     await _recordAnyCompletion();
+    // A second tap that landed before the first one's frame: the session it
+    // asks for is already running. The same guard [_command] gives the others.
+    if (_inFlight.contains(_machine.snapshot.phase)) {
+      _publish();
+      return;
+    }
 
     // Read here, at the tap, and never again for this session. That one line is
     // what makes a change to the setting apply to the *next* session: the
@@ -222,6 +246,8 @@ class SessionController extends Notifier<SessionSnapshot> {
       at: from,
     );
     _publish();
+    // A long break wraps the cycle as it begins.
+    await _saveCycle();
   }
 
   /// Ends the break the user is on, skipped or cut short, and goes back to
@@ -303,6 +329,12 @@ class SessionController extends Notifier<SessionSnapshot> {
   /// the ticker that repaints it has been asleep, and the first frame the user
   /// sees on returning should be right rather than one tick stale.
   Future<void> catchUp() => _tick();
+
+  /// After a garden reset: the sessions the cycle was counting are gone.
+  void resetCycle() {
+    _machine.resetCycle();
+    _publish();
+  }
 
   static const Set<SessionPhase> _running = {SessionPhase.running};
   static const Set<SessionPhase> _held = {SessionPhase.paused};
@@ -410,6 +442,7 @@ class SessionController extends Notifier<SessionSnapshot> {
     ));
 
     await _save(completed);
+    await _saveCycle();
     await _sow(completed);
     ref.invalidate(completedSessionsProvider);
     // The journal counts the sessions table by query rather than watching the
@@ -494,6 +527,13 @@ class SessionController extends Notifier<SessionSnapshot> {
       ref.invalidate(plantsProvider);
     });
   }
+
+  Future<void> _saveCycle() => _write(
+        'saving the cycle position',
+        () => ref
+            .read(cycleStoreProvider)
+            .save(_machine.snapshot.cyclePosition),
+      );
 
   Future<void> _save(FocusSession session) => _write(
         'saving session ${session.id}',

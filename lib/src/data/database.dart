@@ -452,7 +452,8 @@ class AppDatabase extends _$AppDatabase {
   /// `analytics_events`; version 15 adds ticket 18's `entitlements`; version
   /// 16 adds ticket 19's `gardenTheme`; version 17 adds ticket 20's `decor`;
   /// version 18 **drops** `entitlements` again, with the paywall it belonged
-  /// to; version 19 adds ticket 25's `endSound`.
+  /// to; version 19 adds ticket 25's `endSound`; version 20 adds the `cycle`
+  /// row that keeps the Pomodoro cycle's position across launches.
   /// [migration] says what happens at each step.
   ///
   /// A dropped version is not a reused one: 15 still means what it meant, and 18
@@ -460,14 +461,30 @@ class AppDatabase extends _$AppDatabase {
   /// ran a build between them walks 14 → 15 → … → 18 and creates the table only
   /// to drop it three steps later, which is the price of steps that each leave
   /// behind the shape of their own version.
+  /// Where the user is in the Pomodoro cycle — `SessionSnapshot.cyclePosition`
+  /// — so that a relaunch does not start the cycle over. Raw SQL rather than a
+  /// table class: one row, one number, read and written in
+  /// `drift_cycle_store.dart`.
+  static const String createCycle = '''
+    CREATE TABLE cycle (
+      id INTEGER NOT NULL DEFAULT 1,
+      position INTEGER NOT NULL,
+      PRIMARY KEY (id),
+      CHECK (id = 1)
+    )
+  ''';
+
   @override
-  int get schemaVersion => 19;
+  int get schemaVersion => 20;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         // The path from empty: a fresh install has no file, and gets every
         // table at the current version without running an upgrade step.
-        onCreate: (m) => m.createAll(),
+        onCreate: (m) async {
+          await m.createAll();
+          await customStatement(createCycle);
+        },
         // One step at a time, in order. A user who skipped three releases
         // arrives here at an old version and walks all the way up rather than
         // jumping — which is what keeps each step able to assume the shape the
@@ -748,6 +765,10 @@ class AppDatabase extends _$AppDatabase {
               // already had is what it is already on.
               case 18:
                 await m.addColumn(settings, settings.endSound);
+              // 19 → 20: the cycle's position gets a row of its own. Nothing is
+              // backfilled: a missing row reads as session one of the cycle.
+              case 19:
+                await customStatement(createCycle);
               // A version with no step out of it. Loud rather than silent: the
               // alternative is an app running against a schema it only assumes
               // it has.

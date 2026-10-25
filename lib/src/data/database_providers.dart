@@ -3,6 +3,7 @@ import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import 'database.dart';
 import 'drift_analytics_event_log.dart';
+import 'drift_cycle_store.dart';
 import 'drift_decor_repository.dart';
 import 'drift_garden_reset.dart';
 import 'drift_journal_repository.dart';
@@ -67,4 +68,8 @@ final analyticsEventLogProvider = Provider<AnalyticsEventLog>(
 /// .dart` is what calls it, and it is the only thing that does.
 final gardenResetProvider = Provider<GardenReset>(
   (ref) => DriftGardenReset(ref.watch(databaseProvider)),
+);
+
+final cycleStoreProvider = Provider<DriftCycleStore>(
+  (ref) => DriftCycleStore(ref.watch(databaseProvider)),
 );
