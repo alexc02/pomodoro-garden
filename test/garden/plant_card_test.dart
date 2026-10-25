@@ -145,19 +145,18 @@ void main() {
       expect(find.text('2 hours'), findsOneWidget);
     });
 
-    testWidgets('the species is written in the handwritten botanical face',
+    testWidgets('the species is lettered in the display face, in italic',
         (tester) async {
-      // §5.1: the label on the stake in the soil, and the only place in the app
-      // that face is used.
+      // §5.1: the label on the stake in the soil. Italic is what tells a plant
+      // name from a heading set in the same face.
       final plant = _plant(id: 'a', type: PlantType.herb, plot: _middle);
       await _openGarden(tester, [plant]);
 
       await _tapPlot(tester, _middle);
 
-      expect(
-        tester.widget<Text>(find.text(plant.species.label)).style?.fontFamily,
-        GardenTypography.botanicalFontFamily,
-      );
+      final style = tester.widget<Text>(find.text(plant.species.label)).style;
+      expect(style?.fontFamily, GardenTypography.displayFontFamily);
+      expect(style?.fontStyle, FontStyle.italic);
     });
   });
 

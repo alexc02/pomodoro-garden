@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'package:pomodoro_garden/src/data/database.dart';
 import 'package:pomodoro_garden/src/data/drift_analytics_event_log.dart';
+import 'package:pomodoro_garden/src/data/drift_cycle_store.dart';
 import 'package:pomodoro_garden/src/data/drift_decor_repository.dart';
 import 'package:pomodoro_garden/src/data/drift_journal_repository.dart';
 import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
@@ -1057,6 +1058,13 @@ void main() {
     // that is the absence of a sound rather than a switch beside them.
     await settings.save((await settings.load()).withEndSound(EndSound.none));
     expect((await settings.load()).endSound, EndSound.none);
+
+    // 19 → 20 runs on the way up too: the cycle starts at session one, and
+    // its row can be written from the moment it exists.
+    final cycle = DriftCycleStore(database);
+    expect(await cycle.load(), 0);
+    await cycle.save(3);
+    expect(await cycle.load(), 3);
   });
 
   testWidgets('a fresh database is created at the current version, no upgrade '
@@ -1064,7 +1072,7 @@ void main() {
     final database = AppDatabase.inFile(file);
     addTearDown(database.close);
 
-    expect(database.schemaVersion, 19);
+    expect(database.schemaVersion, 20);
     expect(await DriftSettingsRepository(database).load(),
         GardenSettings.defaults);
     expect(await DriftPlantRepository(database).plants(), isEmpty);
@@ -1078,6 +1086,7 @@ void main() {
         'plants',
         'analytics_events',
         'decor',
+        'cycle',
       ]),
     );
     // Never created, rather than created and dropped: `onCreate` builds the

@@ -71,10 +71,10 @@ void main() {
       );
       await scrollToSetting(tester, SettingsKeys.quietMode);
 
-      expect(find.textContaining('does not have permission'), findsNothing);
+      expect(find.textContaining("doesn't have permission"), findsNothing);
       // What is said instead is the promise that makes the switch safe to
       // turn on: the app's own news still gets through its own silence.
-      expect(find.textContaining('your session has finished'), findsOneWidget);
+      expect(find.textContaining("your session's finished"), findsOneWidget);
     });
   });
 
@@ -93,7 +93,7 @@ void main() {
       await settle(tester);
 
       expect(
-        find.textContaining('granted from system settings'),
+        find.textContaining('happens in system settings'),
         findsOneWidget,
       );
       expect(phone.accessRequests, isZero);
@@ -130,7 +130,7 @@ void main() {
       final control = await scrollToSetting(tester, SettingsKeys.quietMode);
 
       expect(tester.widget<SwitchListTile>(control).value, isFalse);
-      expect(find.textContaining('does not have permission'), findsOneWidget);
+      expect(find.textContaining("doesn't have permission"), findsOneWidget);
     });
   });
 

@@ -26,11 +26,44 @@ abstract final class Palette {
   /// a garden rather than a generic dark UI.
   static const Color backgroundDark = Color(0xFF1C2B1C);
 
-  /// Primary text on light surfaces.
-  static const Color textPrimary = Color(0xFF2D3A2D);
+  /// Primary text on light surfaces. The moss of [moss], so text and the
+  /// chrome it sits in are cut from the same sheet.
+  static const Color textPrimary = Color(0xFF22361F);
 
   /// Secondary text on light surfaces: captions, labels, disabled states.
-  static const Color textSecondary = Color(0xFF6B7B6B);
+  ///
+  /// Darker than §5.1's original `#6B7B6B`, which measured under 4.5:1 against
+  /// the cream [backgroundLight] it now sits on.
+  static const Color textSecondary = Color(0xFF4D5E48);
+
+  // --- The chrome (PRD v2.3, Paper Theatre) ---------------------------------
+  //
+  // The app's own controls, as distinct from the garden. [primary] stays the
+  // garden's foliage green — `GardenColors` paints leaves with it — so the
+  // chrome gets tokens of its own rather than borrowing it.
+
+  /// Deep moss: the tab bar, filled buttons, sliders. The light theme's
+  /// primary.
+  static const Color moss = Color(0xFF22361F);
+
+  /// Marigold: the one warm accent in the chrome, for the action a screen is
+  /// for. The dark theme's primary, where [moss] would vanish into the canvas.
+  static const Color marigold = Color(0xFFE8A33D);
+
+  /// A pale sage, like paper left in the sun: unselected tab labels on [moss],
+  /// and the light theme's primary container.
+  static const Color mist = Color(0xFFCFE0DA);
+
+  /// Terracotta: the body of the timer's pot (PRD v2.3). The one object on the
+  /// timer screen that is not the plant, so it is the one warm earth colour
+  /// there.
+  static const Color clay = Color(0xFFC2693E);
+
+  /// The pot's rim, a shade lighter than its body where the light catches it.
+  static const Color clayRim = Color(0xFFD9824F);
+
+  /// The line under the rim, where it overhangs the body.
+  static const Color clayShade = Color(0xFF9A4E2A);
 
   // --- Derived tokens -------------------------------------------------------
   //
@@ -39,12 +72,13 @@ abstract final class Palette {
   // themes resolve. They are marked out here so a future design pass knows
   // which values came from the PRD and which this ticket chose.
 
-  /// Light-mode canvas: warm off-white, a shade of paper rather than pure
-  /// white, to sit with the watercolour illustration style.
-  static const Color backgroundLight = Color(0xFFF7F5EF);
+  /// Light-mode canvas: cream paper, the sheet the paper-cut chrome is cut
+  /// from. Also the text colour on a filled [moss] control.
+  static const Color backgroundLight = Color(0xFFF3E9D2);
 
-  /// Raised surfaces in light mode — cards, sheets, the tab bar.
-  static const Color surfaceLight = Color(0xFFFFFFFF);
+  /// Raised surfaces in light mode — cards and sheets. One shade lighter than
+  /// [backgroundLight], as a card of fresh paper laid on it.
+  static const Color surfaceLight = Color(0xFFFFF8EA);
 
   /// Raised surfaces in dark mode: one step up from [backgroundDark].
   static const Color surfaceDark = Color(0xFF263826);

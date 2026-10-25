@@ -45,6 +45,35 @@ abstract final class Radii {
   static const BorderRadius smAll = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius mdAll = BorderRadius.all(Radius.circular(md));
   static const BorderRadius pillAll = BorderRadius.all(Radius.circular(pill));
+
+  /// A control cut from paper by hand: no two corners alike. Buttons.
+  ///
+  /// Uneven on purpose — four equal radii are what a template gives every
+  /// button, and the paper-cut art is never that regular.
+  static const BorderRadius paperSm = BorderRadius.only(
+    topLeft: Radius.circular(4),
+    topRight: Radius.circular(12),
+    bottomRight: Radius.circular(6),
+    bottomLeft: Radius.circular(10),
+  );
+
+  /// [paperSm] cut the other way round: an outlined button standing beside a
+  /// filled one, so the two read as two pieces of paper rather than one shape
+  /// twice.
+  static const BorderRadius paperSmMirrored = BorderRadius.only(
+    topLeft: Radius.circular(12),
+    topRight: Radius.circular(4),
+    bottomRight: Radius.circular(10),
+    bottomLeft: Radius.circular(6),
+  );
+
+  /// [paperSm] at card size: cards and sheets.
+  static const BorderRadius paperMd = BorderRadius.only(
+    topLeft: Radius.circular(6),
+    topRight: Radius.circular(14),
+    bottomRight: Radius.circular(8),
+    bottomLeft: Radius.circular(12),
+  );
 }
 
 /// Icon sizes. Separate from [Spacing] because an icon's size is a type-scale

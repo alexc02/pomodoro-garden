@@ -197,10 +197,10 @@ class ArrangeBar extends ConsumerWidget {
                       child: Text(
                         key: DecorKeys.guidance,
                         holding == null
-                            ? 'Tap an empty plot to place something, or tap '
+                            ? 'Tap an empty plot to place something. Tap '
                                 'something to pick it up.'
-                            : 'Moving the ${holding.kind.label.toLowerCase()} '
-                                '— tap an empty plot to put it down.',
+                            : 'Moving the ${holding.kind.label.toLowerCase()}. '
+                                'Tap an empty plot to put it down.',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodySmall
                             ?.copyWith(color: colors.textSecondary),

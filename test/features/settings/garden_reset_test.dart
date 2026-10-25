@@ -318,7 +318,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.text('Finish a session and the first thing you grow stands here.'),
+        find.text('Finish a session and your first plant goes in here.'),
         findsOneWidget,
       );
     });
@@ -350,8 +350,8 @@ void main() {
 
       expect(find.byKey(ResetGardenKeys.outcome), findsOneWidget);
       expect(
-        find.text('Your garden is empty. Your next finished session plants the '
-            'first thing in it.'),
+        find.text("Your garden's clear. Your next session plants the first "
+            'thing in it.'),
         findsOneWidget,
       );
     });
@@ -430,8 +430,8 @@ void main() {
       await tapReset(tester);
 
       expect(
-        find.text('Your garden could not be cleared just now, and nothing has '
-            'been removed.'),
+        find.text("Your garden couldn't be cleared just now. Nothing's been "
+            'removed.'),
         findsOneWidget,
       );
       // The sentence has to be true: a message saying nothing was removed, over
@@ -452,6 +452,8 @@ void main() {
       expect(await scrollToSetting(tester, ResetGardenKeys.heldBack),
           findsOneWidget);
       expect(find.byKey(ResetGardenKeys.control), findsNothing);
+      expect(find.textContaining('A session or break is running'),
+          findsOneWidget);
 
       // And the session is still running, which is the point of refusing.
       await tapTab(tester, AppTab.timer);
@@ -491,6 +493,9 @@ void main() {
       await openSettings(tester);
       expect(await scrollToSetting(tester, ResetGardenKeys.heldBack),
           findsOneWidget);
+      // BUG-04: nothing is running, so the note must not say so.
+      expect(find.textContaining('is running'), findsNothing);
+      expect(find.textContaining('just finished'), findsOneWidget);
     });
 
     testWidgets('lets the reset back in once it is at rest', (tester) async {

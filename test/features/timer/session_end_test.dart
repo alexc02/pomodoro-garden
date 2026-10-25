@@ -99,7 +99,7 @@ void main() {
       final grownByTheFirst = haptics.growths;
 
       // A mature plant is replaced by a seed. Nothing grew; a session started.
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant another'));
       await tester.pump();
 
       expect(haptics.growths, grownByTheFirst);
@@ -149,8 +149,7 @@ void main() {
       // grew and asks for nothing.
       expect(notice.title, 'Your ${species.label.toLowerCase()} has bloomed');
       expect(notice.body,
-          'Your focus session is complete. It is in your garden whenever '
-          'you would like to see it.');
+          "Your session's done. It's in your garden whenever you want to look.");
       expect(notice.title, isNot(contains('!')));
     });
 

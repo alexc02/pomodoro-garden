@@ -37,7 +37,7 @@ final class SessionCompletionNotice {
       // read like a bug to whoever gets it.
       return SessionCompletionNotice(
         at: at,
-        title: 'Your session is complete',
+        title: 'Your session\'s done',
         body: 'Something new is growing in your garden.',
         sound: sound,
       );
@@ -46,8 +46,8 @@ final class SessionCompletionNotice {
     return SessionCompletionNotice(
       at: at,
       title: 'Your ${growing.species.label.toLowerCase()} has bloomed',
-      body: 'Your focus session is complete. It is in your garden whenever '
-          'you would like to see it.',
+      body: 'Your session\'s done. It\'s in your garden whenever you want to '
+          'look.',
       sound: sound,
     );
   }
@@ -73,7 +73,7 @@ final class SessionCompletionNotice {
         BreakKind.short => 'Your break is over',
         BreakKind.long => 'Your long break is over',
       },
-      body: 'Another session is waiting whenever you are ready.',
+      body: 'Ready for another session when you are.',
       sound: sound,
     );
   }

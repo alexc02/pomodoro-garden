@@ -110,7 +110,7 @@ class OnboardingSteps extends ConsumerWidget {
                             );
                             onboarding.startFirstSession();
                           },
-                          child: const Text('Start my first session'),
+                          child: const Text('Plant my first seed'),
                         )
                       else
                         FilledButton(
@@ -188,19 +188,18 @@ class _StepBody extends ConsumerWidget {
     final (title, body) = switch (step) {
       OnboardingStep.welcome => (
           'Focus, and something grows',
-          'Every session you see through plants something that stays. This is '
-              'what a few weeks of them looks like.',
+          'Every session you finish plants something that stays. This is a few '
+              'weeks\' worth.',
         ),
       OnboardingStep.sessionLength => (
           'How long is your first session?',
-          'A longer session grows a bigger plant. Nothing is fixed — this is '
-              'the session length, and it lives in Settings afterwards.',
+          'Longer sessions grow bigger plants. You can change this any time in '
+              'Settings.',
         ),
       OnboardingStep.start => (
-          'That is the whole of it',
-          '${settings.sessionLength.inMinutes} minutes of focus, and a seed '
-              'goes into the soil the moment you start. There is nothing to '
-              'sign up for and nothing else to set.',
+          'That\'s all there is to it',
+          '${settings.sessionLength.inMinutes} minutes of focus, and a seed goes '
+              'in the moment you start. No account, and nothing else to set up.',
         ),
     };
 

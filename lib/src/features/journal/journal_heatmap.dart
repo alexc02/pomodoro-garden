@@ -146,9 +146,9 @@ class HeatmapDay extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(Radii.sm),
         // Today is ringed rather than filled, so it says "here" without saying
-        // "a session happened".
+        // "a session happened". In marigold, the chrome's one warm accent.
         border: isToday
-            ? Border.all(color: colors.textSecondary, width: 1.5)
+            ? Border.all(color: theme.colorScheme.secondary, width: 2)
             : null,
       ),
     );

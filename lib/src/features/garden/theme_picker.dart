@@ -261,8 +261,8 @@ class _SeasonNote extends ConsumerWidget {
     final season = ref.watch(seasonProvider);
 
     return Text(
-      'Every theme changes with the seasons. These are previewed as they look '
-      'in ${season.label.toLowerCase()}.',
+      'Every theme turns with the seasons. These show how they look in '
+      '${season.label.toLowerCase()}.',
       textAlign: TextAlign.center,
       style: theme.textTheme.labelSmall
           ?.copyWith(color: GardenColors.of(context).textSecondary),

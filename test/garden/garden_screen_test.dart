@@ -52,7 +52,7 @@ void main() {
     expect(layout.plotCount, 12);
     expect(layout.emptyPlots, 12);
     expect(
-      find.text('Finish a session and the first thing you grow stands here.'),
+      find.text('Finish a session and your first plant goes in here.'),
       findsOneWidget,
     );
   });

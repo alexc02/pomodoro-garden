@@ -288,7 +288,7 @@ void main() {
       // The idle ring shows the length of the session about to be started.
       expect(find.text('50:00'), findsOneWidget);
 
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant it'));
       await tester.pump();
 
       expect(find.text('50:00'), findsOneWidget);
@@ -319,7 +319,7 @@ void main() {
       expect(find.text('Session complete'), findsOneWidget);
 
       // Only now does the new length take over.
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant another'));
       await tester.pump();
       expect(find.text('50:00'), findsOneWidget);
     });
@@ -522,7 +522,7 @@ void main() {
 
     // And everything below the fold is reachable rather than cut off. Scrolled
     // until it appears rather than by a fixed distance: widget tests measure
-    // text in a stand-in font whose glyphs are far wider than Nunito's, so how
+    // text in a stand-in font whose glyphs are far wider than Inter's, so how
     // far down the second section sits here is not a real distance.
     await tester.scrollUntilVisible(
       find.text('Breaks'),

@@ -460,7 +460,7 @@ void main() {
 
       // The user goes straight into the next session rather than waiting for
       // the card. The award is owed, and it waits as long as it has to.
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant another'));
       await tester.pump();
       await advance(tester, clock, const Duration(minutes: 10));
       await settle(tester);

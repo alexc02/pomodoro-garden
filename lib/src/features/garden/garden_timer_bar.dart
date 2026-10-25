@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/paper_card.dart';
 import '../../design/spacing.dart';
 import '../../design/typography.dart';
 import '../../feedback/feedback_providers.dart';
@@ -14,6 +15,7 @@ import '../../session/session_providers.dart';
 import '../../settings/settings_providers.dart';
 import '../../shell/shell_providers.dart';
 import '../../shell/tab.dart';
+import '../../shell/tab_glyph.dart';
 import '../timer/countdown.dart';
 
 /// The timer bar's parts, by name.
@@ -86,13 +88,10 @@ class GardenTimerBar extends ConsumerWidget {
         ),
     };
 
-    final label = Text(
-      line,
-      // Tabular, so the line does not shift as the seconds change.
-      style: theme.textTheme.titleSmall?.copyWith(
-        color: colors.textPrimary,
-        fontFeatures: GardenTypography.tabularFigures,
-      ),
+    // Tabular, so the line does not shift as the seconds change.
+    final tabular = theme.textTheme.titleMedium?.copyWith(
+      color: colors.textPrimary,
+      fontFeatures: GardenTypography.tabularFigures,
     );
 
     return Padding(
@@ -102,39 +101,78 @@ class GardenTimerBar extends ConsumerWidget {
         Spacing.md,
         Spacing.md,
       ),
-      child: Material(
-        key: GardenTimerBarKeys.bar,
-        color: theme.colorScheme.surface.withValues(alpha: 0.94),
-        borderRadius: Radii.pillAll,
-        clipBehavior: Clip.antiAlias,
+      // A card of paper laid on the garden (PRD v2.3).
+      child: PaperCard(
+        surfaceKey: GardenTimerBarKeys.bar,
         child: startable
             ? Padding(
-                padding: const EdgeInsets.only(
-                  left: Spacing.lg,
-                  right: Spacing.xs,
-                  top: Spacing.xs,
-                  bottom: Spacing.xs,
+                padding: const EdgeInsets.fromLTRB(
+                  Spacing.lg,
+                  Spacing.md,
+                  Spacing.md,
+                  Spacing.md,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                // Side by side, and the button drops under the line when
+                // the two will not fit: on the smallest phone at the
+                // largest text sizes, "Plant it" and the session cannot
+                // share a row.
+                child: OverflowBar(
+                  spacing: Spacing.md,
+                  overflowSpacing: Spacing.sm,
+                  alignment: MainAxisAlignment.spaceBetween,
+                  overflowAlignment: OverflowBarAlignment.end,
                   children: [
-                    Flexible(child: label),
-                    const SizedBox(width: Spacing.md),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'UP NEXT',
+                          maxLines: 1,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colors.textSecondary,
+                            fontWeight: GardenTypography.headingWeight,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: Spacing.xs),
+                        // The session in the display face: it is the
+                        // thing this card is about. One line at any text
+                        // size; [spoken] is what a screen reader hears.
+                        Text(
+                          line,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            color: colors.textPrimary,
+                            fontSize: 21,
+                          ),
+                        ),
+                      ],
+                    ),
                     Semantics(
                       label: spoken,
                       button: true,
                       excludeSemantics: true,
                       child: FilledButton(
                         key: GardenTimerBarKeys.start,
+                        // Marigold: the one warm accent in the chrome, kept
+                        // for the action a screen is for.
+                        style: FilledButton.styleFrom(
+                          backgroundColor: theme.colorScheme.secondary,
+                          foregroundColor: theme.colorScheme.onSecondary,
+                        ),
                         onPressed: () {
                           // §9.2's button tap, as the timer's own START has.
                           unawaited(ref
                               .read(microSoundsProvider)
                               .play(MicroSound.buttonTap));
                           openTimer();
-                          ref.read(sessionControllerProvider.notifier).start();
+                          ref
+                              .read(sessionControllerProvider.notifier)
+                              .start();
                         },
-                        child: const Text('Start'),
+                        child: const Text('Plant it'),
                       ),
                     ),
                   ],
@@ -152,15 +190,25 @@ class GardenTimerBar extends ConsumerWidget {
                       vertical: Spacing.md,
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          AppTab.timer.icon,
+                        TabGlyph(
+                          AppTab.timer,
                           size: 20,
                           color: colors.textSecondary,
                         ),
                         const SizedBox(width: Spacing.sm),
-                        Flexible(child: label),
+                        Expanded(
+                          child: Text(
+                            line,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: tabular,
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: colors.textSecondary,
+                        ),
                       ],
                     ),
                   ),

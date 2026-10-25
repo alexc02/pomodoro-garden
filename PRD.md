@@ -2,10 +2,33 @@
 
 # Pomodoro Garden
 
-**Version:** 2.2  
+**Version:** 2.3  
 **Last Updated:** October 2026  
 **Author:** Product Team  
 **Status:** Draft  
+
+---
+
+## Changelog — v2.2 → v2.3
+
+**The chrome follows the art.** The paper-cut style (v2.2) reached the plants and stopped
+there; the controls around them were stock Material in a green tint. v2.3 adopts the
+*Paper Theatre* direction for the app's chrome — moss, cream paper and one marigold accent,
+hand-cut corners — and replaces the type. This change lands the tokens and the theme; the
+screen layouts that complete the direction follow.
+
+| Section | Change |
+|---|---|
+| §5.1 | Chrome colours added: moss `#22361F`, marigold `#E8A33D`, mist `#CFE0DA`; the light canvas is cream paper `#F3E9D2`. Text primary and secondary move to `#22361F` / `#4D5E48` — the old secondary measured under 4.5:1 on cream. Garden green `#6B8E5A` stays the foliage colour and leaves the chrome |
+| §5.1 | Typography: **Fraunces** (display: headings, plant names in italic, journal headers) and **Inter** (UI, and the timer digits — Fraunces has no tabular figures). Nunito and Caveat are removed |
+| §3.4 REQ-025 | The journal's headers are set in the display serif rather than a handwritten face |
+| §5.2 Screen 1 | The garden loses its app bar. A header gives the date and the garden's size ("A garden of thirty-one."), with export and arrange beside it; the garden stands in front of a paper backdrop — sun, two hills cut from the season's colours, and a night sky with a moon in dark mode; US-006's timer bar becomes a paper card with a marigold START |
+| §9.1 | A bare plot is drawn solid — the same paper cut as a planted one, paler and with two furrows — rather than as a faint sheet, which let the hills behind show through as a murky olive |
+| §5.1, §5.2 | The tab bar is a strip of moss paper with a torn top edge, and its icons are the app's own line drawings — a sprout, an hourglass, a notebook and a pair of sliders — in place of the outlined Material set; selection is marigold and a heavier line |
+| §5.2 Screen 2 | The timer loses its ring and its app bar: a large countdown under a band of sky, the plant in a clay pot, and a torn-paper progress strip with "Planted" and "Ready" times at its ends |
+| §5.2 Screen 3, §3.4 REQ-025 | The journal loses its app bar: a header says how long it has been kept and what it holds ("Thirteen plants, pressed."), over the timer's band of sky. Its three cards are cut paper with the garden card's shadow and hand-cut corners, the week's held down by a strip of marigold tape; today's day on the month is ringed in marigold. An empty journal is the same header over one card |
+| §5.2 Screen 4 | Settings loses its app bar: a "Settings" header over the same band of sky, and each group of settings is a card of cut paper. With it no tab has an app bar. The preset chips are cut with the buttons' uneven corners rather than as pills |
+| §5.2, §9 | A copy pass: the app speaks in contractions ("couldn't", "it's"), uses full stops where it used dashes, and says less. The garden card's and the timer's start button becomes "Plant it" ("Plant another" beside a break on offer), and onboarding's last step "Plant my first seed". REQ-036's confirmation text is unchanged |
 
 ---
 
@@ -310,7 +333,7 @@ previews a garden at 500 and at 1000 sessions, alongside the existing debug seas
 
 | ID | Requirement | Specification |
 |---|---|---|
-| REQ-025 | Stats screen | Single scrollable page, botanical journal aesthetic (paper texture, handwritten-style headers) |
+| REQ-025 | Stats screen | Single scrollable page, botanical journal aesthetic (paper texture, headers in the display serif — v2.3) |
 | REQ-026 | Weekly summary | Card showing: sessions this week, total focus time, plants grown, streak days |
 | REQ-027 | Calendar heatmap | Monthly grid; intensity of green = number of sessions that day. Empty days = bare soil color. Opens on the current month; previous/next arrows step through earlier months, never past the current one (v2.2) |
 | REQ-028 | Lifetime stats | Total sessions, total focus hours, total plants, garden level, rare plants earned |
@@ -548,8 +571,12 @@ measurements rather than on hardware.
 | Sky (golden hour) | | `#F5C99B` |
 | Accent (bloom) | | `#E89B9B` |
 | Background (dark mode) | | `#1C2B1C` |
-| Text primary | | `#2D3A2D` |
-| Text secondary | | `#6B7B6B` |
+| Text primary | | `#22361F` (v2.3; was `#2D3A2D`) |
+| Text secondary | | `#4D5E48` (v2.3; was `#6B7B6B`) |
+| Chrome (moss) | | `#22361F` (v2.3) |
+| Chrome accent (marigold) | | `#E8A33D` (v2.3) |
+| Chrome muted (mist) | | `#CFE0DA` (v2.3) |
+| Background (light mode) | | `#F3E9D2` (v2.3) |
 
 | **Typography** | |
 |---|---|
@@ -558,14 +585,15 @@ measurements rather than on hardware.
 | Numbers (timer) | SF Pro Rounded (monospaced digits, tabular) |
 | Botanical labels | Handwritten-style font (e.g., Caveat or similar) for plant names |
 
-**As built (v2.2):** SF Pro is Apple-only, so both platforms bundle **Nunito** (headings,
-body, and tabular timer digits) and **Caveat** (botanical labels). One rounded family on
-both keeps the platforms at visual parity.
+**As built (v2.3):** SF Pro is Apple-only, so both platforms bundle two OFL families.
+**Fraunces** sets headings, journal headers and plant names (in italic). **Inter** sets
+body, controls and the timer digits, because Fraunces has no tabular figures. v2.2 bundled
+Nunito and Caveat; both are gone.
 
 | **Iconography** | |
 |---|---|
 | App icon | A single paper-cut seedling in soil, rounded square. No text. Recognizable at all sizes. |
-| Tab bar icons | Minimalist line icons: garden (home), clock (timer), journal (stats), gear (settings) |
+| Tab bar icons | Minimalist line icons, drawn for the app (v2.3): sprout (garden), hourglass (timer), notebook (journal), sliders (settings) |
 
 ### 5.2 Key Screen Layouts
 
@@ -631,6 +659,13 @@ plant stands beneath it, with no percentage. US-007 asks to see progress "withou
 numbers", so a third number is not added; the ring is the time and the plant is the growth.
 The ambient picker sits below the controls. Revisit the layout only if the final art looks
 lost under the ring.
+
+**As built (v2.3):** the ring is replaced. The countdown stands large at the top, under a band
+of sky; the plant grows in a clay pot below it; and a strip of paper fills across under the
+pot, its leading edge torn, with the time the session was planted and the time it will be
+ready at either end. US-007's "without checking numbers" is now the strip, and the pot is the
+growth. No app bar, as on the garden. CANCEL is an outline beside PAUSE, and PLANT IT is
+marigold, as on the garden's timer card.
 
 #### Screen 3: Dynamic Island States
 

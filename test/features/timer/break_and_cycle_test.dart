@@ -4,7 +4,7 @@ import 'package:pomodoro_garden/src/data/database.dart';
 import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
 import 'package:pomodoro_garden/src/design/garden_colors.dart';
 import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
-import 'package:pomodoro_garden/src/features/timer/session_ring.dart';
+import 'package:pomodoro_garden/src/features/timer/progress_strip.dart';
 import 'package:pomodoro_garden/src/features/timer/timer_screen.dart';
 import 'package:pomodoro_garden/src/garden/growing_plant.dart';
 import 'package:pomodoro_garden/src/shell/tab.dart';
@@ -35,8 +35,8 @@ void main() {
   const session = Duration(minutes: 25);
   const shortBreak = Duration(minutes: 5);
 
-  SessionRing ring(WidgetTester tester) =>
-      tester.widget<SessionRing>(find.byType(SessionRing));
+  ProgressStrip strip(WidgetTester tester) =>
+      tester.widget<ProgressStrip>(find.byType(ProgressStrip));
 
   PlantGrowth? growing(WidgetTester tester) =>
       tester.widget<GrowingPlant>(find.byType(GrowingPlant)).growth;
@@ -66,7 +66,7 @@ void main() {
 
       expect(find.text('Session complete'), findsOneWidget);
       expect(find.text('Take a 5 min break'), findsOneWidget);
-      expect(find.text('Start'), findsOneWidget,
+      expect(find.text('Plant another'), findsOneWidget,
           reason: 'the break is offered, not imposed');
     });
 
@@ -106,12 +106,12 @@ void main() {
 
       expect(find.text('On a break'), findsOneWidget);
       expect(find.text('05:00'), findsOneWidget);
-      expect(ring(tester).progress, 0);
+      expect(strip(tester).progress, 0);
 
       // Read from the clock, exactly as a session is.
       await advance(tester, clock, const Duration(minutes: 2));
       expect(find.text('03:00'), findsOneWidget);
-      expect(ring(tester).progress, closeTo(0.4, 1e-9));
+      expect(strip(tester).progress, closeTo(0.4, 1e-9));
     });
 
     testWidgets('is restful rather than green, and grows nothing',
@@ -123,9 +123,9 @@ void main() {
       await takeTheBreak(tester);
 
       final garden = colours(tester);
-      expect(ring(tester).color, garden.skyDay,
+      expect(strip(tester).color, garden.skyDay,
           reason: 'the sky, not the growing green a session fills with');
-      expect(ring(tester).color, isNot(garden.bloom));
+      expect(strip(tester).color, isNot(garden.bloom));
       expect(growing(tester), isNull, reason: 'bare soil: a break grows nothing');
       expect(
         find.text('Nothing is growing while you rest. The break ends on its '
@@ -144,7 +144,7 @@ void main() {
 
       expect(find.text('Break over'), findsOneWidget);
       expect(find.text('00:00'), findsOneWidget);
-      expect(find.text('Start'), findsOneWidget);
+      expect(find.text('Plant it'), findsOneWidget);
     });
 
     testWidgets('comes back from an hour in the background already over',
@@ -197,10 +197,10 @@ void main() {
       await settle(tester);
 
       expect(find.text('Ready to focus'), findsOneWidget);
-      expect(find.text('Start'), findsOneWidget);
+      expect(find.text('Plant it'), findsOneWidget);
       expect(find.text('25:00'), findsOneWidget,
-          reason: 'the ring shows the session about to be started');
-      expect(ring(tester).progress, 0);
+          reason: 'the countdown shows the session about to be started');
+      expect(strip(tester).progress, 0);
     });
 
     testWidgets('ending it early is the same door', (tester) async {
@@ -240,13 +240,13 @@ void main() {
 
       await tester.tap(find.text('Skip break'));
       await settle(tester);
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant it'));
       await settle(tester);
 
       expect(find.text('Focusing'), findsOneWidget);
       expect(find.text('25:00'), findsOneWidget,
           reason: 'a whole session, not the three minutes the break had left');
-      expect(ring(tester).progress, 0);
+      expect(strip(tester).progress, 0);
     });
   });
 
@@ -293,7 +293,7 @@ void main() {
       // The same calm as the session's notice, and it claims no reward: a break
       // grows nothing, so there is no plant to name and no garden to mention.
       expect(notice.title, 'Your break is over');
-      expect(notice.body, 'Another session is waiting whenever you are ready.');
+      expect(notice.body, 'Ready for another session when you are.');
       expect(notice.title, isNot(contains('!')));
     });
 
@@ -648,7 +648,7 @@ void main() {
 
       expect(find.text('Break over'), findsOneWidget,
           reason: 'the other half of REQ-032 is off, so this one waits');
-      expect(find.text('Start'), findsOneWidget);
+      expect(find.text('Plant it'), findsOneWidget);
     });
 
     testWidgets('starts the next session on its own but offers the break',

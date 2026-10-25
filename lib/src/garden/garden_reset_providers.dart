@@ -191,5 +191,6 @@ class GardenResetController extends Notifier<Resetting> {
     ref.invalidate(milestoneAwardsProvider);
     // PRD §7.1's events, for the debug screen that shows them.
     ref.invalidate(recentEventsProvider);
+    ref.read(sessionControllerProvider.notifier).resetCycle();
   }
 }

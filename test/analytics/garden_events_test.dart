@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'package:pomodoro_garden/src/data/database.dart';
@@ -23,8 +24,15 @@ void main() {
     addTearDown(database.close);
   });
 
-  Future<void> launch(WidgetTester tester) =>
-      pumpApp(tester, clock: clock, database: database);
+  // A phone, held upright. On the suite's default landscape window the
+  // garden's fitted camera is already at the closest zoom allowed, and a pinch
+  // could not be told from no pinch.
+  Future<void> launch(WidgetTester tester) => pumpApp(
+        tester,
+        clock: clock,
+        database: database,
+        surface: const Size(390, 844),
+      );
 
   Future<List<LoggedEvent>> visits() =>
       eventsNamed(database, AnalyticsEventName.gardenViewed);

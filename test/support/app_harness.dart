@@ -271,9 +271,13 @@ Future<Finder> scrollWithin(
 }
 
 /// Opens the timer tab and starts a session, as a user would.
+///
+/// From rest the button is "Plant it"; straight after a finished session,
+/// beside the break on offer, it is "Plant another".
 Future<void> startSession(WidgetTester tester) async {
   await tapTab(tester, AppTab.timer);
-  await tester.tap(find.text('Start'));
+  final fresh = find.text('Plant it');
+  await tester.tap(tester.any(fresh) ? fresh : find.text('Plant another'));
   await tester.pump();
 }
 

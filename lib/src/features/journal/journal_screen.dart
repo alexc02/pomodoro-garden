@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/page_header.dart';
+import '../../design/paper_card.dart';
+import '../../design/sky_band_backdrop.dart';
 import '../../design/spacing.dart';
 import '../../design/typography.dart';
 import '../../garden/plant_painter.dart';
@@ -10,15 +13,17 @@ import '../../garden/plant_palettes.dart';
 import '../../garden/plant_providers.dart';
 import '../../journal/journal_providers.dart';
 import '../../shell/tab.dart';
+import '../../shell/tab_glyph.dart';
+import '../garden/garden_header.dart';
 import 'journal_heatmap.dart';
-import 'journal_paper.dart';
 
 /// The botanical journal: REQ-025 through REQ-029.
 ///
-/// One scrollable page of three cards on a paper ground, headed in the same
-/// hand a plant's label is written in. It is deliberately not a dashboard:
-/// there is no chart, no percentage, no comparison with last week and nothing
-/// coloured red. Everything on it is a count of things the user grew.
+/// One scrollable page of three cut-paper cards under a band of sky, headed in
+/// the same hand a plant's label is written in (PRD v2.3, Paper Theatre). It
+/// is deliberately not a dashboard: there is no chart, no percentage, no
+/// comparison with last week and nothing coloured red. Everything on it is a
+/// count of things the user grew.
 ///
 /// **Nothing on this screen is computed here.** The figures arrive as one
 /// [Journal] out of `journalProvider`, which is six aggregate queries and the
@@ -38,22 +43,27 @@ class JournalScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final journal = ref.watch(journalProvider(firstDayOfWeekIn(context)));
 
+    // No app bar: the tab bar already names the tab, and the top of the page
+    // is better spent on a line about this journal, as the garden's is.
     return Scaffold(
-      appBar: AppBar(title: Text(AppTab.journal.label)),
-      body: PaperBackground(
-        child: SafeArea(
-          child: journal.when(
-            // A blank page rather than a spinner, on the same reasoning the
-            // garden shows a blank sky: the read is six aggregates against an
-            // indexed table, and a spinner that appears for a frame and a half
-            // is worse than the paper that was going to be there anyway.
-            loading: () => const SizedBox.expand(),
-            error: (error, stack) => const _JournalUnreadable(),
-            data: (journal) => journal.isEmpty
-                ? const _FirstPage()
-                : _JournalPage(journal: journal),
+      body: Stack(
+        children: [
+          const SkyBandBackdrop(depth: 0.24),
+          SafeArea(
+            bottom: false,
+            child: journal.when(
+              // A blank page rather than a spinner, on the same reasoning the
+              // garden shows a blank sky: the read is six aggregates against
+              // an indexed table, and a spinner that appears for a frame and a
+              // half is worse than the paper that was going to be there anyway.
+              loading: () => const SizedBox.expand(),
+              error: (error, stack) => const _JournalUnreadable(),
+              data: (journal) => journal.isEmpty
+                  ? const _FirstPage()
+                  : _JournalPage(journal: journal),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -72,6 +82,16 @@ int firstDayOfWeekIn(BuildContext context) {
   return index == 0 ? DateTime.sunday : index;
 }
 
+/// What the journal holds, in a few words: "Thirteen plants, pressed."
+///
+/// The garden's own count, said the way the garden's headline says it, and for
+/// the same reason: it is a number that only goes up.
+String journalHeadline(int plants) {
+  if (plants == 1) return 'One plant, pressed.';
+  final words = GardenHeader.inWords(plants);
+  return '${words[0].toUpperCase()}${words.substring(1)} plants, pressed.';
+}
+
 /// The three cards, in the order PRD §5.2 draws them.
 class _JournalPage extends StatelessWidget {
   const _JournalPage({required this.journal});
@@ -80,19 +100,28 @@ class _JournalPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = MaterialLocalizations.of(context);
+
     return ListView(
-      padding: Spacing.screenPadding,
+      padding: PageHeader.pagePadding,
       children: [
+        PageHeader(
+          eyebrow: switch (journal.firstTended) {
+            final first? =>
+              'Kept since ${localizations.formatMonthYear(first.startsAt)}',
+            null => null,
+          },
+          headline: journalHeadline(journal.lifetime.plants),
+        ),
         _WeekCard(week: journal.week, streak: journal.streak),
-        const SizedBox(height: Spacing.md),
+        const SizedBox(height: Spacing.lg),
         _MonthCard(
           month: journal.month,
           today: journal.today,
           firstTended: journal.firstTended,
         ),
-        const SizedBox(height: Spacing.md),
+        const SizedBox(height: Spacing.lg),
         _LifetimeCard(lifetime: journal.lifetime),
-        const SizedBox(height: Spacing.xxl),
       ],
     );
   }
@@ -113,6 +142,7 @@ class _WeekCard extends StatelessWidget {
 
     return _JournalCard(
       heading: 'This week',
+      taped: true,
       note: _dates(localizations),
       children: [
         Text(
@@ -157,10 +187,10 @@ class _StreakLine extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          resting ? Icons.bedtime_outlined : Icons.local_florist_outlined,
+        TabGlyph(
+          AppTab.garden,
           size: IconSizes.inline,
-          color: resting ? colors.textSecondary : theme.colorScheme.primary,
+          color: resting ? colors.textSecondary : colors.foliage,
         ),
         const SizedBox(width: Spacing.sm),
         Expanded(
@@ -184,7 +214,7 @@ class _StreakLine extends StatelessWidget {
   String get sentence {
     if (streak.isGrowing) {
       return streak.days == 1
-          ? 'A day in a row.'
+          ? '1 day in a row.'
           : '${streak.days} days in a row.';
     }
     if (streak.isResting) {
@@ -415,12 +445,18 @@ class _LifetimeCard extends StatelessWidget {
 
 /// A card on the page: a handwritten heading, an optional note beside it, and
 /// whatever the card has to say.
+///
+/// Cut paper laid on the page, as the garden's card is ([PaperCard]). The
+/// first card is held down with a strip of tape, the way a page in a real
+/// journal would be: one thing on the screen that is plainly stuck there by
+/// hand.
 class _JournalCard extends StatelessWidget {
   const _JournalCard({
     required this.heading,
     required this.children,
     this.note,
     this.actions = const [],
+    this.taped = false,
   });
 
   final String heading;
@@ -431,6 +467,9 @@ class _JournalCard extends StatelessWidget {
   /// The small print under the heading — a date range, usually.
   final String? note;
 
+  /// Whether a strip of tape holds the card down.
+  final bool taped;
+
   final List<Widget> children;
 
   @override
@@ -438,16 +477,14 @@ class _JournalCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = GardenColors.of(context);
 
-    return Card(
-      // A hairline in soil rather than a shadow: a card on this page is a piece
-      // of paper laid on another, not a surface floating over one.
-      shape: RoundedRectangleBorder(
-        borderRadius: Radii.mdAll,
-        side: BorderSide(color: colors.soil.withValues(alpha: 0.22)),
-      ),
-      color: theme.colorScheme.surface.withValues(alpha: 0.86),
+    final card = PaperCard(
       child: Padding(
-        padding: const EdgeInsets.all(Spacing.md),
+        padding: const EdgeInsets.fromLTRB(
+          Spacing.lg,
+          Spacing.md,
+          Spacing.md,
+          Spacing.lg,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -474,6 +511,43 @@ class _JournalCard extends StatelessWidget {
         ),
       ),
     );
+    if (!taped) return card;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        card,
+        const Positioned(
+          top: -Spacing.sm,
+          right: Spacing.xl,
+          child: ExcludeSemantics(child: _Tape()),
+        ),
+      ],
+    );
+  }
+}
+
+/// A strip of tape, a little askew.
+class _Tape extends StatelessWidget {
+  const _Tape();
+
+  @override
+  Widget build(BuildContext context) {
+    final night = Theme.of(context).brightness == Brightness.dark;
+
+    return Transform.rotate(
+      angle: 0.07,
+      child: SizedBox(
+        width: 64,
+        height: 20,
+        child: ColoredBox(
+          color: Theme.of(context)
+              .colorScheme
+              .secondary
+              .withValues(alpha: night ? 0.55 : 0.6),
+        ),
+      ),
+    );
   }
 }
 
@@ -491,37 +565,39 @@ class _FirstPage extends StatelessWidget {
     final colors = GardenColors.of(context);
 
     return ListView(
-      padding: Spacing.screenPadding,
+      padding: PageHeader.pagePadding,
       children: [
-        const SizedBox(height: Spacing.xxl),
-        Icon(
-          AppTab.journal.icon,
-          size: IconSizes.hero,
-          color: theme.colorScheme.primary,
-        ),
-        const SizedBox(height: Spacing.lg),
-        Text(
-          'Your journal',
-          textAlign: TextAlign.center,
-          style: GardenTypography.journalHeading.copyWith(
-            color: colors.textPrimary,
-            fontSize: 34,
+        const PageHeader(headline: 'Your journal'),
+        PaperCard(
+          child: Padding(
+            padding: const EdgeInsets.all(Spacing.lg),
+            child: Column(
+              children: [
+                TabGlyph(
+                  AppTab.journal,
+                  size: IconSizes.hero,
+                  color: colors.foliage,
+                ),
+                const SizedBox(height: Spacing.md),
+                Text(
+                  'Nothing pressed between these pages yet.',
+                  textAlign: TextAlign.center,
+                  style: GardenTypography.journalHeading.copyWith(
+                    color: colors.textPrimary,
+                    fontSize: 21,
+                  ),
+                ),
+                const SizedBox(height: Spacing.sm),
+                Text(
+                  'Finish a session and this page fills in: your week, the '
+                  'days you tended and everything you\'ve grown.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: Spacing.sm),
-        Text(
-          'Nothing pressed between these pages yet.',
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodyMedium,
-        ),
-        const SizedBox(height: Spacing.md),
-        Text(
-          'Finish a focus session and this page fills in: the week you had, '
-          'the days you tended, and everything you have grown.',
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodySmall,
-        ),
-        const SizedBox(height: Spacing.xxl),
       ],
     );
   }
@@ -545,15 +621,15 @@ class _JournalUnreadable extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              AppTab.journal.icon,
+            TabGlyph(
+              AppTab.journal,
               size: IconSizes.hero,
               color: GardenColors.of(context).textSecondary,
             ),
             const SizedBox(height: Spacing.md),
             Text(
-              'Your journal could not be opened just now. Nothing has been '
-              'lost — try again in a moment.',
+              'Your journal couldn\'t be opened just now. Nothing\'s lost. Try '
+              'again in a moment.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium,
             ),

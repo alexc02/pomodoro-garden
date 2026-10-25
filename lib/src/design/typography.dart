@@ -1,21 +1,30 @@
 import 'package:flutter/widgets.dart';
 
-/// The type ramp from PRD §5.1.
+/// The type ramp from PRD §5.1, as revised by the Paper Theatre direction.
 ///
-/// §5.1 specifies SF Pro Rounded for headings and timer numerals. That family
-/// ships only on iOS, and this app runs on Android at parity, so the app
-/// bundles **Nunito** — a rounded humanist sans with the same warmth — and uses
-/// it on both platforms. Bundling rather than fetching also keeps first launch
-/// working offline.
+/// Two bundled families, both SIL OFL and both common in iOS apps:
+///
+/// - **Inter** is the UI family — body copy, labels, buttons, the tab bar. It
+///   is what keeps the controls reading as familiar, legible interface.
+/// - **Fraunces** is the display face — screen titles, section headings, the
+///   timer readout and plant names. A soft, slightly old-style serif: the
+///   "cut-paper picture book" half of §5.1's brief, where Inter is the
+///   "Apple Reminders minimalism" half.
+///
+/// §5.1 originally asked for SF Pro Rounded, which ships only on iOS; bundling
+/// both families keeps Android at parity and first launch working offline.
 abstract final class GardenTypography {
-  /// The bundled UI family. Declared in `pubspec.yaml` at weights 400/600/700.
-  static const String fontFamily = 'Nunito';
+  /// The UI family. Declared in `pubspec.yaml` at weights 400/600/700.
+  static const String fontFamily = 'Inter';
 
-  /// The handwritten family §5.1 asks for on botanical labels — plant names,
-  /// and nothing else. Caveat, the PRD's own example. Bundled at 400/600.
-  static const String botanicalFontFamily = 'Caveat';
+  /// The display face. Declared in `pubspec.yaml` at 600, upright and italic.
+  ///
+  /// It replaces the handwritten face §5.1 named for plant names and REQ-025's
+  /// journal headers: a script font was the most generic way to say "warm",
+  /// and an italic serif carries the same hand-labelled feel without it.
+  static const String displayFontFamily = 'Fraunces';
 
-  /// Headings are semibold, per §5.1's "rounded, semibold — warm, friendly".
+  /// Headings are semibold in both families.
   static const FontWeight headingWeight = FontWeight.w600;
 
   /// Body copy is regular.
@@ -23,28 +32,30 @@ abstract final class GardenTypography {
 
   /// Screen titles.
   static const TextStyle displayLarge = TextStyle(
-    fontFamily: fontFamily,
+    fontFamily: displayFontFamily,
     fontWeight: headingWeight,
     fontSize: 34,
-    height: 1.2,
+    height: 1.1,
     letterSpacing: -0.4,
   );
 
   /// Section headings within a screen.
   static const TextStyle headlineMedium = TextStyle(
-    fontFamily: fontFamily,
+    fontFamily: displayFontFamily,
     fontWeight: headingWeight,
     fontSize: 24,
-    height: 1.25,
+    height: 1.2,
     letterSpacing: -0.2,
   );
 
-  /// Card and list-row headings.
+  /// Card and list-row headings, app-bar titles and button labels. In the UI
+  /// family: these sit inside controls, where the display face would be noise.
   static const TextStyle titleMedium = TextStyle(
     fontFamily: fontFamily,
     fontWeight: headingWeight,
     fontSize: 17,
     height: 1.3,
+    letterSpacing: -0.2,
   );
 
   /// Default body copy.
@@ -52,7 +63,8 @@ abstract final class GardenTypography {
     fontFamily: fontFamily,
     fontWeight: bodyWeight,
     fontSize: 16,
-    height: 1.4,
+    height: 1.45,
+    letterSpacing: -0.1,
   );
 
   /// Body copy in a supporting role: card subtitles, secondary paragraphs.
@@ -69,39 +81,47 @@ abstract final class GardenTypography {
     fontWeight: bodyWeight,
     fontSize: 12,
     height: 1.2,
-    letterSpacing: 0.2,
+    letterSpacing: 0.1,
   );
 
-  /// The timer readout: large, rounded, and **tabular**.
+  /// The timer readout: large, semibold, and **tabular**.
   ///
   /// [FontFeature.tabularFigures] forces every digit onto the same advance
   /// width, so `25:00` counting down to `24:59` does not jitter horizontally as
   /// glyphs change each second. This is the one style in the ramp with a
   /// behavioural requirement rather than a visual one, and
   /// `test/design/typography_test.dart` measures it.
+  ///
+  /// **In the UI family, not the display face.** Fraunces has no tabular
+  /// figures — its `1` is two-thirds the width of its `0` — so a countdown set
+  /// in it would shift on every tick. Inter's are tabular.
   static const TextStyle timerDigits = TextStyle(
     fontFamily: fontFamily,
     fontWeight: headingWeight,
     fontSize: 64,
-    height: 1.1,
-    letterSpacing: 0,
+    height: 1.0,
+    letterSpacing: -1.5,
     fontFeatures: [FontFeature.tabularFigures()],
   );
 
-  /// [timerDigits], sized to sit inside a ring [ringDiameter] across.
+  /// [timerDigits] at the timer screen's size, for a screen [width] across
+  /// (PRD v2.3).
   ///
-  /// The countdown has to shrink with the ring on a small screen, and a screen
-  /// that wrote its own font size to do that would be the one place in the app
-  /// picking type by hand. The ratio lives here instead: a quarter of the
-  /// diameter leaves the digits comfortably clear of the stroke at every size
-  /// the ring is allowed to take.
-  static TextStyle timerDigitsInRing(double ringDiameter) =>
-      timerDigits.copyWith(fontSize: ringDiameter * _timerDigitsToRing);
+  /// The countdown is the largest thing on the screen, read from across a
+  /// desk: about a quarter of the width, which is five digits and a colon
+  /// filling most of a phone held upright, and capped so a tablet does not get
+  /// a wall of numbers. A screen that wrote its own font size to do this would
+  /// be the one place in the app picking type by hand; the ratio lives here.
+  static TextStyle timerDigitsFor(double width) => timerDigits.copyWith(
+        fontSize: (width * _timerDigitsToWidth).clamp(56.0, 104.0),
+        letterSpacing: -3,
+      );
 
-  static const double _timerDigitsToRing = 0.24;
+  static const double _timerDigitsToWidth = 0.27;
 
   /// The timer readout at glanceable size — session rows, the journal, and
-  /// anywhere a duration sits inline. Tabular for the same reason.
+  /// anywhere a duration sits inline. In the UI family, because at this size
+  /// it sits among labels rather than above them; tabular for the same reason.
   static const TextStyle timerDigitsSmall = TextStyle(
     fontFamily: fontFamily,
     fontWeight: headingWeight,
@@ -121,32 +141,30 @@ abstract final class GardenTypography {
     FontFeature.tabularFigures(),
   ];
 
-  /// Plant names, as if pencilled onto a plant label. Set larger than body
-  /// copy because Caveat's x-height runs small next to Nunito's.
+  /// Plant names, as if lettered onto a plant label: the display face in
+  /// italic.
   ///
-  /// One of the two styles off the UI family, and it applies to plant names
-  /// alone — [journalHeading] is the other, and between them they are the whole
-  /// of §5.1's handwriting. Setting UI chrome in either would be a misread.
+  /// Plant names and [journalHeading] are §5.1's "botanical" type. Setting UI
+  /// chrome in either would be a misread.
   static const TextStyle botanicalLabel = TextStyle(
-    fontFamily: botanicalFontFamily,
-    fontWeight: bodyWeight,
-    fontSize: 22,
+    fontFamily: displayFontFamily,
+    fontWeight: headingWeight,
+    fontStyle: FontStyle.italic,
+    fontSize: 21,
     height: 1.2,
   );
 
   /// The headings in the botanical journal — "This week", "August 2026",
   /// "Lifetime" — as if written at the top of a page.
   ///
-  /// REQ-025 asks for handwritten headers on that screen by name, which is why
-  /// this exists at all: it is the one place other than a plant's label where
-  /// §5.1's second face is the *specified* type rather than a decoration
-  /// somebody reached for. Semibold and larger than [botanicalLabel], because a
-  /// heading holding up a card of figures has more work to do than a name on a
-  /// stake, and Caveat at regular weight goes faint at heading sizes.
+  /// REQ-025 asks for distinct headers on that screen by name. Larger than
+  /// [botanicalLabel], because a heading holding up a card of figures has more
+  /// work to do than a name on a stake.
   static const TextStyle journalHeading = TextStyle(
-    fontFamily: botanicalFontFamily,
+    fontFamily: displayFontFamily,
     fontWeight: headingWeight,
-    fontSize: 30,
+    fontSize: 26,
     height: 1.15,
+    letterSpacing: -0.3,
   );
 }

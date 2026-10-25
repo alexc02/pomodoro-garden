@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_garden/src/design/garden_colors.dart';
 import 'package:pomodoro_garden/src/features/journal/journal_heatmap.dart';
-import 'package:pomodoro_garden/src/features/journal/journal_paper.dart';
+import 'package:pomodoro_garden/src/design/paper_painter.dart';
 import 'package:pomodoro_garden/src/features/journal/journal_screen.dart';
 
 /// The two decisions the journal makes that are neither a query nor a layout:

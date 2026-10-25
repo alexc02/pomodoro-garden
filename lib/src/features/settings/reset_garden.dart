@@ -49,10 +49,9 @@ Future<bool> confirmGardenReset(BuildContext context) async {
       key: ResetGardenKeys.firstConfirmation,
       title: const Text('Reset your garden?'),
       content: const Text(
-        'Every plant you have grown, every session behind them and everything '
-        'the app has counted about them are cleared.\n\n'
-        'What you have chosen in settings stays — your lengths, your theme '
-        'and your sounds are all still yours afterwards.',
+        'Every plant you\'ve grown, and every session and stat behind them, '
+        'will be cleared.\n\nYour settings stay: your lengths, your theme and '
+        'your sounds.',
       ),
       actions: [
         TextButton(
@@ -77,7 +76,7 @@ Future<bool> confirmGardenReset(BuildContext context) async {
     context: context,
     builder: (context) => AlertDialog(
       key: ResetGardenKeys.secondConfirmation,
-      title: const Text('This cannot be undone'),
+      title: const Text('This can\'t be undone'),
       // REQ-036's sentence, as the whole of the second question. Said in the
       // requirement's own words rather than paraphrased, because this is the
       // line the user is being asked to agree to.

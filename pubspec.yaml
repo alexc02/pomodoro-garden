@@ -100,23 +100,27 @@ flutter:
     - assets/art/plants/
     - assets/art/decor/
 
-  # Nunito is bundled rather than fetched at runtime, and used on both
-  # platforms. PRD §5.1 asks for SF Pro Rounded, which exists only on iOS;
-  # shipping one rounded family keeps the two platforms at visual parity and
-  # keeps the app working offline. See lib/src/design/typography.dart.
+  # Both families are bundled rather than fetched at runtime, and used on both
+  # platforms, so the two stay at visual parity and first launch works offline.
+  # Both are SIL OFL 1.1; the licences sit beside the files. Static instances
+  # rather than the variable fonts, because Flutter does not drive a variable
+  # font's weight axis from `fontWeight`. See lib/src/design/typography.dart.
   fonts:
-    - family: Nunito
+    # The UI family (Inter 4.1, rsms/inter).
+    - family: Inter
       fonts:
-        - asset: assets/fonts/Nunito-Regular.ttf
+        - asset: assets/fonts/Inter-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Nunito-SemiBold.ttf
+        - asset: assets/fonts/Inter-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Nunito-Bold.ttf
+        - asset: assets/fonts/Inter-Bold.ttf
           weight: 700
-    # §5.1's handwritten face, for plant names only.
-    - family: Caveat
+    # The display face: headings, the timer, plant names (Fraunces 1.000,
+    # undercasetype/Fraunces, the 72pt optical size).
+    - family: Fraunces
       fonts:
-        - asset: assets/fonts/Caveat-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Caveat-SemiBold.ttf
+        - asset: assets/fonts/Fraunces-SemiBold.ttf
           weight: 600
+        - asset: assets/fonts/Fraunces-SemiBoldItalic.ttf
+          weight: 600
+          style: italic

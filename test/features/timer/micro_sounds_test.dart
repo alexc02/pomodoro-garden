@@ -32,7 +32,7 @@ void main() {
       await pumpApp(tester, microSounds: sounds);
       await tapTab(tester, AppTab.timer);
 
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant it'));
       await tester.pump();
 
       // Most of the way down, and nothing has landed yet.
@@ -61,7 +61,7 @@ void main() {
 
       // A second session drops a second seed: a different plant, not a
       // further-grown one.
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant another'));
       await settle(tester);
       expect(sounds.countOf(MicroSound.soilSettle), 2);
     });
@@ -215,7 +215,7 @@ void main() {
       await pumpApp(tester, microSounds: sounds);
       await tapTab(tester, AppTab.timer);
 
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant it'));
       await tester.pump();
 
       // The tap first, before anything has moved.
@@ -464,7 +464,8 @@ Future<void> completeSessions(
 ) async {
   await tapTab(tester, AppTab.timer);
   for (var i = 0; i < count; i++) {
-    await tester.tap(find.text('Start').last);
+    // The first from rest; each after it from the end of the one before.
+    await tester.tap(find.text(i == 0 ? 'Plant it' : 'Plant another').last);
     await tester.pump();
     await advance(tester, clock, const Duration(minutes: 25));
     await settle(tester);

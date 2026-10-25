@@ -567,17 +567,31 @@ void main() {
       expect(snapshot.growthProgress, snapshot.progress);
     });
 
-    test('a plant does not grow past mature, however long the pause', () {
+    test('a plant stops at maturing, however long the pause — REQ-016 '
+        'keeps mature for the completion', () {
       machine.start(plannedDuration: classic);
       clock.advance(const Duration(minutes: 5));
       machine.pause();
       clock.advance(const Duration(hours: 8));
 
       expect(machine.snapshot.growthProgress, 1);
-      expect(machine.snapshot.growing!.stage, GrowthStage.mature);
+      expect(machine.snapshot.growing!.stage, GrowthStage.maturing);
       expect(machine.snapshot.phase, SessionPhase.paused,
           reason: 'a mature plant does not finish the session for you');
       expect(machine.snapshot.remaining, const Duration(minutes: 20));
+    });
+
+    test('a held plant becomes mature the moment its session completes', () {
+      machine.start(plannedDuration: classic);
+      clock.advance(const Duration(minutes: 20));
+      machine.pause();
+      clock.advance(const Duration(minutes: 10));
+      expect(machine.snapshot.growing!.stage, GrowthStage.maturing);
+
+      machine.resume();
+      clock.advance(const Duration(minutes: 5));
+      expect(machine.poll(), isNotNull);
+      expect(machine.snapshot.growing!.stage, GrowthStage.mature);
     });
   });
 

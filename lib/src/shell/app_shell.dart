@@ -8,6 +8,8 @@ import '../features/settings/settings_screen.dart';
 import '../features/timer/timer_screen.dart';
 import 'shell_providers.dart';
 import 'tab.dart';
+import 'tab_glyph.dart';
+import 'torn_edge.dart';
 
 /// The four-tab shell that is the app's root.
 ///
@@ -51,23 +53,30 @@ class AppShell extends ConsumerWidget {
             ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selected.index,
-        onDestinationSelected: (index) => ref
-            .read(selectedTabProvider.notifier)
-            .select(AppTab.values[index]),
-        destinations: [
-          for (final tab in AppTab.values)
-            NavigationDestination(
-              // Two of the four carry a key, so that a coach mark can find the
-              // destination it is about rather than being told where the bar
-              // puts it. Null on the other two, which nothing points at.
-              key: CoachMarkTargets.forTab(tab),
-              icon: Icon(tab.icon),
-              label: tab.label,
-              tooltip: tab.label,
-            ),
-        ],
+      // A strip of moss paper with a torn top edge, the bar's whole look apart
+      // from its glyphs (PRD v2.3). The bar itself stays Material's, for what
+      // it does rather than how it looks: its semantics, its hit targets and
+      // its text scaling are all things a hand-built bar would have to redo.
+      bottomNavigationBar: TornEdge(
+        child: NavigationBar(
+          selectedIndex: selected.index,
+          onDestinationSelected: (index) => ref
+              .read(selectedTabProvider.notifier)
+              .select(AppTab.values[index]),
+          destinations: [
+            for (final tab in AppTab.values)
+              NavigationDestination(
+                // Two of the four carry a key, so that a coach mark can find
+                // the destination it is about rather than being told where the
+                // bar puts it. Null on the other two, which nothing points at.
+                key: CoachMarkTargets.forTab(tab),
+                icon: TabGlyph(tab),
+                selectedIcon: TabGlyph(tab, selected: true),
+                label: tab.label,
+                tooltip: tab.label,
+              ),
+          ],
+        ),
       ),
     );
   }

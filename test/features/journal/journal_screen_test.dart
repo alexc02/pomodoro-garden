@@ -5,9 +5,10 @@ import 'package:pomodoro_garden/src/data/database.dart';
 import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
 import 'package:pomodoro_garden/src/data/drift_session_repository.dart';
 import 'package:pomodoro_garden/src/design/garden_colors.dart';
+import 'package:pomodoro_garden/src/design/page_header.dart';
+import 'package:pomodoro_garden/src/design/sky_band_backdrop.dart';
 import 'package:pomodoro_garden/src/design/typography.dart';
 import 'package:pomodoro_garden/src/features/journal/journal_heatmap.dart';
-import 'package:pomodoro_garden/src/features/journal/journal_paper.dart';
 import 'package:pomodoro_garden/src/features/journal/journal_screen.dart';
 import 'package:pomodoro_garden/src/shell/tab.dart';
 
@@ -452,18 +453,43 @@ void main() {
   });
 
   group('the page itself', () {
-    testWidgets('REQ-025: paper, and headings in the handwritten face',
+    test('is headed with what has been grown, in words', () {
+      expect(journalHeadline(1), 'One plant, pressed.');
+      expect(journalHeadline(13), 'Thirteen plants, pressed.');
+      expect(journalHeadline(42), 'Forty-two plants, pressed.');
+      expect(journalHeadline(142), '142 plants, pressed.');
+    });
+
+    testWidgets('PRD v2.3: no app bar; the header says it instead',
         (tester) async {
       await completed(DateTime(2026, 8, 11, 9));
 
       await openJournal(tester);
 
-      expect(find.byType(PaperBackground), findsOneWidget);
+      expect(find.byType(AppBar), findsNothing);
+      expect(find.text('Kept since August 2026'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(PageHeader),
+          matching: find.text('One plant, pressed.'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('REQ-025: paper, and headings in the display face',
+        (tester) async {
+      await completed(DateTime(2026, 8, 11, 9));
+
+      await openJournal(tester);
+
+      expect(find.byType(SkyBandBackdrop), findsOneWidget);
+      expect(find.byType(AppBar), findsNothing);
 
       final headings = tester
           .widgetList<Text>(find.byType(Text))
           .where((text) =>
-              text.style?.fontFamily == GardenTypography.botanicalFontFamily)
+              text.style?.fontFamily == GardenTypography.displayFontFamily)
           .map((text) => text.data);
       expect(
         headings,
@@ -478,7 +504,7 @@ void main() {
 
       expect(
         find.descendant(
-          of: find.byType(PaperBackground),
+          of: find.byType(JournalScreen),
           matching: find.byType(Scrollable),
         ),
         findsOneWidget,
@@ -524,7 +550,7 @@ void main() {
 
       await tapTab(tester, AppTab.journal);
       expect(find.text('1 session · 25m'), findsOneWidget);
-      expect(find.text('A day in a row.'), findsOneWidget);
+      expect(find.text('1 day in a row.'), findsOneWidget);
       expect(shadeOf(tester, _tuesday), isNot(shadeOf(tester, const CalendarDay(2026, 8, 12))));
     });
   });

@@ -88,7 +88,7 @@ class MilestoneCard extends StatelessWidget {
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              'A bonus plant for your garden. It is already standing in it.',
+              'A bonus plant for your garden. It\'s already planted.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium
                   ?.copyWith(color: colors.textSecondary),

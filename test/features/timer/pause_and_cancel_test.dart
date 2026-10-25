@@ -3,7 +3,7 @@ import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'package:pomodoro_garden/src/data/database.dart';
 import 'package:pomodoro_garden/src/data/drift_plant_repository.dart';
 import 'package:pomodoro_garden/src/data/drift_session_repository.dart';
-import 'package:pomodoro_garden/src/features/timer/session_ring.dart';
+import 'package:pomodoro_garden/src/features/timer/progress_strip.dart';
 import 'package:pomodoro_garden/src/garden/growing_plant.dart';
 
 import '../../support/app_harness.dart';
@@ -24,8 +24,8 @@ void main() {
     addTearDown(database.close);
   });
 
-  SessionRing ring(WidgetTester tester) =>
-      tester.widget<SessionRing>(find.byType(SessionRing));
+  ProgressStrip strip(WidgetTester tester) =>
+      tester.widget<ProgressStrip>(find.byType(ProgressStrip));
 
   PlantGrowth? growing(WidgetTester tester) =>
       tester.widget<GrowingPlant>(find.byType(GrowingPlant)).growth;
@@ -81,16 +81,16 @@ void main() {
       expect(session.pausedDuration, const Duration(minutes: 7));
     });
 
-    testWidgets('the ring stops filling while the countdown is held',
+    testWidgets('the strip stops filling while the countdown is held',
         (tester) async {
       await openTimer(tester);
       await startSession(tester);
       await advance(tester, clock, const Duration(minutes: 5));
       await pauseSession(tester);
 
-      expect(ring(tester).progress, closeTo(0.2, 1e-9));
+      expect(strip(tester).progress, closeTo(0.2, 1e-9));
       await advance(tester, clock, const Duration(minutes: 10));
-      expect(ring(tester).progress, closeTo(0.2, 1e-9));
+      expect(strip(tester).progress, closeTo(0.2, 1e-9));
     });
 
     testWidgets('the plant carries on growing, at half speed — REQ-009',
@@ -105,7 +105,7 @@ void main() {
       await advance(tester, clock, const Duration(minutes: 15));
       expect(growing(tester)!.stage, GrowthStage.young,
           reason: 'the plant advanced while the countdown stood still');
-      expect(ring(tester).progress, closeTo(0.2, 1e-9),
+      expect(strip(tester).progress, closeTo(0.2, 1e-9),
           reason: 'and the countdown really did stand still');
     });
 
@@ -155,7 +155,7 @@ void main() {
 
       expect(find.text('Pause'), findsNothing);
       expect(find.text('Cancel'), findsNothing);
-      expect(find.text('Start'), findsOneWidget);
+      expect(find.text('Plant another'), findsOneWidget);
     });
   });
 
@@ -183,7 +183,7 @@ void main() {
 
       expect(find.text('Ready to focus'), findsOneWidget);
       expect(find.text('25:00'), findsOneWidget,
-          reason: 'the ring is back to the length of the next session');
+          reason: 'the countdown is back to the length of the next session');
       expect(growing(tester), isNull, reason: 'the soil is bare again');
       expect(find.text('No sessions grown yet'), findsOneWidget);
 
@@ -256,7 +256,7 @@ void main() {
       await advance(tester, clock, const Duration(minutes: 10));
       await cancelSession(tester, confirm: true);
 
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant it'));
       await tester.pump();
 
       expect(find.text('Focusing'), findsOneWidget);

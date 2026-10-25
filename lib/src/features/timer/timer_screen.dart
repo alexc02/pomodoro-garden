@@ -5,65 +5,161 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/sky_band_backdrop.dart';
 import '../../design/spacing.dart';
 import '../../design/typography.dart';
 import '../../feedback/feedback_providers.dart';
 import '../../feedback/micro_sounds.dart';
 import '../../garden/growing_plant.dart';
+import '../../onboarding/onboarding.dart';
+import '../../onboarding/onboarding_providers.dart';
 import '../../session/session_announcer.dart';
 import '../../session/session_providers.dart';
 import '../../settings/settings_providers.dart';
-import '../../shell/tab.dart';
 import '../../time/clock_provider.dart';
+import '../../shell/torn_edge.dart';
 import '../onboarding/coach_marks.dart';
 import 'ambience_picker.dart';
 import 'countdown.dart';
-import 'session_ring.dart';
+import 'potted_plant.dart';
+import 'progress_strip.dart';
 
 /// The focus timer: start a session, watch it run, see it finish.
-class TimerScreen extends ConsumerWidget {
+///
+/// PRD v2.3's Paper Theatre: no app bar — the tab bar names the tab — a large
+/// countdown under a band of sky, the plant growing in a clay pot, and a strip
+/// of paper filling across as the session is spent.
+class TimerScreen extends ConsumerStatefulWidget {
   const TimerScreen({super.key});
 
+  /// How long the pot takes to make room for the first coach mark, and to
+  /// take it back.
+  static const Duration makingRoom = Duration(milliseconds: 300);
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TimerScreen> createState() => _TimerScreenState();
+}
+
+class _TimerScreenState extends ConsumerState<TimerScreen> {
+  final GlobalKey _controlsKey = GlobalKey(debugLabel: 'timer.controls');
+
+  /// Room along the bottom for the tab bar's torn edge, which rises over the
+  /// screen.
+  static final EdgeInsets _padding =
+      Spacing.screenPadding + const EdgeInsets.only(bottom: TornEdge.height);
+
+  /// The height the pot was last drawn at.
+  double _drawn = 0;
+
+  /// The pot's height that puts the controls just above the first coach
+  /// mark's card, or null before it has been worked out.
+  double? _fitted;
+
+  @override
+  Widget build(BuildContext context) {
+    final coached = ref.watch(onboardingProvider).mark == CoachMark.timer;
+    if (!coached) _fitted = null;
+
     return Scaffold(
-      appBar: AppBar(title: Text(AppTab.timer.label)),
-      body: SafeArea(
-        // Scrollable, with the ring sized to the room left over, so a small
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Outside the safe area, so the band of sky runs up under the
+          // status bar.
+          const SkyBandBackdrop(),
+          SafeArea(
+        // Scrollable, with the pot sized to the room left over, so a small
         // phone at a large text scale shows the whole screen rather than
         // overflowing it.
         child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            padding: Spacing.screenPadding,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: _TimerBody(ringDiameter: _ringDiameter(constraints)),
-            ),
-          ),
+          builder: (context, constraints) {
+            final full = _stageHeight(constraints);
+            final fitted = _fitted;
+            return ValueListenableBuilder<double?>(
+              valueListenable: CoachMarkLayer.timerCardTop,
+              builder: (context, cardTop, _) {
+                if (coached && cardTop != null) {
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _fit(cardTop));
+                }
+                return TweenAnimationBuilder<double>(
+                  tween: Tween(
+                    end: coached && fitted != null && fitted < full
+                        ? fitted
+                        : full,
+                  ),
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : TimerScreen.makingRoom,
+                  curve: Curves.easeInOut,
+                  onEnd: () {
+                    if (coached && cardTop != null) _fit(cardTop);
+                  },
+                  builder: (context, height, _) => SingleChildScrollView(
+                    padding: _padding,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight - _padding.vertical,
+                      ),
+                      child: _TimerBody(
+                        stageHeight: _drawn = height,
+                        controlsKey: _controlsKey,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
         ),
+          ),
+        ],
       ),
     );
   }
 
-  /// The ring takes the room it can have: not so wide that it touches the edges
-  /// of a large screen, not so tall that it crowds out the controls on a short
-  /// one.
+  /// Works out how small the pot has to be for CANCEL and PAUSE to sit above
+  /// the first coach mark's card, whose top is at [cardTop].
   ///
-  /// The share of the height came down from 0.45 when ticket 05 gave a running
-  /// session two controls to show. CANCEL and PAUSE are the whole of what the
-  /// user can do while a session runs, and a screen that puts them below the
-  /// fold has buried its own controls to make its ring bigger.
-  static double _ringDiameter(BoxConstraints constraints) {
+  /// The pot is the only thing above the controls that changes size, so the
+  /// controls move by whatever it gives up. Measured off the frame just drawn,
+  /// and again after the next one until it stops changing: the column is
+  /// centred when it is shorter than the screen, which moves its top too.
+  void _fit(double cardTop) {
+    if (!mounted) return;
+    final controls = _controlsKey.currentContext?.findRenderObject();
+    if (controls is! RenderBox || !controls.hasSize) return;
+    final bottom = controls.localToGlobal(Offset(0, controls.size.height)).dy;
+    final fitted = (_drawn - (bottom - cardTop)).clamp(64.0, 280.0);
+    if (_fitted == null || (fitted - _fitted!).abs() > 0.5) {
+      setState(() => _fitted = fitted);
+    }
+  }
+
+  /// The pot takes the room it can have: not so wide that it touches the
+  /// edges of a large screen, not so tall that it crowds out the controls on a
+  /// short one.
+  ///
+  /// A smaller share of the height than the ring had, because the countdown
+  /// now stands above the pot rather than inside it. CANCEL and PAUSE are the
+  /// whole of what the user can do while a session runs, and a screen that
+  /// puts them below the fold has buried its own controls to make its pot
+  /// bigger.
+  static double _stageHeight(BoxConstraints constraints) {
     final fromWidth = constraints.maxWidth - Spacing.md * 2;
-    final fromHeight = constraints.maxHeight * 0.4;
-    return (fromWidth < fromHeight ? fromWidth : fromHeight).clamp(140, 280);
+    final fromHeight = constraints.maxHeight * 0.32;
+    return (fromWidth < fromHeight ? fromWidth : fromHeight).clamp(120, 280);
   }
 }
 
 class _TimerBody extends ConsumerWidget {
-  const _TimerBody({required this.ringDiameter});
+  const _TimerBody({required this.stageHeight, required this.controlsKey});
 
-  final double ringDiameter;
+  /// How tall the plant and its pot stand.
+  final double stageHeight;
+
+  /// Carried by the controls, so the screen can tell where they end.
+  final GlobalKey controlsKey;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -72,113 +168,155 @@ class _TimerBody extends ConsumerWidget {
     final garden = GardenColors.of(context);
 
     // Before the first session of the app's life there is nothing to count
-    // down, so the ring shows the length of the session about to be started —
-    // which is how a change made in settings shows up here without the running
-    // session's countdown ever moving.
+    // down, so the countdown shows the length of the session about to be
+    // started — which is how a change made in settings shows up here without
+    // the running session's countdown ever moving.
     final remaining = snapshot.phase == SessionPhase.idle
         ? ref.watch(settingsProvider).sessionLength
         : snapshot.remaining;
+    // Not while the first coach mark is up: its card says the same thing,
+    // and the line it would take is what keeps PAUSE above the card.
+    final coached = ref.watch(onboardingProvider).mark == CoachMark.timer;
+    final note = coached ? null : _noteFor(snapshot);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          switch (snapshot.phase) {
-            SessionPhase.idle => 'Ready to focus',
-            SessionPhase.running => 'Focusing',
-            SessionPhase.paused => 'Paused',
-            SessionPhase.completed => 'Session complete',
-            // The kind is named, because a long break is the thing the cycle
-            // has been counting towards and a user who has earned one should be
-            // told they have.
-            SessionPhase.onBreak =>
-              snapshot.breakKind == BreakKind.long ? 'Long break' : 'On a break',
-            SessionPhase.breakOver => 'Break over',
-          },
-          style: theme.textTheme.headlineMedium,
+        // Where the session is, and — once something is growing — what it is.
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Expanded(
+              child: Text(
+                switch (snapshot.phase) {
+                  SessionPhase.idle => 'Ready to focus',
+                  SessionPhase.running => 'Focusing',
+                  SessionPhase.paused => 'Paused',
+                  SessionPhase.completed => 'Session complete',
+                  // The kind is named, because a long break is the thing the
+                  // cycle has been counting towards and a user who has earned
+                  // one should be told they have.
+                  SessionPhase.onBreak => snapshot.breakKind == BreakKind.long
+                      ? 'Long break'
+                      : 'On a break',
+                  SessionPhase.breakOver => 'Break over',
+                },
+                style: theme.textTheme.headlineMedium
+                    ?.copyWith(color: garden.textPrimary),
+              ),
+            ),
+            if (_growingNow(snapshot) case final growth?) ...[
+              const SizedBox(width: Spacing.sm),
+              Text(
+                growth.species.label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: garden.textPrimary,
+                  fontWeight: GardenTypography.headingWeight,
+                ),
+              ),
+            ],
+          ],
         ),
-        const SizedBox(height: Spacing.xl),
         Semantics(
           // The digits on their own read out as "twenty-five colon zero zero".
           label: '${formatCountdown(remaining)} remaining',
-          child: SessionRing(
-            // What the first of US-003's coach marks points at. The key is
-            // carried by the real ring rather than by anything the tutorial
-            // owns, which is the whole of what "over the live UI" asks of this
-            // screen.
-            key: CoachMarkTargets.timer,
-            progress: snapshot.progress,
-            // The one moment the bloom accent is spent: a finished session.
-            // A held session drops back to the muted text colour, so the ring
-            // reads as stopped from across a desk rather than only up close.
-            //
-            // A break takes the sky. It is the restful half of the treatment
-            // the ticket asks for and it is the one colour on this screen that
-            // is not about growing something: green is the session, and a break
-            // that filled a green ring would look like work being done.
-            color: switch (snapshot.phase) {
-              SessionPhase.completed => garden.bloom,
-              SessionPhase.paused => garden.textSecondary,
-              SessionPhase.onBreak || SessionPhase.breakOver => garden.skyDay,
-              _ => null,
-            },
-            diameter: ringDiameter,
+          excludeSemantics: true,
+          // Scaled down rather than wrapped or clipped: at the largest text
+          // sizes on the smallest phone five digits this big are wider than
+          // the screen, and a countdown is no use in two halves.
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
             child: Text(
               formatCountdown(remaining),
-              style: GardenTypography.timerDigitsInRing(ringDiameter)
-                  .copyWith(color: garden.textPrimary),
+              style: GardenTypography.timerDigitsFor(
+                MediaQuery.sizeOf(context).width,
+              ).copyWith(color: garden.textPrimary),
             ),
           ),
         ),
-        const SizedBox(height: Spacing.md),
-        // The other half of the ring: the ring says how much time is left, the
-        // plant says what the time is buying. Before the first session it is a
-        // bed of bare soil, which is the invitation.
-        GrowingPlant(
-          growth: snapshot.growing,
-          size: ringDiameter * 0.5,
-          // §5.3's bloom, for a completion the user watched. One that ran out
-          // with the app away is found complete on the way back in, and the
-          // rule that keeps the chime quiet then keeps the petals in as well.
-          completed: _watchedComplete(snapshot, ref),
-          // §5.4's soil settle, at §5.4's moment — "seed planted", which §5.3
-          // puts at the *end* of the 0.8-second drop. The plant knows when it
-          // landed and this screen knows that landing makes a sound; see
-          // [GrowingPlant.onLanded] for why those are two jobs.
-          onLanded: () => _play(ref, MicroSound.soilSettle),
-        ),
-        const SizedBox(height: Spacing.md),
-        // The controls come before anything explaining them. What the user can
-        // do stays as close to the ring as the layout allows, so that on the
-        // shortest supported screen it is the prose that falls below the fold
-        // and never the buttons.
-        switch (snapshot.phase) {
-          SessionPhase.running ||
-          SessionPhase.paused =>
-            const _RunningControls(),
-          SessionPhase.completed => const _BreakOffered(),
-          SessionPhase.onBreak => const _BreakControls(),
-          // Nothing is counting down and nothing is on offer, so there is one
-          // thing to do. A break that ran its course lands here too: it is a
-          // restful idle, and START is what is left.
-          SessionPhase.idle || SessionPhase.breakOver => const _StartButton(),
-        },
         // Only rendered when there is something to say. An empty [Text] still
         // takes a line, and lines are what this screen is short of.
-        if (_noteFor(snapshot) case final note?) ...[
-          const SizedBox(height: Spacing.md),
+        if (note != null)
           Text(
             note,
-            textAlign: TextAlign.center,
             // Tabular, because the paused note has a duration counting up in
-            // the middle of it and a sentence that re-centres every second is
-            // the same jitter the countdown is forbidden from having.
-            style: theme.textTheme.labelSmall?.copyWith(
+            // the middle of it and a sentence that reflows every second is the
+            // same jitter the countdown is forbidden from having.
+            style: theme.textTheme.bodyMedium?.copyWith(
               color: garden.textSecondary,
               fontFeatures: GardenTypography.tabularFigures,
             ),
           ),
-        ],
+        const SizedBox(height: Spacing.md),
+        // What the time is buying. Before the first session it is a pot of
+        // bare soil, which is the invitation.
+        Center(
+          child: PottedPlant(
+            // What the first of US-003's coach marks points at. The key is
+            // carried by the real pot rather than by anything the tutorial
+            // owns, which is the whole of what "over the live UI" asks of this
+            // screen.
+            key: CoachMarkTargets.timer,
+            growth: snapshot.growing,
+            height: stageHeight,
+            // §5.3's bloom, for a completion the user watched. One that ran
+            // out with the app away is found complete on the way back in, and
+            // the rule that keeps the chime quiet then keeps the petals in as
+            // well.
+            completed: _watchedComplete(snapshot, ref),
+            // §5.4's soil settle, at §5.4's moment — "seed planted", which §5.3
+            // puts at the *end* of the 0.8-second drop. The plant knows when it
+            // landed and this screen knows that landing makes a sound; see
+            // [GrowingPlant.onLanded] for why those are two jobs.
+            onLanded: () => _play(ref, MicroSound.soilSettle),
+          ),
+        ),
+        const SizedBox(height: Spacing.md),
+        ProgressStrip(
+          progress: snapshot.progress,
+          // The one moment the bloom accent is spent: a finished session. A
+          // held session drops back to the muted text colour, so the strip
+          // reads as stopped from across a desk rather than only up close.
+          //
+          // A break takes the sky. It is the restful half of the treatment the
+          // ticket asks for and it is the one colour on this screen that is
+          // not about growing something: a break that filled the strip in the
+          // session's marigold would look like work being done.
+          color: switch (snapshot.phase) {
+            SessionPhase.completed => garden.bloom,
+            SessionPhase.paused => garden.textSecondary,
+            SessionPhase.onBreak || SessionPhase.breakOver => garden.skyDay,
+            _ => null,
+          },
+        ),
+        const SizedBox(height: Spacing.xs),
+        _StripTimes(snapshot: snapshot),
+        const SizedBox(height: Spacing.md),
+        // The controls come before anything else below the pot. What the user
+        // can do stays as close to the countdown as the layout allows, so that
+        // on the shortest supported screen it is the picker that falls below
+        // the fold and never the buttons.
+        KeyedSubtree(
+          key: controlsKey,
+          child: Center(
+            child: switch (snapshot.phase) {
+              SessionPhase.running ||
+              SessionPhase.paused =>
+                const _RunningControls(),
+              SessionPhase.completed => const _BreakOffered(),
+              SessionPhase.onBreak => const _BreakControls(),
+              // Nothing is counting down and nothing is on offer, so there is
+              // one thing to do. A break that ran its course lands here too: it
+              // is a restful idle, and PLANT IT is what is left.
+              SessionPhase.idle ||
+              SessionPhase.breakOver =>
+                const _StartButton(),
+            },
+          ),
+        ),
         // REQ-012, below the controls on purpose. The bed is a thing the user
         // sets and forgets, and CANCEL and PAUSE are the things they may need
         // in a hurry — so the picker takes the space under the fold on the
@@ -186,8 +324,71 @@ class _TimerBody extends ConsumerWidget {
         const SizedBox(height: Spacing.lg),
         const AmbiencePicker(),
         const SizedBox(height: Spacing.lg),
-        const _SessionsGrown(),
+        const Center(child: _SessionsGrown()),
       ],
+    );
+  }
+}
+
+/// What is growing in the pot right now, or null when nothing is — before the
+/// first session, and through a break, which grows nothing.
+PlantGrowth? _growingNow(SessionSnapshot snapshot) => switch (snapshot.phase) {
+      SessionPhase.running ||
+      SessionPhase.paused ||
+      SessionPhase.completed =>
+        snapshot.growing,
+      _ => null,
+    };
+
+/// The two ends of the strip, said as times of day: when this session was
+/// planted and when it will be ready — or, through a break, when it ends.
+///
+/// Kept in the layout when there is nothing to say, so the screen does not
+/// jump by a line as a session starts and finishes.
+class _StripTimes extends StatelessWidget {
+  const _StripTimes({required this.snapshot});
+
+  final SessionSnapshot snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final due = snapshot.dueAt;
+    final localizations = MaterialLocalizations.of(context);
+    final twentyFour = MediaQuery.alwaysUse24HourFormatOf(context);
+    String at(DateTime instant) => localizations.formatTimeOfDay(
+          TimeOfDay.fromDateTime(instant.toLocal()),
+          alwaysUse24HourFormat: twentyFour,
+        );
+
+    // The planted instant is the due one, less the session and every pause in
+    // it: [SessionSnapshot.dueAt] moves out by exactly as long as the session
+    // has been held.
+    final held = snapshot.elapsed + snapshot.remaining + snapshot.pausedSoFar;
+
+    final (String, String)? ends = switch ((snapshot.phase, due)) {
+      (SessionPhase.running || SessionPhase.paused, final due?) =>
+        ('Planted ${at(due.subtract(held))}', 'Ready ${at(due)}'),
+      (SessionPhase.onBreak, final due?) => ('Resting', 'Back at ${at(due)}'),
+      _ => null,
+    };
+
+    final style = theme.textTheme.labelSmall?.copyWith(
+      color: GardenColors.of(context).textSecondary,
+      fontWeight: GardenTypography.headingWeight,
+      fontFeatures: GardenTypography.tabularFigures,
+    );
+    return Visibility(
+      visible: ends != null,
+      maintainSize: true,
+      maintainAnimation: true,
+      maintainState: true,
+      child: Row(
+        children: [
+          Expanded(child: Text(ends?.$1 ?? ' ', style: style, maxLines: 1)),
+          Text(ends?.$2 ?? ' ', style: style, maxLines: 1),
+        ],
+      ),
     );
   }
 }
@@ -253,13 +454,22 @@ class _StartButton extends ConsumerWidget {
   const _StartButton();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => FilledButton(
-        onPressed: () {
-          _tapped(ref);
-          ref.read(sessionControllerProvider.notifier).start();
-        },
-        child: const Text('Start'),
-      );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
+    return FilledButton(
+      // Marigold, as the garden's PLANT IT is: the one warm accent in the
+      // chrome, kept for the action a screen is for.
+      style: FilledButton.styleFrom(
+        backgroundColor: scheme.secondary,
+        foregroundColor: scheme.onSecondary,
+      ),
+      onPressed: () {
+        _tapped(ref);
+        ref.read(sessionControllerProvider.notifier).start();
+      },
+      child: const Text('Plant it'),
+    );
+  }
 }
 
 /// What a finished session offers: the break it earned, and the option of not
@@ -294,7 +504,7 @@ class _BreakOffered extends ConsumerWidget {
             _tapped(ref);
             session.start();
           },
-          child: const Text('Start'),
+          child: const Text('Plant another'),
         ),
         FilledButton(
           onPressed: () {
@@ -332,7 +542,8 @@ class _BreakControls extends ConsumerWidget {
 
 /// PRD §5.2's two controls for a session in flight: leave, or hold.
 ///
-/// Cancel is the quieter of the two by design. Pausing is a thing the user
+/// Cancel is the quieter of the two by design — an outline beside a filled
+/// button. Pausing is a thing the user
 /// should feel free to do; abandoning twenty minutes of work is not, and the
 /// button that does it should not sit under the thumb that was reaching for
 /// PAUSE.
@@ -353,7 +564,7 @@ class _RunningControls extends ConsumerWidget {
       spacing: Spacing.md,
       runSpacing: Spacing.sm,
       children: [
-        TextButton(
+        OutlinedButton(
           // No sound here. This tap opens a question rather than answering
           // one — nothing has ended yet — and the sound is in [_cancel], on
           // the confirmation that actually abandons the session.
@@ -393,8 +604,7 @@ class _RunningControls extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Cancel this session?'),
         content: const Text(
-          'The plant you are growing will not be planted, and nothing will be '
-          'added to your garden.',
+          'The plant you\'re growing won\'t be planted.',
         ),
         actions: [
           TextButton(
@@ -449,7 +659,7 @@ class _SessionsGrown extends ConsumerWidget {
             style: style,
           ),
           loading: () => const SizedBox(height: Spacing.md),
-          error: (_, _) => Text('Could not read your garden', style: style),
+          error: (_, _) => Text('Couldn\'t read your garden', style: style),
         );
   }
 }

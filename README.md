@@ -400,9 +400,13 @@ lib/
       theme_palette.dart       REQ-034's twelve: three biomes × four seasons
       garden_skin.dart         the pair the garden is painted from
       theme.dart               light and dark ThemeData
+      paper_painter.dart       the paper grain every screen lies under
+      sky_band_backdrop.dart   paper with a band of sky: timer, journal, settings
+      paper_card.dart          a card of cut paper, with its hard and soft shadow
+      page_header.dart         the display-face header in place of an app bar
     shell/                   the four-tab shell
     features/                one directory per tab
-      timer/                   the focus timer: ring, countdown, START
+      timer/                   the focus timer: pot, countdown, paper strip, Plant it
         ambience_picker.dart     REQ-012's six beds, on the session's own screen
       garden/                  the garden tab: the camera and the gestures
         garden_screen.dart       the tab — mostly garden, and a word when needed
@@ -419,9 +423,8 @@ lib/
         garden_preview.dart      the flourishing garden a first-run user has not grown
         coach_marks.dart         US-003's three, anchored to the real widgets
       journal/                 the botanical journal: REQ-025 to REQ-029
-        journal_screen.dart      the tab: three cards on a paper page
+        journal_screen.dart      the tab: three cards of paper under a band of sky
         journal_heatmap.dart     REQ-027: a month of days, shaded by what grew
-        journal_paper.dart       the page itself — a wash and a scatter of fibres
       settings/                the settings screen: presets and the sliders
         end_sound_picker.dart    REQ-031's six sounds, each one played when it is picked
         reset_garden.dart        REQ-036's two confirmations, and nothing between them
@@ -515,10 +518,11 @@ its digits change — and that is measured in `test/design/typography_test.dart`
 against the real bundled font, not the test stand-in.
 
 **Fonts bundled, not fetched.** PRD §5.1 asks for SF Pro Rounded, which exists
-only on iOS; the app ships **Nunito** and uses it on both platforms, so they
-stay visually identical and first launch works offline. §5.1's handwritten face
-for plant names is **Caveat**, exposed as one token — `botanicalLabel` — and
-used for plant names only.
+only on iOS; the app ships two OFL families and uses them on both platforms, so
+they stay visually identical and first launch works offline. **Fraunces** is the
+display face — headings, journal headers, and plant names in italic
+(`botanicalLabel`). **Inter** is everything else, the timer digits included:
+Fraunces has no tabular figures.
 
 **Tabs keep their state.** The shell is an `IndexedStack`, so every tab's
 subtree stays alive. A session runs on the timer tab while the user wanders to

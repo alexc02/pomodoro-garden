@@ -47,6 +47,7 @@ final class DriftGardenReset implements GardenReset {
       // go this way: the log is the one place the app would still remember a
       // garden the user asked it to forget.
       await _database.delete(_database.analyticsEvents).go();
+      await _database.customStatement('DELETE FROM cycle');
     });
   }
 }

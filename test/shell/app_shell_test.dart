@@ -1,36 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pomodoro_garden/src/features/garden/garden_header.dart';
 import 'package:pomodoro_garden/src/features/garden/garden_screen.dart';
 import 'package:pomodoro_garden/src/features/journal/journal_screen.dart';
 import 'package:pomodoro_garden/src/features/settings/settings_screen.dart';
 import 'package:pomodoro_garden/src/features/timer/timer_screen.dart';
 import 'package:pomodoro_garden/src/shell/tab.dart';
+import 'package:pomodoro_garden/src/shell/tab_glyph.dart';
+import 'package:pomodoro_garden/src/shell/torn_edge.dart';
 
 import '../support/app_harness.dart';
 
-/// The title shown by the currently visible tab — i.e. the one `IndexedStack`
-/// is not hiding. Every tab's subtree stays in the widget tree, so
-/// `find.text` alone would match all four.
-String _visibleTitle(WidgetTester tester) {
-  final titles = tester
-      .widgetList<Text>(find.descendant(
-        of: find.byType(AppBar),
-        matching: find.byType(Text),
-      ))
-      .map((text) => text.data)
-      .whereType<String>()
-      .toList();
-
-  final visible = titles.where((title) {
-    final finder = find.descendant(
-      of: find.byType(AppBar),
-      matching: find.text(title),
-    );
-    return tester.any(finder.hitTestable());
-  }).toList();
-
-  expect(visible, hasLength(1), reason: 'Expected exactly one visible tab');
-  return visible.single;
+/// That [tab] is the one on screen.
+///
+/// No tab has an app bar — PRD v2.3 heads each with its own header, and the
+/// tab bar is what names them — so each is recognised by what heads it. Every
+/// tab's subtree stays in the tree under `IndexedStack`, so the heading must
+/// also be the one that can be hit.
+void _expectShowing(WidgetTester tester, AppTab tab) {
+  final heading = switch (tab) {
+    AppTab.garden => find.descendant(
+        of: find.byType(GardenHeader),
+        matching: find.text(GardenHeader.headline(0)),
+      ),
+    AppTab.timer => find.descendant(
+        of: find.byType(TimerScreen),
+        matching: find.text('Ready to focus'),
+      ),
+    AppTab.journal => find.descendant(
+        of: find.byType(JournalScreen),
+        matching: find.text('Your journal'),
+      ),
+    AppTab.settings => find.descendant(
+        of: find.byType(SettingsScreen),
+        matching: find.text('Settings'),
+      ),
+  };
+  expect(heading.hitTestable(), findsOneWidget);
+  expect(find.byType(AppBar), findsNothing);
 }
 
 void main() {
@@ -38,7 +45,7 @@ void main() {
     await pumpApp(tester);
 
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(_visibleTitle(tester), AppTab.garden.label);
+    _expectShowing(tester, AppTab.garden);
   });
 
   testWidgets('offers exactly the four tabs, in PRD order', (tester) async {
@@ -55,24 +62,47 @@ void main() {
     );
   });
 
-  testWidgets('uses line icons in the tab bar', (tester) async {
+  testWidgets('draws each tab its own line glyph', (tester) async {
     await pumpApp(tester);
 
-    final icons = tester
+    final destinations = tester
         .widget<NavigationBar>(find.byType(NavigationBar))
         .destinations
         .cast<NavigationDestination>()
-        .map((destination) => (destination.icon as Icon).icon);
+        .toList();
 
+    // PRD v2.3: the app's own drawings rather than the outlined Material set,
+    // and selection is a heavier line rather than a filled glyph.
+    for (final (index, tab) in AppTab.values.indexed) {
+      final icon = destinations[index].icon as TabGlyph;
+      final selected = destinations[index].selectedIcon! as TabGlyph;
+      expect(icon.tab, tab);
+      expect(icon.selected, isFalse);
+      expect(selected.tab, tab);
+      expect(selected.selected, isTrue);
+    }
+  });
+
+  testWidgets('the bar has a torn top edge that takes no taps',
+      (tester) async {
+    await pumpApp(tester);
+
+    final bar = find.byType(NavigationBar);
     expect(
-      icons,
-      const [
-        Icons.local_florist_outlined,
-        Icons.timer_outlined,
-        Icons.menu_book_outlined,
-        Icons.settings_outlined,
-      ],
-      reason: 'PRD §5.1 asks for minimalist line icons — the outlined set.',
+      find.ancestor(of: bar, matching: find.byType(TornEdge)),
+      findsOneWidget,
+    );
+
+    // The tear rises over the bottom of the screen, and a tap there still
+    // reaches the screen rather than stopping on a few pixels of decoration.
+    final tear = find.descendant(
+      of: find.byType(TornEdge),
+      matching: find.byType(IgnorePointer),
+    );
+    expect(tester.widget<IgnorePointer>(tear.first).ignoring, isTrue);
+    expect(
+      tester.getRect(tear.first).top,
+      lessThan(tester.getRect(bar).top),
     );
   });
 
@@ -81,7 +111,7 @@ void main() {
 
     for (final tab in AppTab.values) {
       await tapTab(tester, tab);
-      expect(_visibleTitle(tester), tab.label);
+      _expectShowing(tester, tab);
     }
 
     // Distinct types, not four copies of the same screen. The stack keeps the

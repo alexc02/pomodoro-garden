@@ -14,6 +14,8 @@ void main() {
       test('$name carries the garden colours and the type ramp', () {
         expect(theme.extension<GardenColors>(), isNotNull);
         expect(theme.textTheme.displayLarge?.fontFamily,
+            GardenTypography.displayFontFamily);
+        expect(theme.textTheme.bodyMedium?.fontFamily,
             GardenTypography.fontFamily);
         expect(theme.textTheme.displayLarge?.fontWeight,
             GardenTypography.headingWeight);
@@ -30,6 +32,9 @@ void main() {
         final tokens = <Color>[
           Palette.primary,
           Palette.onPrimary,
+          Palette.moss,
+          Palette.marigold,
+          Palette.mist,
           Palette.soil,
           Palette.skyDay,
           Palette.skyGoldenHour,
@@ -102,9 +107,17 @@ void main() {
       );
     });
 
-    test('both keep garden green as the primary', () {
-      expect(AppTheme.light.colorScheme.primary, Palette.primary);
-      expect(AppTheme.dark.colorScheme.primary, Palette.primary);
+    test('the chrome is moss by day and marigold by night', () {
+      // Moss on the green-black dark canvas would be a control nobody could
+      // find, so the dark theme leads with the warm accent instead.
+      expect(AppTheme.light.colorScheme.primary, Palette.moss);
+      expect(AppTheme.dark.colorScheme.primary, Palette.marigold);
+    });
+
+    test('the tab bar is a moss strip in both themes', () {
+      for (final theme in [AppTheme.light, AppTheme.dark]) {
+        expect(theme.navigationBarTheme.backgroundColor, Palette.moss);
+      }
     });
   });
 
@@ -116,7 +129,7 @@ void main() {
       const light = GardenColors.light;
       const dark = GardenColors.dark;
 
-      expect(AppTheme.light.colorScheme.primary, Palette.primary);
+      expect(light.foliage, Palette.primary);
       expect(light.soil, Palette.soil);
       expect(light.skyDay, Palette.skyDay);
       expect(light.skyGoldenHour, Palette.skyGoldenHour);
@@ -141,8 +154,10 @@ void main() {
       expect(Palette.skyGoldenHour, const Color(0xFFF5C99B));
       expect(Palette.accentBloom, const Color(0xFFE89B9B));
       expect(Palette.backgroundDark, const Color(0xFF1C2B1C));
-      expect(Palette.textPrimary, const Color(0xFF2D3A2D));
-      expect(Palette.textSecondary, const Color(0xFF6B7B6B));
+      // v2.3 (Paper Theatre) moved both text colours to the moss family; the
+      // old secondary measured under 4.5:1 on the cream canvas.
+      expect(Palette.textPrimary, const Color(0xFF22361F));
+      expect(Palette.textSecondary, const Color(0xFF4D5E48));
     });
   });
 

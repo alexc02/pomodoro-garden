@@ -7,16 +7,17 @@ import 'package:pomodoro_garden/src/design/typography.dart';
 
 /// Widget tests render with a stand-in font whose glyphs are all the same
 /// width, which would make any width assertion below pass for the wrong reason.
-/// So load the real Nunito files the app bundles.
+/// So load the real Inter and Fraunces files the app bundles.
 Future<void> _loadBundledFonts() async {
   const families = {
     GardenTypography.fontFamily: [
-      'assets/fonts/Nunito-Regular.ttf',
-      'assets/fonts/Nunito-SemiBold.ttf',
+      'assets/fonts/Inter-Regular.ttf',
+      'assets/fonts/Inter-SemiBold.ttf',
+      'assets/fonts/Inter-Bold.ttf',
     ],
-    GardenTypography.botanicalFontFamily: [
-      'assets/fonts/Caveat-Regular.ttf',
-      'assets/fonts/Caveat-SemiBold.ttf',
+    GardenTypography.displayFontFamily: [
+      'assets/fonts/Fraunces-SemiBold.ttf',
+      'assets/fonts/Fraunces-SemiBoldItalic.ttf',
     ],
   };
 
@@ -58,7 +59,7 @@ void main() {
         _widthOf('W', style),
         greaterThan(_widthOf('i', style) * 1.5),
         reason: 'Expected a real proportional font, got the test stand-in — '
-            'check the asset paths in _loadBundledNunito.',
+            'check the asset paths in _loadBundledFonts.',
       );
     });
   });
@@ -96,7 +97,7 @@ void main() {
       expect(_widthOf('00:00', style), _widthOf('88:88', style));
     });
 
-    test('is rounded and semibold, matching the heading voice', () {
+    test('is in the UI family, the one of the two with tabular figures', () {
       expect(GardenTypography.timerDigits.fontFamily, GardenTypography.fontFamily);
       expect(
         GardenTypography.timerDigits.fontWeight,
@@ -113,7 +114,6 @@ void main() {
         GardenTypography.titleMedium,
       ]) {
         expect(heading.fontWeight, GardenTypography.headingWeight);
-        expect(heading.fontFamily, GardenTypography.fontFamily);
       }
 
       expect(GardenTypography.bodyMedium.fontWeight, GardenTypography.bodyWeight);
@@ -134,67 +134,63 @@ void main() {
     });
   });
 
-  group('GardenTypography.botanicalLabel', () {
-    test('is the only style off the UI family', () {
-      final uiStyles = [
+  group('the two families', () {
+    test('the display face carries the headings and the botany', () {
+      for (final style in const [
         GardenTypography.displayLarge,
         GardenTypography.headlineMedium,
+        GardenTypography.botanicalLabel,
+        GardenTypography.journalHeading,
+      ]) {
+        expect(style.fontFamily, GardenTypography.displayFontFamily);
+      }
+    });
+
+    test('controls and every readout are in the UI family', () {
+      for (final style in const [
         GardenTypography.titleMedium,
         GardenTypography.bodyMedium,
         GardenTypography.bodySmall,
         GardenTypography.labelSmall,
         GardenTypography.timerDigits,
         GardenTypography.timerDigitsSmall,
-      ];
-
-      for (final style in uiStyles) {
+      ]) {
         expect(style.fontFamily, GardenTypography.fontFamily);
       }
+    });
 
-      expect(
-        GardenTypography.botanicalLabel.fontFamily,
-        GardenTypography.botanicalFontFamily,
-        reason: 'PRD §5.1: plant names are set in a handwritten face.',
-      );
-      expect(
-        GardenTypography.journalHeading.fontFamily,
-        GardenTypography.botanicalFontFamily,
-        reason: 'REQ-025: the journal is headed in the same hand.',
-      );
+    test('a plant name is italic, so it reads as a label and not a heading', () {
+      expect(GardenTypography.botanicalLabel.fontStyle, FontStyle.italic);
+      expect(GardenTypography.journalHeading.fontStyle, isNot(FontStyle.italic));
     });
 
     test('heads the journal larger than it labels a plant', () {
-      // A heading holding up a card of figures against a name on a stake. Both
-      // are Caveat, and a journal set at the label's size reads as a caption.
       expect(
         GardenTypography.journalHeading.fontSize!,
         greaterThan(GardenTypography.botanicalLabel.fontSize!),
       );
     });
 
-    test('renders in the bundled handwritten font, not a fallback', () {
-      // Caveat is a connected script; its glyph advances differ markedly from
-      // Nunito's at the same size. If the family failed to load, Flutter would
-      // silently substitute and these widths would coincide.
+    test('renders the display face from the bundle, not a fallback', () {
+      // Fraunces and Inter set the same word at markedly different widths. If
+      // the display family failed to load, Flutter would silently substitute
+      // and these widths would coincide.
       const size = 32.0;
       const sample = 'Sunflower';
 
-      final handwritten = _widthOf(
+      final display = _widthOf(
         sample,
         const TextStyle(
-          fontFamily: GardenTypography.botanicalFontFamily,
+          fontFamily: GardenTypography.displayFontFamily,
           fontSize: size,
         ),
       );
       final ui = _widthOf(
         sample,
-        const TextStyle(
-          fontFamily: GardenTypography.fontFamily,
-          fontSize: size,
-        ),
+        const TextStyle(fontFamily: GardenTypography.fontFamily, fontSize: size),
       );
 
-      expect(handwritten, isNot(ui));
+      expect(display, isNot(ui));
     });
   });
 }

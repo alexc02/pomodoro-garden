@@ -23,11 +23,11 @@ abstract final class AppTheme {
 
   static const ColorScheme _lightScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: Palette.primary,
-    onPrimary: Palette.onPrimary,
-    primaryContainer: Palette.skyDay,
+    primary: Palette.moss,
+    onPrimary: Palette.backgroundLight,
+    primaryContainer: Palette.mist,
     onPrimaryContainer: Palette.textPrimary,
-    secondary: Palette.accentBloom,
+    secondary: Palette.marigold,
     onSecondary: Palette.textPrimary,
     secondaryContainer: Palette.skyGoldenHour,
     onSecondaryContainer: Palette.textPrimary,
@@ -41,14 +41,16 @@ abstract final class AppTheme {
     outline: Palette.textSecondary,
   );
 
+  // Marigold rather than moss as the primary: moss on the green-black canvas
+  // is a control nobody can find.
   static const ColorScheme _darkScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: Palette.primary,
-    onPrimary: Palette.onPrimary,
+    primary: Palette.marigold,
+    onPrimary: Palette.moss,
     primaryContainer: Palette.surfaceDark,
     onPrimaryContainer: Palette.textPrimaryDark,
-    secondary: Palette.accentBloom,
-    onSecondary: Palette.textPrimary,
+    secondary: Palette.marigold,
+    onSecondary: Palette.moss,
     secondaryContainer: Palette.soil,
     onSecondaryContainer: Palette.textPrimaryDark,
     tertiary: Palette.soil,
@@ -81,17 +83,17 @@ abstract final class AppTheme {
         foregroundColor: garden.textPrimary,
         titleTextStyle: textTheme.titleMedium,
       ),
+      // The tab bar is a strip of moss paper in both themes, and selection is
+      // marigold plus weight rather than a tinted pill — the pill indicator is
+      // the most recognisable stock part of a Material 3 app.
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: scheme.surface,
+        backgroundColor: Palette.moss,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: scheme.primary.withValues(alpha: 0.16),
-        indicatorShape: const RoundedRectangleBorder(
-          borderRadius: Radii.pillAll,
-        ),
+        indicatorColor: Colors.transparent,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return textTheme.labelSmall?.copyWith(
-            color: selected ? scheme.primary : garden.textSecondary,
+            color: selected ? Palette.marigold : Palette.mist,
             fontWeight: selected
                 ? GardenTypography.headingWeight
                 : GardenTypography.bodyWeight,
@@ -100,7 +102,7 @@ abstract final class AppTheme {
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            color: selected ? scheme.primary : garden.textSecondary,
+            color: selected ? Palette.marigold : Palette.mist,
           );
         }),
       ),
@@ -109,11 +111,30 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: const RoundedRectangleBorder(borderRadius: Radii.mdAll),
+        shape: const RoundedRectangleBorder(borderRadius: Radii.paperMd),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          shape: const RoundedRectangleBorder(borderRadius: Radii.pillAll),
+          shape: const RoundedRectangleBorder(borderRadius: Radii.paperSm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.lg,
+            vertical: Spacing.md,
+          ),
+          textStyle: textTheme.titleMedium,
+        ),
+      ),
+      // The quieter control beside a filled one: the same paper, outlined.
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          shape: const RoundedRectangleBorder(
+            borderRadius: Radii.paperSmMirrored,
+          ),
+          side: BorderSide(color: scheme.primary, width: 2),
+          foregroundColor: scheme.primary,
           padding: const EdgeInsets.symmetric(
             horizontal: Spacing.lg,
             vertical: Spacing.md,
@@ -132,15 +153,16 @@ abstract final class AppTheme {
         trackHeight: Spacing.xs,
         showValueIndicator: ShowValueIndicator.never,
       ),
-      // The preset chips. Selection reads as a filled pill plus a tick rather
-      // than a colour change alone, which keeps it legible to anyone who cannot
-      // separate the selected green from the unselected outline.
+      // The preset chips: small cut tabs of paper, with the buttons' uneven
+      // corners. Selection reads as a fill plus a tick rather than a colour
+      // change alone, which keeps it legible to anyone who cannot separate the
+      // selected green from the unselected outline.
       chipTheme: ChipThemeData(
         backgroundColor: scheme.surface,
         selectedColor: scheme.primary.withValues(alpha: 0.16),
         checkmarkColor: scheme.primary,
         side: BorderSide(color: garden.textSecondary.withValues(alpha: 0.35)),
-        shape: const StadiumBorder(),
+        shape: const RoundedRectangleBorder(borderRadius: Radii.paperSm),
         labelStyle: textTheme.bodyMedium,
         secondaryLabelStyle: textTheme.bodyMedium,
         padding: const EdgeInsets.symmetric(

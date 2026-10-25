@@ -91,7 +91,7 @@ void main() {
     await growOne(tester, database);
     // The tap that starts the next session polls for the last one's completion
     // before it starts — a second chance to plant the same session.
-    await tester.tap(find.text('Start'));
+    await tester.tap(find.text('Plant another'));
     await settle(tester);
 
     expect(await DriftPlantRepository(database).plants(), hasLength(1));
@@ -102,7 +102,7 @@ void main() {
     addTearDown(database.close);
 
     await growOne(tester, database);
-    await tester.tap(find.text('Start'));
+    await tester.tap(find.text('Plant another'));
     await tester.pump();
     await advance(tester, clock, const Duration(minutes: 25));
     await settle(tester);
@@ -129,7 +129,7 @@ void main() {
 
     await growOne(tester, database);
     for (var more = 0; more < 3; more++) {
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant another'));
       await tester.pump();
       await advance(tester, clock, const Duration(minutes: 25));
       await settle(tester);

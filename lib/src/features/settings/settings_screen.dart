@@ -6,10 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/page_header.dart';
+import '../../design/paper_card.dart';
+import '../../design/sky_band_backdrop.dart';
 import '../../design/spacing.dart';
 import '../../design/typography.dart';
 import '../../garden/garden_providers.dart';
 import '../../garden/garden_reset_providers.dart';
+import '../../session/session_providers.dart';
 import '../../garden/season_providers.dart';
 import '../../garden/theme_providers.dart';
 import '../../onboarding/onboarding_providers.dart';
@@ -86,40 +90,47 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // No app bar, as the garden, timer and journal have none (PRD v2.3): a
+    // header over a band of sky, and each group of settings a card of paper.
     return Scaffold(
-      appBar: AppBar(title: Text(AppTab.settings.label)),
-      body: SafeArea(
-        child: ListView(
-          padding: Spacing.screenPadding,
-          children: [
-            const _FocusSessionSection(),
-            const SizedBox(height: Spacing.lg),
-            const _BreaksSection(),
-            const SizedBox(height: Spacing.lg),
-            const _FeedbackSection(),
-            const SizedBox(height: Spacing.lg),
-            const _LiveSessionSection(),
-            const SizedBox(height: Spacing.lg),
-            const _QuietModeSection(),
-            const SizedBox(height: Spacing.lg),
-            const _GardenSection(),
-            const SizedBox(height: Spacing.lg),
-            const _ResetSection(),
-            // Last, and only in a debug build: it is not a setting, and the
-            // list should not open on it.
-            if (kDebugMode) ...[
-              const SizedBox(height: Spacing.lg),
-              const _SeasonSection(),
-              const SizedBox(height: Spacing.lg),
-              const _MilestonePreviewSection(),
-              const SizedBox(height: Spacing.lg),
-              const _OnboardingSection(),
-              const SizedBox(height: Spacing.lg),
-              const _EventLogSection(),
-            ],
-            const SizedBox(height: Spacing.xxl),
-          ],
-        ),
+      body: Stack(
+        children: [
+          const SkyBandBackdrop(depth: 0.24),
+          SafeArea(
+            bottom: false,
+            child: ListView(
+              padding: PageHeader.pagePadding,
+              children: [
+                PageHeader(headline: AppTab.settings.label),
+                const _FocusSessionSection(),
+                const SizedBox(height: Spacing.lg),
+                const _BreaksSection(),
+                const SizedBox(height: Spacing.lg),
+                const _FeedbackSection(),
+                const SizedBox(height: Spacing.lg),
+                const _LiveSessionSection(),
+                const SizedBox(height: Spacing.lg),
+                const _QuietModeSection(),
+                const SizedBox(height: Spacing.lg),
+                const _GardenSection(),
+                const SizedBox(height: Spacing.lg),
+                const _ResetSection(),
+                // Last, and only in a debug build: it is not a setting, and the
+                // list should not open on it.
+                if (kDebugMode) ...[
+                  const SizedBox(height: Spacing.lg),
+                  const _SeasonSection(),
+                  const SizedBox(height: Spacing.lg),
+                  const _MilestonePreviewSection(),
+                  const SizedBox(height: Spacing.lg),
+                  const _OnboardingSection(),
+                  const SizedBox(height: Spacing.lg),
+                  const _EventLogSection(),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -157,8 +168,8 @@ class _FocusSessionSection extends ConsumerWidget {
           ),
         ),
         const _Note(
-          'A new length applies to the next session you start. A session '
-          'already growing keeps the length it began with.',
+          'Changes apply from your next session. One that\'s already growing '
+          'keeps its length.',
         ),
       ],
     );
@@ -219,8 +230,8 @@ class _BreaksSection extends ConsumerWidget {
               _change(ref, (s) => s.withAutoStartBreak(enabled: enabled)),
           title: const Text('Start breaks automatically'),
           subtitle: const Text(
-            'Your break begins as soon as a session finishes, instead of '
-            'waiting to be accepted.',
+            'Your break starts as soon as a session ends, without waiting for a '
+            'tap.',
           ),
           contentPadding: EdgeInsets.zero,
         ),
@@ -231,7 +242,7 @@ class _BreaksSection extends ConsumerWidget {
               _change(ref, (s) => s.withAutoStartNextSession(enabled: enabled)),
           title: const Text('Start sessions automatically'),
           subtitle: const Text(
-            'The next session begins as soon as a break ends.',
+            'The next session starts as soon as a break ends.',
           ),
           contentPadding: EdgeInsets.zero,
         ),
@@ -240,9 +251,9 @@ class _BreaksSection extends ConsumerWidget {
         // free — so the cycle picks up where it left off when the app is next
         // awake rather than having run on without it.
         const _Note(
-          'With both on, the timer moves from focus to break and back on its '
-          'own. Nothing starts while the app is closed; the cycle carries on '
-          'when you open it again.',
+          'With both on, the timer goes from focus to break and back by itself. '
+          'Nothing starts while the app is closed; it picks up when you open it '
+          'again.',
         ),
       ],
     );
@@ -275,9 +286,8 @@ class _FeedbackSection extends ConsumerWidget {
         // meeting. A note promising "tap one to hear it" full stop would be
         // wrong for exactly the user who had silenced their phone to focus.
         const _Note(
-          'Whichever you pick is what you hear when a session finishes, and '
-          'what the notification plays if you are away from the app. Tap one '
-          'to hear it, unless your phone is silenced.',
+          'Plays when a session finishes, in the app or in the notification if '
+          'you\'re away. Tap one to hear it, unless your phone is on silent.',
         ),
         SwitchListTile(
           key: SettingsKeys.haptics,
@@ -331,8 +341,8 @@ class _LiveSessionSection extends ConsumerWidget {
         // system already holds. This switch is about a window onto a session,
         // never about the session.
         const _Note(
-          'Turning this off does not stop a session. It still finishes and '
-          'still tells you when it does.',
+          'Turning this off doesn\'t stop a session. It still finishes, and '
+          'still lets you know.',
         ),
       ],
     );
@@ -374,9 +384,9 @@ class _QuietModeSection extends ConsumerWidget {
         QuietModeAccess.unavailable => const [
             _Note(
               key: SettingsKeys.quietModeUnsupported,
-              'This phone will not let an app change its Do Not Disturb '
-              'setting, so sessions run with the sound as you left it. '
-              'Switching it on before you start is a swipe away.',
+              'This phone doesn\'t let apps change Do Not Disturb, so sessions '
+              'keep your sound as it is. You can switch it on yourself before '
+              'you start.',
             ),
           ],
       },
@@ -412,14 +422,14 @@ class _QuietModeSection extends ConsumerWidget {
       ),
       if (revoked)
         const _Note(
-          'Pomodoro Garden does not have permission to silence your phone, so '
-          'sessions are running with the sound on. Turn the switch on again '
-          'to be taken to where it is granted.',
+          'Pomodoro Garden doesn\'t have permission to silence your phone, so '
+          'sessions run with the sound on. Turn the switch on again to grant '
+          'it.',
         )
       else
         const _Note(
-          'Alarms and reminders still come through — including this app\'s own '
-          'notice that your session has finished.',
+          'Alarms and reminders still come through, and so does the note that '
+          'your session\'s finished.',
         ),
     ];
   }
@@ -449,8 +459,8 @@ class _QuietModeSection extends ConsumerWidget {
         onTap: () => _showTheRecipe(context),
         title: const Text('Silencing your phone for a session'),
         subtitle: const Text(
-          'Your phone will not let an app turn a Focus on for you. A Shortcut '
-          'can do it, and start your session at the same time.',
+          'Your phone doesn\'t let apps turn on a Focus. A Shortcut can, and it '
+          'can start your session at the same time.',
         ),
         trailing: const Icon(Icons.chevron_right),
         contentPadding: EdgeInsets.zero,
@@ -483,11 +493,9 @@ class _QuietModeSection extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('One thing to switch on'),
         content: const Text(
-          'Your phone will not let an app silence it without permission, and '
-          'there is no way to ask for that here — it is granted from system '
-          'settings.\n\n'
-          'Find Pomodoro Garden in the list that opens and turn it on. You can '
-          'come straight back.',
+          'Your phone has to give Pomodoro Garden permission first, and that '
+          'happens in system settings.\n\nFind Pomodoro Garden in the list that '
+          'opens and turn it on, then come straight back.',
         ),
         actions: [
           TextButton(
@@ -518,17 +526,16 @@ class _QuietModeSection extends ConsumerWidget {
         title: const Text('Silence your phone for a session'),
         content: const SingleChildScrollView(
           child: Text(
-            'Your phone keeps Focus modes to itself: no app can turn one on '
-            'for you. Shortcuts can, and it can start your session in the same '
-            'breath.\n\n'
+            'No app can turn on a Focus mode for you, but Shortcuts can, and it '
+            'can start your session at the same time.\n\n'
             '1. Open Shortcuts and create a new shortcut.\n'
             '2. Add "Set Focus". Choose Do Not Disturb, turn it on, and set it '
             'to last until the time your session will end.\n'
             '3. Add "Start a focus session" — it is under Pomodoro Garden.\n'
             '4. Name it, then run it instead of tapping Start. It works from '
             'the Home Screen, from the share sheet, or by asking Siri.\n\n'
-            'Do Not Disturb turns itself off at the time you chose, so nothing '
-            'is left silenced afterwards.',
+            'Do Not Disturb turns itself off at the time you chose, so your '
+            'phone won\'t stay silenced.',
           ),
         ),
         actions: [
@@ -570,7 +577,7 @@ class _GardenSection extends ConsumerWidget {
           child: Text('Theme: ${chosen.label}'),
         ),
         const _Note(
-          'Your garden changes with the seasons whichever theme it is in.',
+          'Every theme turns with the seasons.',
         ),
         // REQ-035's second door. Here rather than in a section of its own
         // because an export *is* a thing you do to the garden, and the row
@@ -605,8 +612,7 @@ class _ResetSection extends StatelessWidget {
       children: [
         _ResetDoor(),
         _Note(
-          'Your settings and your theme are not part of this and are not '
-          'cleared.',
+          'Your settings and theme stay as they are.',
         ),
       ],
     );
@@ -620,10 +626,17 @@ class _ResetDoor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (!ref.watch(gardenMayBeResetProvider)) {
-      return const _Note(
+      // A finished session is held back too, but nothing in it is running and
+      // there is nothing to cancel, so it gets its own way out.
+      final finished = ref.watch(sessionControllerProvider).phase ==
+          SessionPhase.completed;
+      return _Note(
         key: ResetGardenKeys.heldBack,
-        'Your timer has something in flight. Clearing your garden is here when '
-        'it is at rest — nothing is going to end your session for you.',
+        finished
+            ? 'Your session\'s just finished. Take its break first (you can '
+                'skip it), then you can reset.'
+            : 'A session or break is running. Finish or cancel it first; '
+                'resetting won\'t end it for you.',
       );
     }
 
@@ -669,10 +682,9 @@ class _ResetDoor extends ConsumerWidget {
 
     final said = switch (await controller.clear()) {
       ResetOutcome.cleared =>
-        'Your garden is empty. Your next finished session plants the first '
-            'thing in it.',
-      ResetOutcome.failed => 'Your garden could not be cleared just now, and '
-          'nothing has been removed.',
+        'Your garden\'s clear. Your next session plants the first thing in it.',
+      ResetOutcome.failed => 'Your garden couldn\'t be cleared just now. '
+          'Nothing\'s been removed.',
       // Said by the section rather than here: the row has already gone back to
       // its held-back note, which explains why in more words than a snack bar
       // over a timer has room for.
@@ -881,7 +893,7 @@ class _QuietModeHint extends StatelessWidget {
       padding: const EdgeInsets.all(Spacing.md),
       decoration: BoxDecoration(
         color: theme.colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(Spacing.sm),
+        borderRadius: Radii.paperSm,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -894,8 +906,8 @@ class _QuietModeHint extends StatelessWidget {
           ),
           const SizedBox(height: Spacing.xs),
           Text(
-            'It takes one Shortcut, made once. After that, starting a session '
-            'and turning on Do Not Disturb are the same tap.',
+            'Set up one Shortcut once, and a single tap starts your session and '
+            'turns on Do Not Disturb.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSecondaryContainer,
             ),
@@ -1108,9 +1120,14 @@ class _Section extends StatelessWidget {
           ),
           child: Text(title, style: Theme.of(context).textTheme.headlineMedium),
         ),
-        Card(
+        PaperCard(
           child: Padding(
-            padding: const EdgeInsets.all(Spacing.md),
+            padding: const EdgeInsets.fromLTRB(
+              Spacing.lg,
+              Spacing.md,
+              Spacing.md,
+              Spacing.lg,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

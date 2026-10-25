@@ -242,7 +242,7 @@ void main() {
       // The bottom bar still works while the image is being made, and the tab
       // it opens is live rather than a frozen picture of one.
       await tapTab(tester, AppTab.timer);
-      expect(find.text('Start'), findsOneWidget);
+      expect(find.text('Plant it'), findsOneWidget);
 
       // And the export carried on regardless of the user walking away from the
       // screen they started it on: it belongs to the app, not to the garden.

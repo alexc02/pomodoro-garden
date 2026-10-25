@@ -68,8 +68,9 @@ Future<void> exportGarden(BuildContext context, WidgetRef ref) async {
     key: ExportKeys.failure,
     content: Text(
       outcome.becauseUnavailable
-          ? 'This device had nowhere to send the image.'
-          : 'Your garden could not be turned into an image just now.',
+          ? 'This phone has nowhere to send the picture.'
+          : 'Couldn\'t make a picture of your garden just now. Try again in a '
+              'moment.',
     ),
   ));
   ref.read(gardenExportControllerProvider.notifier).acknowledge();
@@ -87,7 +88,7 @@ bool _busy(Exporting state) => state is Drawing || state is Handing;
 String _label(Exporting state) => switch (state) {
       Drawing() => 'Drawing your garden',
       Handing() => 'Opening the share sheet',
-      NotExporting() || ExportFailed() => 'Export your garden as an image',
+      NotExporting() || ExportFailed() => 'Share a picture of your garden',
     };
 
 /// REQ-035 from the garden itself: the share action in the app bar.
@@ -138,7 +139,7 @@ class ExportGardenTile extends ConsumerWidget {
       key: ExportKeys.setting,
       contentPadding: EdgeInsets.zero,
       leading: const Icon(Icons.ios_share),
-      title: const Text('Export your garden'),
+      title: const Text('Share your garden'),
       // Said out loud here and not on the garden's app bar, because this is the
       // door with room for a sentence.
       subtitle: const Text('A picture of the whole garden, at full size.'),

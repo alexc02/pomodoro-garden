@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
+import '../design/palette.dart';
 import 'decor_sprite.dart';
 import 'plant_sprite.dart';
 
@@ -333,9 +334,15 @@ final class GardenAtlas {
   /// keeps the ground from looking like a diagram under paper plants.
   ///
   /// Two tiles rather than one tinted two ways, because they differ in more
-  /// than colour. Bare soil is cut thin — a faint sheet inside its frame — so
-  /// that a newly unlocked plot reads as somewhere a plant *could* go rather
-  /// than as a plant that failed to draw.
+  /// than colour. Bare soil is unworked ground — the same cut, paler and dry,
+  /// with two furrows pressed into it — so that a newly unlocked plot reads as
+  /// somewhere a plant *could* go rather than as a plant that failed to draw.
+  ///
+  /// **Both tiles are opaque.** Bare soil used to be a faint sheet, which let
+  /// whatever was behind it through: over `GardenBackdrop`'s green hills that
+  /// mixed to a murky olive, and an empty garden — the first screen a new user
+  /// sees — was a field of it (PRD v2.3). Paleness, not transparency, is what
+  /// says "unplanted" now, and it says the same over any sky or hill.
   ///
   /// **The soil is soil and the frame is [decor]**, which is REQ-034's "soil
   /// tiles and decor" at the scale a plot has: the ground is earth, and the
@@ -352,22 +359,47 @@ final class GardenAtlas {
     Color decor, {
     required bool planted,
   }) {
+    final frame = planted ? decor : Color.lerp(decor, _paper, _barePaleness)!;
+    final ground = planted ? soil : Color.lerp(soil, _paper, _barePaleness)!;
+
     canvas.drawPath(
       _cutDiamond(cell, 1, Offset.zero),
-      Paint()..color = decor.withValues(alpha: planted ? 0.55 : 0.32),
+      Paint()..color = frame,
     );
     canvas.drawPath(
       _cutDiamond(cell, 0.84, Offset(0, cell.height * 0.05)),
       Paint()
         ..color = Color.lerp(decor, const Color(0xFF000000), 0.45)!
-            .withValues(alpha: planted ? 0.45 : 0.22)
+            .withValues(alpha: planted ? 0.45 : 0.3)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, cell.height * 0.02),
     );
-    canvas.drawPath(
-      _cutDiamond(cell, 0.84, Offset(0, -cell.height * 0.01)),
-      Paint()..color = soil.withValues(alpha: planted ? 0.95 : 0.3),
-    );
+    final sheet = _cutDiamond(cell, 0.84, Offset(0, -cell.height * 0.01));
+    canvas.drawPath(sheet, Paint()..color = ground);
+    if (planted) return;
+
+    // Two furrows across the bare sheet, along the diamond's long axis: ground
+    // turned over and waiting, drawn in the soil's own colour.
+    final furrow = Paint()
+      ..color = soil.withValues(alpha: 0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = cell.height * 0.035;
+    final c = sheet.getBounds().center;
+    final reach = cell.width * 0.2;
+    for (final dy in [-cell.height * 0.09, cell.height * 0.09]) {
+      canvas.drawLine(
+        Offset(c.dx - reach, c.dy + dy),
+        Offset(c.dx + reach, c.dy + dy),
+        furrow,
+      );
+    }
   }
+
+  /// The pale, dry paper bare soil is lightened toward.
+  static const Color _paper = Palette.surfaceLight;
+
+  /// How far toward [_paper] bare soil and its frame are lightened.
+  static const double _barePaleness = 0.3;
 
   /// A diamond [scale] the size of [cell], moved by [shift], whose edges
   /// wander a little as a scissor cut does.

@@ -6,11 +6,14 @@ import '../../design/garden_colors.dart';
 import '../../design/spacing.dart';
 import '../../garden/decor_providers.dart';
 import '../../garden/garden_providers.dart';
+import '../../garden/garden_transition.dart';
 import '../../garden/season_weather.dart';
 import '../../shell/tab.dart';
-import '../journal/journal_paper.dart';
+import '../../shell/tab_glyph.dart';
 import 'decor_picker.dart';
 import 'export_garden.dart';
+import 'garden_backdrop.dart';
+import 'garden_header.dart';
 import 'garden_timer_bar.dart';
 import 'garden_view.dart';
 import 'seasonal_garden.dart';
@@ -20,8 +23,10 @@ import 'seasonal_garden.dart';
 ///
 /// The product's whole emotional premise lives on this screen — the garden is
 /// here tomorrow, next week and next month — so it is deliberately mostly
-/// garden. There is no app bar over it and no chrome in it; the only thing this
-/// screen adds to [GardenView] is a word when the garden has something to say.
+/// garden. There is no app bar over it: a [GardenHeader] says the date and how
+/// big the garden has grown, the garden stands in front of [GardenBackdrop]'s
+/// paper hills, and the only other thing this screen adds to [GardenView] is a
+/// word when the garden has something to say.
 ///
 /// REQ-019's season and REQ-034's theme are put on here, by [SeasonalGarden],
 /// and reach no further than this subtree: the colours arrive through the theme
@@ -36,94 +41,57 @@ class GardenScreen extends ConsumerWidget {
 
     return SeasonalGarden(
       builder: (context, skin) => Scaffold(
-        // §5.2's "navigation bar (minimal)", and the same one every other tab
-        // has: the garden is the screen, and the bar is there to name it.
-        appBar: AppBar(
-          title: Text(AppTab.garden.label),
-          // REQ-035's export beside REQ-040's arranging: the two things a user
-          // does *to* the garden rather than in it.
-          actions: const [ExportGardenAction(), _Arrange()],
-        ),
         // The sky, and the whole background: the garden is drawn on top of it
         // and is smaller than it whenever the user has zoomed out. It is the
         // skin's sky rather than the app's, which is the largest single thing
-        // a change of season or of theme does to the screen.
+        // a change of season or of theme does to the screen. [GardenBackdrop]
+        // paints over it at once; this is what shows for the frame before.
         backgroundColor: GardenColors.of(context).skyDay,
-        body: SafeArea(
-          child: garden.when(
-            // A blank sky rather than a spinner. The read is one query against
-            // a table of at most two hundred rows, and a spinner that appears
-            // for a frame and a half is worse than a background that was going
-            // to be there anyway — the garden fades in over it either way,
-            // §5.3.
-            loading: () => const SizedBox.expand(),
-            error: (error, stack) => const _GardenUnreadable(),
-            data: (layout) => Stack(
-              fit: StackFit.expand,
-              children: [
-                // The sky is paper too (PRD v2.2 §9.1): the journal's fibres,
-                // laid once over the sky colour and never repainted as the
-                // garden pans over them.
-                RepaintBoundary(
-                  child: CustomPaint(
-                    painter: PaperPainter(
-                      fibre: GardenColors.of(context).textSecondary,
-                      wash: GardenColors.of(context).soil,
-                    ),
-                  ),
-                ),
-                Semantics(
-                  // The garden is one painted surface, so it has no widgets for
-                  // a screen reader to walk and has to say what it holds
-                  // itself. Wrapped around the painting alone rather than
-                  // around the whole stack, so that the caption below stays a
-                  // line of its own rather than being merged into this one.
-                  label: _summary(layout),
-                  child: GardenView(layout: layout),
-                ),
-                // In front of the plants and behind anything the garden has to
-                // say: weather falls through a garden, not across a sentence.
-                SeasonWeather(transition: skin),
-                // Along the bottom, the garden's one line of text, when it has
-                // something to say, over US-006's timer bar. On a garden too
-                // short for both, the bar wins: starting a session is the thing
-                // to do, and the caption only describes the garden.
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final roomy = constraints.maxHeight >= _roomForCaption;
-                    return Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (!roomy)
-                            const SizedBox.shrink()
-                          else if (layout.plants.isEmpty)
-                            const _Caption('Finish a session and the first '
-                                'thing you grow stands here.')
-                          else if (layout.unplaced.isNotEmpty)
-                            _Caption(_holdingMessage(layout.unplaced.length)),
-                          const GardenTimerBar(),
-                        ],
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Outside the safe area, so the sky runs up under the status bar.
+            const GardenBackdrop(),
+            SafeArea(
+              child: garden.when(
+                // A blank sky rather than a spinner. The read is one query
+                // against a table of at most two hundred rows, and a spinner
+                // that appears for a frame and a half is worse than a
+                // background that was going to be there anyway — the garden
+                // fades in over it either way, §5.3.
+                loading: () => const SizedBox.expand(),
+                error: (error, stack) => const _GardenUnreadable(),
+                // The header lies over the top of the garden rather than
+                // above it: the garden is drawn centred, so the top of the
+                // screen is sky, and a header in a column would push the
+                // garden off a small phone at a large text size.
+                data: (layout) => Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _GardenStage(layout: layout, skin: skin),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: GardenHeader(
+                        plants: layout.plants.length,
+                        // REQ-035's export beside REQ-040's arranging: the two
+                        // things a user does *to* the garden rather than in it.
+                        actions: const [ExportGardenAction(), _Arrange()],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
-                // REQ-040's arranging, over everything: it is the only thing on
-                // this screen the user is *doing* rather than looking at, and
-                // it is nothing at all when they are not.
-                const ArrangeBar(),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
   /// How tall the garden must be to show a caption above the timer bar
-  /// without either being pushed off the bottom.
-  static const double _roomForCaption = 240;
+  /// without either being pushed off the bottom — allowing for the bar at its
+  /// tallest, when a narrow screen puts its button under its line.
+  static const double _roomForCaption = 300;
 
   /// What the garden amounts to, in a sentence.
   ///
@@ -168,6 +136,69 @@ class GardenScreen extends ConsumerWidget {
   static String _holdingMessage(int waiting) => waiting == 1
       ? 'Your garden is full. One more plant is waiting for space.'
       : 'Your garden is full. $waiting more plants are waiting for space.';
+}
+
+/// Everything under the header: the garden, its weather, and along the bottom
+/// its caption and the timer bar.
+class _GardenStage extends StatelessWidget {
+  const _GardenStage({required this.layout, required this.skin});
+
+  final GardenLayout layout;
+
+  final GardenTransition skin;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Semantics(
+          // The garden is one painted surface, so it has no widgets for a
+          // screen reader to walk and has to say what it holds itself. Wrapped
+          // around the painting alone rather than around the whole stack, so
+          // that the caption below stays a line of its own rather than being
+          // merged into this one.
+          label: GardenScreen._summary(layout),
+          child: GardenView(layout: layout),
+        ),
+        // In front of the plants and behind anything the garden has to say:
+        // weather falls through a garden, not across a sentence.
+        SeasonWeather(transition: skin),
+        // Along the bottom, the garden's one line of text, when it has
+        // something to say, over US-006's timer bar. On a garden too short for
+        // both, the bar wins: starting a session is the thing to do, and the
+        // caption only describes the garden.
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final roomy =
+                constraints.maxHeight >= GardenScreen._roomForCaption;
+            return Align(
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!roomy)
+                    const SizedBox.shrink()
+                  else if (layout.plants.isEmpty)
+                    const _Caption('Finish a session and your first plant goes '
+                        'in here.')
+                  else if (layout.unplaced.isNotEmpty)
+                    _Caption(GardenScreen._holdingMessage(
+                      layout.unplaced.length,
+                    )),
+                  const GardenTimerBar(),
+                ],
+              ),
+            );
+          },
+        ),
+        // REQ-040's arranging, over everything: it is the only thing on this
+        // screen the user is *doing* rather than looking at, and it is nothing
+        // at all when they are not.
+        const ArrangeBar(),
+      ],
+    );
+  }
 }
 
 /// The way into REQ-040's arranging, and the way back out of it.
@@ -250,15 +281,15 @@ class _GardenUnreadable extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              AppTab.garden.icon,
+            TabGlyph(
+              AppTab.garden,
               size: IconSizes.hero,
               color: GardenColors.of(context).textSecondary,
             ),
             const SizedBox(height: Spacing.md),
             Text(
-              'Your garden could not be opened just now. Nothing has been '
-              'lost — try again in a moment.',
+              'Your garden couldn\'t be opened just now. Nothing\'s lost. Try '
+              'again in a moment.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium,
             ),

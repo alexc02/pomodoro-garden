@@ -2,45 +2,18 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../design/garden_colors.dart';
-
-/// The page the journal is written on: REQ-025's paper texture.
+/// Paper: a warm wash towards the edges, and short fibres through it.
+///
+/// REQ-025's paper texture, and since PRD v2.3 the grain of every screen: the
+/// garden's backdrop and the band of sky behind the timer, the journal and
+/// the settings all lay it over themselves.
 ///
 /// Drawn rather than shipped as an image, for the reason the plant sprites are:
 /// a bitmap of paper is a fixed size on a screen that is not, it tiles visibly
 /// on a tall page, and it would be a second thing to redraw when a theme
-/// changes. This is a wash and a scatter of fibres over the theme's own
-/// background, so it is the right colour in both brightnesses by construction
-/// and costs one paint per resize.
-///
-/// It is a texture and nothing else: no shadow, no border, and nothing on it
-/// that a screen reader can find. What is *on* the page is the caller's.
-class PaperBackground extends StatelessWidget {
-  const PaperBackground({required this.child, super.key});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = GardenColors.of(context);
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-      ),
-      // Isolated so the page scrolling over it does not repaint the fibres:
-      // the texture changes when the window does and at no other time.
-      child: RepaintBoundary(
-        child: CustomPaint(
-          painter: PaperPainter(fibre: colors.textSecondary, wash: colors.soil),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-/// Paper: a warm wash towards the edges, and short fibres through it.
+/// changes. It is a wash and a scatter of fibres in the theme's own colours,
+/// so it is right in both brightnesses by construction and costs one paint per
+/// resize.
 ///
 /// Both are faint on purpose — the test of this texture is that a user
 /// notices the page is not flat white without ever noticing why. Nothing here

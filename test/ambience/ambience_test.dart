@@ -250,7 +250,7 @@ void main() {
 
       await tester.tap(find.text('Skip break'));
       await settle(tester);
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant it'));
       await settle(tester);
 
       expect(ambience.playing, AmbientSound.forest);
@@ -314,7 +314,7 @@ void main() {
       await advance(tester, clock, const Duration(minutes: 25));
       await settle(tester);
 
-      await tester.tap(find.text('Start'));
+      await tester.tap(find.text('Plant another'));
       await settle(tester);
 
       expect(ambience.playing, AmbientSound.ocean);
