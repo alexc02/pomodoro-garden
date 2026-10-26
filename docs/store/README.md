@@ -13,6 +13,7 @@ the code and the release build's merged `AndroidManifest.xml`, not copied from t
 | `iarc-questionnaire.md` | Content rating (Play) and age rating (App Store), plus the target-audience choice |
 | `app-store-privacy.md` | App Store Connect's App Privacy, export compliance and review notes |
 | `feature-graphic.png` | Play's 1024 × 500 feature graphic (`tool/generate_store_art.dart`) |
+| `screenshots/` | App Store screenshots, captioned per PRD §6.3: `iphone-6.3` (1206 × 2622, required), `iphone-6.9` (1320 × 2868, optional), `ipad-13` (2064 × 2752, required) |
 
 ## Your checklist
 
@@ -21,7 +22,8 @@ the code and the release build's merged `AndroidManifest.xml`, not copied from t
 - [ ] Host it at a public URL (your website, or GitHub Pages) and note the URL in
       `play-data-safety.md` and `app-store-privacy.md`
 - [ ] Decide the Play target audience (`iarc-questionnaire.md` recommends 13 and over)
-- [ ] Take the six screenshots (PRD §6.3) from the iOS Simulator and the Android emulator
+- [x] iOS screenshots: `screenshots/` (see below)
+- [ ] Android screenshots from the emulator
 
 **Google Play Console**
 - [ ] App content → Privacy policy: the URL
@@ -54,3 +56,21 @@ xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive \
 
 Upload `build/ios/ipa/Pip Garden.ipa` with Transporter. Bump the build number after `+` in
 `pubspec.yaml` for every upload.
+
+## Regenerating the App Store screenshots
+
+```
+tool/screenshots/capture.sh          # raw captures from the iOS Simulator
+python3 tool/screenshots/compose.py  # captioned store images (needs Pillow)
+```
+
+`capture.sh` launches the app through `tool/screenshots/main.dart`, which seeds an 80-session
+garden in memory, so your own data on the simulator is never touched. Shot 3 stands in for
+PRD §6.3's Dynamic Island shot: the simulator can't capture an expanded Live Activity.
+Which set goes in which App Store Connect slot:
+
+| Folder | Slot | |
+|---|---|---|
+| `iphone-6.3` | iPhone, Dynamic Island (medium) — 1206 × 2622 | **Required** |
+| `iphone-6.9` | iPhone, Dynamic Island (large) — 1320 × 2868 | Optional; falls back to medium |
+| `ipad-13` | iPad 13" — 2064 × 2752 | **Required** |
