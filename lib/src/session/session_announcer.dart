@@ -94,6 +94,14 @@ class _SessionAnnouncerState extends ConsumerState<SessionAnnouncer> {
       _askAboutNotifications();
     }
 
+    // A paused session has no end time, so nothing may stay scheduled for the
+    // old one. Normally the cancel on return already cleared it; this covers a
+    // notice that survived anyway.
+    if (previous.phase == SessionPhase.running &&
+        next.phase == SessionPhase.paused) {
+      _cancelNotice();
+    }
+
     if (previous.phase != SessionPhase.completed &&
         next.phase == SessionPhase.completed) {
       _ended();
@@ -178,10 +186,10 @@ class _SessionAnnouncerState extends ConsumerState<SessionAnnouncer> {
 
     final notice = switch (snapshot.phase) {
       SessionPhase.running => SessionCompletionNotice.forGrowth(
-          snapshot.growing,
-          at: due,
-          sound: sound,
-        ),
+        snapshot.growing,
+        at: due,
+        sound: sound,
+      ),
       SessionPhase.onBreak when snapshot.breakKind != null =>
         SessionCompletionNotice.forBreak(
           kind: snapshot.breakKind!,
