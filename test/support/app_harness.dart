@@ -18,6 +18,7 @@ import 'package:pip_garden/src/garden/art_bundle.dart';
 import 'package:pip_garden/src/garden/art_providers.dart';
 import 'package:pip_garden/src/live/live_session_providers.dart';
 import 'package:pip_garden/src/notifications/notification_providers.dart';
+import 'package:pip_garden/src/notifications/session_notifications.dart';
 import 'package:pip_garden/src/quiet/quiet_mode_providers.dart';
 import 'package:pip_garden/src/session/session_providers.dart';
 import 'package:pip_garden/src/shell/tab.dart';
@@ -53,7 +54,7 @@ Future<void> pumpApp(
   Size? surface,
   GardenSettings? settings,
   bool firstLaunch = false,
-  FakeSessionNotifications? notifications,
+  SessionNotifications? notifications,
   FakeEndSoundPlayer? endSound,
   FakeMicroSounds? microSounds,
   FakeHaptics? haptics,

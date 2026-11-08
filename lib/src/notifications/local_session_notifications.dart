@@ -78,7 +78,7 @@ NotificationDetails completionDetails(EndSound sound) {
 /// timezone changes mid-session don't matter.
 final class LocalSessionNotifications implements SessionNotifications {
   LocalSessionNotifications({FlutterLocalNotificationsPlugin? plugin})
-      : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   /// Fixed ids, so rescheduling replaces and cancel needs no bookkeeping.
   static const int _completionId = 1;
@@ -101,37 +101,54 @@ final class LocalSessionNotifications implements SessionNotifications {
           // No badges: nothing to count.
           final granted = await _plugin
               .resolvePlatformSpecificImplementation<
-                  IOSFlutterLocalNotificationsPlugin>()
+                IOSFlutterLocalNotificationsPlugin
+              >()
               ?.requestPermissions(alert: true, sound: true);
           return granted ?? false;
         }
 
         final granted = await _plugin
             .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin
+            >()
             ?.requestNotificationsPermission();
         // Null below Android 13, where no permission is needed.
         return granted ?? true;
       });
 
-  @override
-  Future<void> scheduleCompletion(SessionCompletionNotice notice) =>
-      _schedule(_completionId, notice, 'the completion notification');
+  /// Tail of the schedule/cancel queue. See [_inOrder].
+  Future<void> _last = Future<void>.value();
+
+  /// Runs [operation] after every earlier schedule or cancel has finished.
+  ///
+  /// Scheduling awaits more steps than cancelling (sound install, schedule
+  /// mode), so without this a cancel issued on a quick return could reach the
+  /// OS first and the stale schedule would land after it and fire.
+  Future<void> _inOrder(Future<void> Function() operation) {
+    final next = _last.then((_) => operation());
+    // [_try] never throws, but a broken link must not stall the queue.
+    _last = next.catchError((Object _) {});
+    return next;
+  }
 
   @override
-  Future<void> scheduleFollowUp(SessionCompletionNotice notice) =>
-      _schedule(_followUpId, notice, 'the break-end notification');
+  Future<void> scheduleCompletion(SessionCompletionNotice notice) => _inOrder(
+    () => _schedule(_completionId, notice, 'the completion notification'),
+  );
 
-  Future<void> _schedule(
-    int id,
-    SessionCompletionNotice notice,
-    String what,
-  ) =>
+  @override
+  Future<void> scheduleFollowUp(SessionCompletionNotice notice) => _inOrder(
+    () => _schedule(_followUpId, notice, 'the break-end notification'),
+  );
+
+  Future<void> _schedule(int id, SessionCompletionNotice notice, String what) =>
       _try('scheduling $what', () async {
         await _initialise();
         // Separate try: a failed copy means the default sound, not no notice.
-        await _try('installing the end sound for iOS',
-            () => _installIosSound(notice.sound));
+        await _try(
+          'installing the end sound for iOS',
+          () => _installIosSound(notice.sound),
+        );
 
         await _plugin.zonedSchedule(
           id: id,
@@ -144,13 +161,14 @@ final class LocalSessionNotifications implements SessionNotifications {
       });
 
   @override
-  Future<void> cancelCompletion() =>
-      _try('cancelling the completion notification', () async {
-        await _initialise();
-        // Also removes already-delivered ones from the shade.
-        await _plugin.cancel(id: _completionId);
-        await _plugin.cancel(id: _followUpId);
-      });
+  Future<void> cancelCompletion() => _inOrder(
+    () => _try('cancelling the completion notification', () async {
+      await _initialise();
+      // Also removes already-delivered ones from the shade.
+      await _plugin.cancel(id: _completionId);
+      await _plugin.cancel(id: _followUpId);
+    }),
+  );
 
   /// Memoised plugin setup. Cleared on failure so the next call retries.
   Future<void> _initialise() async {
@@ -187,7 +205,8 @@ final class LocalSessionNotifications implements SessionNotifications {
 
     final exact = await _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.canScheduleExactNotifications();
     return (exact ?? false)
         ? AndroidScheduleMode.exactAllowWhileIdle
@@ -264,11 +283,13 @@ final class LocalSessionNotifications implements SessionNotifications {
   }
 
   void _report(String what, Object error, StackTrace stack) {
-    FlutterError.reportError(FlutterErrorDetails(
-      exception: error,
-      stack: stack,
-      library: 'pip_garden',
-      context: ErrorDescription(what),
-    ));
+    FlutterError.reportError(
+      FlutterErrorDetails(
+        exception: error,
+        stack: stack,
+        library: 'pip_garden',
+        context: ErrorDescription(what),
+      ),
+    );
   }
 }
