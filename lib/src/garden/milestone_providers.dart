@@ -57,6 +57,22 @@ class MilestoneAwards extends Notifier<List<Plant>> {
     );
   }
 
+  static Plant? _outermostSessionPlant(List<Plant> plants) {
+    Plant? outermost;
+    var furthest = -1;
+    for (final plant in plants) {
+      final plot = plant.plot;
+      final order = plant.isBonus || plot == null
+          ? null
+          : GardenPlots.orderOf(plot);
+      if (order != null && order > furthest) {
+        outermost = plant;
+        furthest = order;
+      }
+    }
+    return outermost;
+  }
+
   Future<void> _award() async {
     try {
       final garden = ref.read(plantRepositoryProvider);
@@ -86,8 +102,19 @@ class MilestoneAwards extends Notifier<List<Plant>> {
           // limited by unlocked plots; `GardenLayout` grows to fit. A null
           // plot means 200 plants; the plant is still recorded.
           final sowing = GardenPlots.sow(plants: occupied, decor: arranged);
-          final plot = sowing.plot;
+          var plot = sowing.plot;
           if (plot != null) occupied.add(plot);
+
+          // 200 plants already: the award takes the outermost session
+          // plant's plot. That plant is kept, unplaced, like any other past
+          // the cap. Awards never displace each other.
+          if (plot == null) {
+            final outermost = _outermostSessionPlant(await garden.plants());
+            if (outermost != null) {
+              await garden.save(outermost.inPlot(null));
+              plot = outermost.plot;
+            }
+          }
 
           final displaced = sowing.displacing;
           if (displaced != null) {

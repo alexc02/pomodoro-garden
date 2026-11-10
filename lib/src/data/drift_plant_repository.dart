@@ -26,7 +26,8 @@ final class DriftPlantRepository implements PlantRepository {
             milestoneSessions: plant.milestone?.sessions,
             plotX: plant.plot?.x,
             plotY: plant.plot?.y,
-          ),
+            // Nulls written out, so saving a plant with no plot clears it.
+          ).toCompanion(false),
         );
   }
 

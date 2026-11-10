@@ -239,9 +239,10 @@ void main() {
       expect(layout.plantIn(awarded.plot!), awarded);
     });
 
-    testWidgets('kept unplaced at the cap', (tester) async {
+    testWidgets('takes a session plant\'s plot at the cap', (tester) async {
       // Plot 200 is the end of the placement order, so the garden can't grow.
-      // The award is still recorded and counted.
+      // Each award takes the outermost session plant's plot; that plant is
+      // kept, unplaced, like any other past the cap.
       final database = AppDatabase.forTesting();
       addTearDown(database.close);
       await seedGarden(database, sessions: 210);
@@ -261,10 +262,23 @@ void main() {
       final awarded = await awardedPlants(database);
       expect(awarded, hasLength(4));
       expect(
-        awarded.every((plant) => plant.plot == null),
-        isTrue,
-        reason: 'unplaced but kept',
+        {for (final plant in awarded) plant.plot},
+        GardenPlots.inPlacementOrder.skip(196).toSet(),
+        reason: 'the four outermost plots, one each',
       );
+
+      final plants = await DriftPlantRepository(database).plants();
+      expect(plants, hasLength(214), reason: 'nothing dropped');
+      expect(
+        plants.where((plant) => plant.plot == null),
+        hasLength(14),
+        reason: 'ten past the cap plus the four that made way',
+      );
+
+      final layout = _painter(tester).layout;
+      expect(layout.plotCount, 200);
+      expect(layout.plants, hasLength(200), reason: 'one plant per plot');
+      expect(layout.bonusPlants, hasLength(4));
     });
   });
 
