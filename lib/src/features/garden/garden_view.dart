@@ -254,15 +254,15 @@ class _GardenViewState extends ConsumerState<GardenView>
     final atlas = _atlas;
     if (camera == null || atlas == null) return;
 
+    final arranging = ref.read(decorArrangerProvider);
+    final arranger = ref.read(decorArrangerProvider.notifier);
+
     final target = GardenHitTest(
       layout: widget.layout,
       projection: camera,
       // Hit-test against the same texture that was drawn.
       atlas: atlas,
-    ).at(details.localPosition);
-
-    final arranging = ref.read(decorArrangerProvider);
-    final arranger = ref.read(decorArrangerProvider.notifier);
+    ).at(details.localPosition, arranging: arranging is! NotArranging);
 
     switch (arranging) {
       case NotArranging():

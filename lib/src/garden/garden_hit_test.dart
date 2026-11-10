@@ -64,11 +64,15 @@ final class GardenHitTest {
 
   /// What is at [point] (garden paint coordinates), or null for the sky or a
   /// locked plot.
-  GardenTarget? at(Offset point) {
+  ///
+  /// Plants are skipped while [arranging]. They can't be picked up, and a
+  /// tall one would otherwise swallow taps meant for decor behind it.
+  GardenTarget? at(Offset point, {bool arranging = false}) {
     // `layout.plots` is in paint order, so reversed is nearest first.
     for (final plot in layout.plots.reversed) {
       final plant = layout.plantIn(plot);
       if (plant != null) {
+        if (arranging) continue;
         final picture = _pictureIn(plot, atlas.footprintFor(plant.species));
         if (picture.contains(point)) return PlantTarget(plot, plant);
         continue;

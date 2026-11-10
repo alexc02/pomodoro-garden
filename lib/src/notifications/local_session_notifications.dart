@@ -132,9 +132,16 @@ final class LocalSessionNotifications implements SessionNotifications {
   }
 
   @override
-  Future<void> scheduleCompletion(SessionCompletionNotice notice) => _inOrder(
-    () => _schedule(_completionId, notice, 'the completion notification'),
-  );
+  Future<void> scheduleCompletion(SessionCompletionNotice notice) =>
+      _inOrder(() async {
+        // Clear any old follow-up first. Locking twice without a resume in
+        // between left one behind, and the break end then fired twice.
+        await _try('cancelling the old break-end notification', () async {
+          await _initialise();
+          await _plugin.cancel(id: _followUpId);
+        });
+        await _schedule(_completionId, notice, 'the completion notification');
+      });
 
   @override
   Future<void> scheduleFollowUp(SessionCompletionNotice notice) => _inOrder(

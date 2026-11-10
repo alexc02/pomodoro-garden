@@ -269,4 +269,50 @@ void main() {
 
     expect(hitTest.plantAt(const Offset(200, 300)), isNull);
   });
+
+  group('while arranging', () {
+    // Trees on the three plots in front of (0, 0).
+    const behind = GardenPlot(0, 0);
+    final trees = [
+      _plant('t1', PlantType.largeTree, const GardenPlot(1, 0)),
+      _plant('t2', PlantType.largeTree, const GardenPlot(0, 1)),
+      _plant('t3', PlantType.largeTree, const GardenPlot(1, 1)),
+    ];
+    final tap = _camera.centreOf(behind);
+
+    GardenLayout garden({List<Decor> decor = const []}) => GardenLayout.of(
+          plants: trees,
+          decor: decor,
+          completedSessions: 12,
+        );
+
+    for (final kind in DecorKind.values) {
+      test('${kind.name} behind a tree can be picked up', () {
+        final item = testDecor(kind, behind);
+        final hitTest = _hitTest(garden(decor: [item]));
+
+        // Normally the tree gets it.
+        expect(hitTest.at(tap), isA<PlantTarget>());
+
+        final target = hitTest.at(tap, arranging: true);
+        expect(target, isA<DecorTarget>());
+        expect((target! as DecorTarget).decor, item);
+      });
+    }
+
+    test('soil behind a tree can be tapped', () {
+      final target = _hitTest(garden()).at(tap, arranging: true);
+
+      expect(target, isA<SoilTarget>());
+      expect(target!.plot, behind);
+    });
+
+    test('a plant is still hit in its own plot', () {
+      final tree = trees.last;
+      final target = _hitTest(garden())
+          .at(_camera.centreOf(tree.plot!), arranging: true);
+
+      expect((target! as PlantTarget).plant, tree);
+    });
+  });
 }

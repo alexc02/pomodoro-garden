@@ -4,11 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'package:pip_garden/src/data/database.dart';
 import 'package:pip_garden/src/data/drift_decor_repository.dart';
+import 'package:pip_garden/src/data/drift_plant_repository.dart';
 import 'package:pip_garden/src/features/garden/decor_picker.dart';
+import 'package:pip_garden/src/features/garden/plant_card.dart';
 import 'package:pip_garden/src/garden/garden_painter.dart';
 import 'package:pip_garden/src/shell/tab.dart';
 
 import '../support/app_harness.dart';
+import '../support/celebrations.dart';
 import '../support/garden_seed.dart';
 
 // Arranging through the real app. The garden is one painted surface, so
@@ -190,6 +193,100 @@ void main() {
       expect(find.byKey(DecorKeys.guidance), findsNothing);
       await _tapPlot(tester, _emptyPlot(6));
       expect(find.byKey(DecorKeys.kind(DecorKind.bench)), findsNothing);
+    });
+  });
+
+  // Decor behind a plant couldn't be picked up, so it couldn't be removed.
+  group('behind plants', () {
+    /// [sessions] plants, with a [kind] in every unlocked plot left over.
+    /// Returns the decor nearest first, so tapping one never hits another.
+    Future<List<Decor>> openCrowdedGarden(
+      WidgetTester tester, {
+      required int sessions,
+      required DecorKind kind,
+    }) async {
+      final repository = DriftDecorRepository(database);
+      for (var n = sessions; n < GardenPlots.unlockedAfter(sessions); n++) {
+        await repository.save(Decor(
+          id: 'item-$n',
+          kind: kind,
+          plot: _emptyPlot(n),
+          placedAt: testInstant,
+        ));
+      }
+
+      await seedGarden(database, sessions: sessions);
+      await pumpApp(tester, database: database, surface: const Size(500, 900));
+      // 10+ sessions shows the milestone sheet over the garden.
+      await dismissCelebrations(tester);
+      await tapTab(tester, AppTab.garden);
+      await startArranging(tester);
+
+      return _painter(tester).layout.decor.toList()
+        ..sort((a, b) => b.plot.depth.compareTo(a.plot.depth));
+    }
+
+    for (final (sessions, kind) in const [
+      (9, DecorKind.bench),
+      (9, DecorKind.birdbath),
+      (9, DecorKind.pond),
+      (14, DecorKind.lantern),
+      (14, DecorKind.pond),
+    ]) {
+      testWidgets('removes every ${kind.name} from a garden of $sessions',
+          (tester) async {
+        final items =
+            await openCrowdedGarden(tester, sessions: sessions, kind: kind);
+
+        for (final item in items) {
+          await _tapPlot(tester, item.plot);
+          expect(find.byKey(DecorKeys.remove), findsOneWidget,
+              reason: 'could not pick up ${item.plot}');
+          await tester.tap(find.byKey(DecorKeys.remove));
+          await settle(tester);
+        }
+
+        expect(_painter(tester).layout.decor, isEmpty);
+        expect(await DriftDecorRepository(database).decor(), isEmpty);
+      });
+    }
+
+    testWidgets('removing one keeps the rest', (tester) async {
+      final items =
+          await openCrowdedGarden(tester, sessions: 9, kind: DecorKind.pond);
+
+      await _tapPlot(tester, items.first.plot);
+      await tester.tap(find.byKey(DecorKeys.remove));
+      await settle(tester);
+
+      expect(
+        await DriftDecorRepository(database).decor(),
+        unorderedEquals(items.skip(1)),
+      );
+      expect(await DriftPlantRepository(database).plants(), hasLength(9));
+    });
+
+    testWidgets('places decor in a plot behind a plant', (tester) async {
+      final items =
+          await openCrowdedGarden(tester, sessions: 9, kind: DecorKind.pond);
+      // The one furthest back.
+      final plot = items.last.plot;
+      await _tapPlot(tester, plot);
+      await tester.tap(find.byKey(DecorKeys.remove));
+      await settle(tester);
+
+      await place(tester, DecorKind.bench, plot);
+
+      expect(_painter(tester).layout.decorIn(plot)?.kind, DecorKind.bench);
+    });
+
+    testWidgets('tapping a plant still does nothing', (tester) async {
+      await openCrowdedGarden(tester, sessions: 9, kind: DecorKind.pond);
+
+      await _tapPlot(tester, _emptyPlot(0));
+
+      expect(find.byType(PlantCard), findsNothing);
+      expect(find.byKey(DecorKeys.remove), findsNothing);
     });
   });
 
