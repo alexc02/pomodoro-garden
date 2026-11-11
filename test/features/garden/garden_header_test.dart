@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'package:pip_garden/src/data/database.dart';
-import 'package:pip_garden/src/design/palette.dart';
-import 'package:pip_garden/src/features/garden/garden_backdrop.dart';
 import 'package:pip_garden/src/features/garden/garden_header.dart';
 
 import '../../support/app_harness.dart';
@@ -50,54 +47,4 @@ void main() {
     expect(find.text('Tuesday, 11 August'), findsOneWidget);
   });
 
-  group('the backdrop', () {
-    const day = GardenBackdropPainter(
-      sky: Palette.skyDay,
-      foliage: Palette.primary,
-      sun: Palette.skyGoldenHour,
-      night: false,
-    );
-    const night = GardenBackdropPainter(
-      sky: Palette.skyDay,
-      foliage: Palette.primary,
-      sun: Palette.skyGoldenHour,
-      night: true,
-    );
-
-    test('is the season sky by day', () {
-      expect(day.paintedSky, Palette.skyDay);
-    });
-
-    test('is dark at night', () {
-      expect(
-        night.paintedSky.computeLuminance(),
-        lessThan(Palette.skyDay.computeLuminance() / 4),
-      );
-    });
-
-    test('fades the far hill toward the sky', () {
-      // The far hill is closer to the sky colour.
-      double distance(Color a, Color b) =>
-          (a.r - b.r).abs() + (a.g - b.g).abs() + (a.b - b.b).abs();
-      expect(
-        distance(day.farHill, Palette.skyDay),
-        lessThan(distance(day.nearHill, Palette.skyDay)),
-      );
-    });
-
-    testWidgets('follows the app into dark mode', (tester) async {
-      useDarkMode(tester);
-      await pumpApp(tester);
-
-      final painter = tester
-          .widgetList<CustomPaint>(find.descendant(
-            of: find.byType(GardenBackdrop),
-            matching: find.byType(CustomPaint),
-          ))
-          .map((paint) => paint.painter)
-          .whereType<GardenBackdropPainter>()
-          .single;
-      expect(painter.night, isTrue);
-    });
-  });
 }

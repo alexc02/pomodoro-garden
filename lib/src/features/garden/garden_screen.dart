@@ -4,6 +4,7 @@ import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
 import '../../design/spacing.dart';
+import '../../garden/daylight_providers.dart';
 import '../../garden/decor_providers.dart';
 import '../../garden/garden_providers.dart';
 import '../../garden/garden_transition.dart';
@@ -53,9 +54,11 @@ class GardenScreen extends ConsumerWidget {
                     _GardenStage(layout: layout, skin: skin),
                     Align(
                       alignment: Alignment.topCenter,
-                      child: GardenHeader(
-                        plants: layout.plants.length,
-                        actions: const [ExportGardenAction(), _Arrange()],
+                      child: _SkyInk(
+                        child: GardenHeader(
+                          plants: layout.plants.length,
+                          actions: const [ExportGardenAction(), _Arrange()],
+                        ),
                       ),
                     ),
                   ],
@@ -153,6 +156,34 @@ class _GardenStage extends StatelessWidget {
         // Arrange bar on top; it's empty when not arranging.
         const ArrangeBar(),
       ],
+    );
+  }
+}
+
+/// Picks the header's text and icon colour from the sky behind it, since the
+/// sky no longer matches light/dark mode.
+class _SkyInk extends ConsumerWidget {
+  const _SkyInk({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = GardenColors.of(context);
+    final ink = GardenSky(
+      day: colors.skyDay,
+      daylight: ref.watch(daylightProvider),
+    ).ink;
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        extensions: [colors.copyWith(textPrimary: ink)],
+        iconButtonTheme: IconButtonThemeData(
+          style: IconButton.styleFrom(foregroundColor: ink),
+        ),
+        progressIndicatorTheme: ProgressIndicatorThemeData(color: ink),
+      ),
+      child: child,
     );
   }
 }
