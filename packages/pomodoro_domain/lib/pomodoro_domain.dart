@@ -4,6 +4,7 @@ library;
 export 'src/analytics/analytics.dart';
 export 'src/analytics/analytics_event.dart';
 export 'src/analytics/analytics_event_log.dart';
+export 'src/garden/daylight.dart';
 export 'src/garden/decor.dart';
 export 'src/garden/decor_repository.dart';
 export 'src/garden/garden_layout.dart';

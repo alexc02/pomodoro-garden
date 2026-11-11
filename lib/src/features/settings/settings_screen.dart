@@ -11,6 +11,7 @@ import '../../design/paper_card.dart';
 import '../../design/sky_band_backdrop.dart';
 import '../../design/spacing.dart';
 import '../../design/typography.dart';
+import '../../garden/daylight_providers.dart';
 import '../../garden/garden_providers.dart';
 import '../../garden/garden_reset_providers.dart';
 import '../../session/session_providers.dart';
@@ -21,6 +22,7 @@ import '../../quiet/quiet_mode.dart';
 import '../../quiet/quiet_mode_providers.dart';
 import '../../settings/settings_providers.dart';
 import '../../shell/tab.dart';
+import '../../time/clock_provider.dart';
 import '../garden/export_garden.dart';
 import '../garden/theme_picker.dart';
 import 'end_sound_picker.dart';
@@ -57,6 +59,10 @@ abstract final class SettingsKeys {
 
 /// Debug builds only.
   static const Key season = Key('settings.season');
+
+  /// Debug only.
+  static const Key timeOfDay = Key('settings.timeOfDay');
+  static const Key timeOfDaySlider = Key('settings.timeOfDaySlider');
 
 /// Debug builds only.
   static const Key milestonePreview = Key('settings.milestonePreview');
@@ -102,6 +108,8 @@ class SettingsScreen extends StatelessWidget {
                 if (kDebugMode) ...[
                   const SizedBox(height: Spacing.lg),
                   const _SeasonSection(),
+                  const SizedBox(height: Spacing.lg),
+                  const _TimeOfDaySection(),
                   const SizedBox(height: Spacing.lg),
                   const _MilestonePreviewSection(),
                   const SizedBox(height: Spacing.lg),
@@ -658,6 +666,72 @@ class _SeasonSection extends ConsumerWidget {
           'The garden reads the date and shows ${showing.label}. Pinning a '
           'season changes the garden tab and nothing else — not the timer, and '
           'not what a session grows.',
+        ),
+      ],
+    );
+  }
+}
+
+/// Debug only: pin the garden sky to a time of day. Not saved.
+class _TimeOfDaySection extends ConsumerWidget {
+  const _TimeOfDaySection();
+
+  static const int _step = 15;
+
+  static String _hhmm(Duration t) {
+    final h = t.inHours.toString().padLeft(2, '0');
+    final m = (t.inMinutes % 60).toString().padLeft(2, '0');
+    return '$h:$m';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final forced = ref.watch(forcedTimeOfDayProvider);
+    final season = ref.watch(seasonProvider);
+    final now = ref.watch(clockProvider).now().toLocal();
+    final showing = forced ?? Duration(hours: now.hour, minutes: now.minute);
+
+    void force(Duration? time) =>
+        ref.read(forcedTimeOfDayProvider.notifier).force(time);
+
+    final presets = <(String, Duration?)>[
+      ('Follow the clock', null),
+      ('Sunrise', Daylight.sunriseIn(season)),
+      ('Noon', const Duration(hours: 12)),
+      ('Sunset', Daylight.sunsetIn(season)),
+      ('Midnight', Duration.zero),
+    ];
+
+    return _Section(
+      title: 'Time of day (debug)',
+      children: [
+        Wrap(
+          key: SettingsKeys.timeOfDay,
+          spacing: Spacing.sm,
+          runSpacing: Spacing.sm,
+          children: [
+            for (final (label, time) in presets)
+              ChoiceChip(
+                label: Text(label),
+                selected: forced == time,
+                onSelected: (isSelected) {
+                  if (isSelected) force(time);
+                },
+              ),
+          ],
+        ),
+        Slider(
+          key: SettingsKeys.timeOfDaySlider,
+          value: (showing.inMinutes ~/ _step * _step).toDouble(),
+          max: (24 * 60 - _step).toDouble(),
+          divisions: 24 * 60 ~/ _step - 1,
+          semanticFormatterCallback: (v) => _hhmm(Duration(minutes: v.round())),
+          onChanged: (v) => force(Duration(minutes: v.round())),
+        ),
+        _Note(
+          forced == null
+              ? 'Following the clock (${_hhmm(showing)}).'
+              : 'Sky pinned to ${_hhmm(showing)}. Garden tab only.',
         ),
       ],
     );
