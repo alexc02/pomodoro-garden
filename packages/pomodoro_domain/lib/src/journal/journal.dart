@@ -153,7 +153,14 @@ final class JournalLifetime {
 
   int get gardenLevel => GardenPlots.levelAfter(sessions);
 
-  int get plots => GardenPlots.unlockedAfter(sessions);
+  /// Same floor-then-fit rule as `GardenLayout`: the garden always has a
+  /// plot per plant, up to the cap.
+  int get plots {
+    final unlocked = GardenPlots.unlockedAfter(sessions);
+    final planted =
+        plants > GardenPlots.maximum ? GardenPlots.maximum : plants;
+    return planted > unlocked ? planted : unlocked;
+  }
 }
 
 /// The journal page: week, month and lifetime cards plus the streak.

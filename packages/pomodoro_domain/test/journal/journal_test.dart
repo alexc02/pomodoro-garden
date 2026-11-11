@@ -129,14 +129,43 @@ void main() {
       expect(lifetime.bonusPlants, 7);
     });
 
-    test('reads the garden level and its plots off the session count', () {
+    test('reads the garden level off the session count', () {
       final lifetime = JournalLifetime.of(
         sessions: const SessionTally(sessions: 100, focus: Duration(hours: 41)),
         plants: const PlantTally(plants: 100, bonusPlants: 2),
       );
 
       expect(lifetime.gardenLevel, GardenPlots.levelAfter(100));
-      expect(lifetime.plots, GardenPlots.unlockedAfter(100));
+    });
+
+    test('has the unlocked plots while the plants fit in them', () {
+      final lifetime = JournalLifetime.of(
+        sessions: const SessionTally(sessions: 10, focus: Duration(hours: 4)),
+        plants: const PlantTally(plants: 11, bonusPlants: 1),
+      );
+
+      expect(lifetime.plots, GardenPlots.unlockedAfter(10));
+      expect(lifetime.plots, 16);
+    });
+
+    test('has a plot per plant once they outgrow the unlocks', () {
+      // Same rule as GardenLayout: the unlocked count is a floor.
+      final lifetime = JournalLifetime.of(
+        sessions: const SessionTally(sessions: 100, focus: Duration(hours: 41)),
+        plants: const PlantTally(plants: 104, bonusPlants: 4),
+      );
+
+      expect(GardenPlots.unlockedAfter(100), 52);
+      expect(lifetime.plots, 104);
+    });
+
+    test('never has more plots than the garden can hold', () {
+      final lifetime = JournalLifetime.of(
+        sessions: const SessionTally(sessions: 300, focus: Duration(hours: 125)),
+        plants: const PlantTally(plants: 305, bonusPlants: 5),
+      );
+
+      expect(lifetime.plots, GardenPlots.maximum);
     });
   });
 

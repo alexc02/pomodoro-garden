@@ -90,7 +90,7 @@ abstract interface class SessionNotifications {
   /// Safe to call repeatedly; the OS only prompts once.
   Future<bool> requestPermission();
 
-  /// Replaces any previously scheduled completion.
+  /// Replaces any previously scheduled completion and clears the follow-up.
   Future<void> scheduleCompletion(SessionCompletionNotice notice);
 
   /// Schedules the end of the auto-started break as a second notice (ADR
