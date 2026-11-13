@@ -135,7 +135,7 @@ Picture _stages(
 
     for (final (row, kind) in species.indexed) {
       bundle.plants
-          .spriteFor(type: PlantType.flower, stage: stage)
+          .spriteFor(form: PlantForm.rayed, stage: stage)
           .paint(canvas, cell(row), plantPaletteIn(colours, kind));
     }
 
@@ -149,7 +149,7 @@ Picture _stages(
     );
 
     const PlaceholderPlantSpriteRegistry()
-        .spriteFor(type: PlantType.flower, stage: stage)
+        .spriteFor(form: PlantForm.rayed, stage: stage)
         .paint(canvas, cell(4),
             plantPaletteIn(colours, PlantSpecies.sunflower));
   }
@@ -221,7 +221,7 @@ Future<void> _saveCloseUp(
       Paint()..color = colours.skyDay,
     );
   bundle.plants
-      .spriteFor(type: PlantType.flower, stage: GrowthStage.mature)
+      .spriteFor(form: PlantForm.rayed, stage: GrowthStage.mature)
       .paint(
         canvas,
         const Rect.fromLTWH(0, 0, side, side),
@@ -241,27 +241,27 @@ Future<Image> _decode(String path) async {
   return frame.image;
 }
 
-/// One row per plant type, one column per stage.
+/// One row per plant form, one column per stage.
 Future<void> _saveTypes(
   String path,
   ArtBundle bundle,
   GardenColors colours,
 ) async {
   const cell = 160.0;
-  const types = PlantType.values;
-  final size = Size(cell * GrowthStage.values.length, cell * types.length);
+  const forms = PlantForm.values;
+  final size = Size(cell * GrowthStage.values.length, cell * forms.length);
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder)
     ..drawRect(Offset.zero & size, Paint()..color = colours.skyDay);
 
-  for (final (row, type) in types.indexed) {
+  for (final (row, form) in forms.indexed) {
     canvas.drawRect(
       Rect.fromLTWH(0, (row + 1) * cell - 14, size.width, 14),
       Paint()..color = colours.soil,
     );
-    final species = PlantSpecies.values.firstWhere((s) => s.type == type);
+    final species = PlantSpecies.values.firstWhere((s) => s.form == form);
     for (final stage in GrowthStage.values) {
-      bundle.plants.spriteFor(type: type, stage: stage).paint(
+      bundle.plants.spriteFor(form: form, stage: stage).paint(
             canvas,
             Rect.fromLTWH(stage.index * cell + 4, row * cell + 4, cell - 8,
                 cell - 8 - 10),

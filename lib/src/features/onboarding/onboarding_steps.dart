@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/headline.dart';
 import '../../design/spacing.dart';
 import '../../feedback/feedback_providers.dart';
 import '../../feedback/micro_sounds.dart';
@@ -176,7 +177,7 @@ class _StepBody extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(title, style: theme.textTheme.headlineMedium),
+        Headline(title, style: theme.textTheme.headlineMedium),
         const SizedBox(height: Spacing.sm),
         Text(
           body,

@@ -262,17 +262,17 @@ void main() {
     test('each stage covers more than the last', () {
       // Every step, not just seed vs mature. A smaller stage would visibly
       // shrink mid-session.
-      for (final type in PlantType.values) {
+      for (final form in PlantForm.values) {
         final areas = [
           for (final stage in _growing)
-            _plant(manifest, type, stage, plants).art.inked,
+            _plant(manifest, form, stage, plants).art.inked,
         ];
 
         for (var i = 1; i < areas.length; i++) {
           expect(
             areas[i],
             greaterThan(areas[i - 1]),
-            reason: '${type.name} covers less at ${_growing[i].name} '
+            reason: '${form.name} covers less at ${_growing[i].name} '
                 'than at ${_growing[i - 1].name}: it shrinks',
           );
         }
@@ -281,23 +281,23 @@ void main() {
 
     test('never gets narrower or shorter', () {
       // Area growing while the bounding box shrinks means the stage jumped.
-      for (final type in PlantType.values) {
+      for (final form in PlantForm.values) {
         final boxes = [
           for (final stage in _growing)
-            _plant(manifest, type, stage, plants).art.bounds,
+            _plant(manifest, form, stage, plants).art.bounds,
         ];
 
         for (var i = 1; i < boxes.length; i++) {
           expect(
             boxes[i].width,
             greaterThanOrEqualTo(boxes[i - 1].width - _growthTolerance),
-            reason: '${type.name} is narrower at ${_growing[i].name} than at '
+            reason: '${form.name} is narrower at ${_growing[i].name} than at '
                 '${_growing[i - 1].name}',
           );
           expect(
             boxes[i].height,
             greaterThanOrEqualTo(boxes[i - 1].height - _growthTolerance),
-            reason: '${type.name} is shorter at ${_growing[i].name} than at '
+            reason: '${form.name} is shorter at ${_growing[i].name} than at '
                 '${_growing[i - 1].name}',
           );
         }
@@ -306,13 +306,13 @@ void main() {
 
     test('seed sits on the soil', () {
       // A seed sits in the ground, so it should be in the bottom of its box.
-      for (final type in PlantType.values) {
+      for (final form in PlantForm.values) {
         final seed =
-            _plant(manifest, type, GrowthStage.seed, plants).art.bounds;
+            _plant(manifest, form, GrowthStage.seed, plants).art.bounds;
         expect(
           seed.top,
           greaterThan(0.5),
-          reason: '${type.name}\'s seed reaches into the top half of its box: '
+          reason: '${form.name}\'s seed reaches into the top half of its box: '
               'it is drawn as a plant rather than as something in the soil',
         );
       }
@@ -321,17 +321,17 @@ void main() {
     test('does not drift between stages', () {
       // Checks movement between consecutive stages, not absolute position.
       // Small drift per step would look like the plant hopping sideways.
-      for (final type in PlantType.values) {
+      for (final form in PlantForm.values) {
         final centres = [
           for (final stage in GrowthStage.values)
-            _plant(manifest, type, stage, plants).art.bounds.center.dx,
+            _plant(manifest, form, stage, plants).art.bounds.center.dx,
         ];
 
         for (var i = 1; i < centres.length; i++) {
           expect(
             centres[i],
             closeTo(centres[i - 1], _driftTolerance),
-            reason: '${type.name} moves sideways between '
+            reason: '${form.name} moves sideways between '
                 '${GrowthStage.values[i - 1].name} and '
                 '${GrowthStage.values[i].name}: '
                 '${centres[i - 1].toStringAsFixed(3)} → '
@@ -403,11 +403,11 @@ const double _artBudgetMegabytes = 16;
 
 _Delivered _plant(
   ArtManifest manifest,
-  PlantType type,
+  PlantForm form,
   GrowthStage stage,
   List<_Delivered> plants,
 ) {
-  final entry = manifest.plants[(type, stage)]!;
+  final entry = manifest.plants[(form, stage)]!;
   return plants.firstWhere((it) => it.path == entry.art);
 }
 

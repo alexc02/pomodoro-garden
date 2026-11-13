@@ -67,10 +67,10 @@ void main() {
     Directory('$_directory/decor').createSync(recursive: true);
 
     final plantRows = <Map<String, Object?>>[];
-    for (final type in PlantType.values) {
+    for (final form in PlantForm.values) {
       for (final stage in GrowthStage.values) {
-        final sprite = plants.spriteFor(type: type, stage: stage);
-        final name = '${type.name}_${stage.name}';
+        final sprite = plants.spriteFor(form: form, stage: stage);
+        final name = '${form.name}_${stage.name}';
 
         final footprint = await _write(
           '$_directory/plants/$name.png',
@@ -86,7 +86,7 @@ void main() {
         );
 
         plantRows.add({
-          'type': type.name,
+          'form': form.name,
           'stage': stage.name,
           'art': '$_directory/plants/$name.png',
           'roles': '$_directory/plants/$name.roles.png',

@@ -247,15 +247,17 @@ class _GardenViewState extends ConsumerState<GardenView>
 
   /// Normally a tap on a plant opens its card and anything else does nothing.
   ///
-  /// While arranging: tap empty soil to place decor, tap decor to pick it up.
-  /// Plants can't be moved or removed. See [ArrangeBar].
+  /// While arranging, with nothing in hand: tap a plant or an object to pick
+  /// it up, tap empty soil to place decor. With something in hand: tap any
+  /// other plot and the two trade places, tap its own plot to put it down.
+  /// See [ArrangeBar].
   void _tap(TapUpDetails details) {
     final camera = _camera;
     final atlas = _atlas;
     if (camera == null || atlas == null) return;
 
-    final arranging = ref.read(decorArrangerProvider);
-    final arranger = ref.read(decorArrangerProvider.notifier);
+    final arranging = ref.read(gardenArrangerProvider);
+    final arranger = ref.read(gardenArrangerProvider.notifier);
 
     final target = GardenHitTest(
       layout: widget.layout,
@@ -273,22 +275,18 @@ class _GardenViewState extends ConsumerState<GardenView>
             unawaited(showDecorPicker(context, ref, plot));
           case DecorTarget(:final decor):
             arranger.pickUp(decor);
-          case PlantTarget():
+          case PlantTarget(:final plant, :final plot):
+            arranger.pickUpPlant(plant, plot);
           case null:
             break;
         }
-      case Holding(:final decor):
-        switch (target) {
-          case SoilTarget(:final plot):
-            unawaited(arranger.move(decor, plot));
-          // Tapping the held item puts it down.
-          case DecorTarget(decor: final tapped) when tapped.id == decor.id:
-            arranger.putDown();
-          case DecorTarget(:final decor):
-            arranger.pickUp(decor);
-          case PlantTarget():
-          case null:
-            break;
+      case Holding():
+        // If the garden changed under the hold there's nothing left to move.
+        final stale = !arranging.standsIn(widget.layout);
+        if (stale || target?.plot == arranging.plot) {
+          arranger.putDown();
+        } else if (target != null) {
+          unawaited(arranger.move(arranging, target.plot));
         }
     }
   }
@@ -299,6 +297,12 @@ class _GardenViewState extends ConsumerState<GardenView>
 
     // Under reduce-motion pass null so the painter doesn't listen at all.
     final sway = _still! ? null : _sway;
+
+    final arranging = ref.watch(gardenArrangerProvider);
+    final held = arranging is Holding && arranging.standsIn(widget.layout)
+        ? arranging.plot
+        : null;
+    final heldOutline = GardenColors.of(context).bloom;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -324,6 +328,8 @@ class _GardenViewState extends ConsumerState<GardenView>
                   projection: camera,
                   atlas: atlas,
                   sway: sway,
+                  held: held,
+                  heldOutline: heldOutline,
                 ),
               ),
             ),

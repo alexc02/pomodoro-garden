@@ -79,7 +79,7 @@ void main() {
     );
     expect(layout.decorIn(GardenPlots.inPlacementOrder[3])!.kind,
         DecorKind.lantern);
-    expect(layout.unplaced, isEmpty);
+    expect(layout.shelved, isEmpty);
   });
 
   testWidgets('full garden displaces decor', (tester) async {
@@ -104,7 +104,7 @@ void main() {
     final layout = _painter(tester).layout;
     expect(layout.plantIn(last), isNotNull);
     expect(layout.decor, isEmpty);
-    expect(layout.unplaced, isEmpty, reason: 'nothing unplaced');
+    expect(layout.shelved, isEmpty, reason: 'nothing shelved');
     expect(await DriftDecorRepository(database).decor(), isEmpty,
         reason: 'displaced decor deleted');
   });
@@ -141,6 +141,6 @@ void main() {
     expect(layout.bonusPlants, hasLength(1));
     expect(layout.plantIn(last)!.milestone, Milestone.ten);
     expect(layout.decor, isEmpty);
-    expect(layout.unplaced, isEmpty);
+    expect(layout.shelved, isEmpty);
   });
 }

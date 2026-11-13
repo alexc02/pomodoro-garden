@@ -3,10 +3,12 @@ import 'garden_plot.dart';
 import 'growth_stage.dart';
 import 'milestone.dart';
 import 'plant_type.dart';
+import 'season.dart';
 
 /// What a running session is growing right now. Derived, never stored.
 ///
-/// Species comes from the session id so it can't change mid-session.
+/// Species comes from the session id and the season it started in, so it
+/// can't change mid-session.
 final class PlantGrowth {
   const PlantGrowth({
     required this.type,
@@ -18,11 +20,21 @@ final class PlantGrowth {
   factory PlantGrowth.forSession(
     FocusSession session, {
     required double progress,
+    Hemisphere hemisphere = Hemisphere.northern,
   }) {
     final type = PlantType.forSessionLength(session.plannedDuration);
     return PlantGrowth(
       type: type,
-      species: PlantSpecies.chosenFor(type: type, seed: session.id),
+      species: PlantSpecies.chosenFor(
+        type: type,
+        seed: session.id,
+        // The start, like [Plant.plantedAt]: a session that runs across the
+        // first of the month grows what was in season when it began.
+        season: Season.on(
+          session.startedAt.toLocal(),
+          hemisphere: hemisphere,
+        ),
+      ),
       stage: GrowthStage.forProgress(progress),
       sessionId: session.id,
     );
@@ -71,11 +83,13 @@ final class Plant {
   });
 
   /// Throws [ArgumentError] if the session didn't complete. [plot] comes from
-  /// [GardenPlots.nextFree]; null means the garden is full.
+  /// [GardenPlots.nextFree]; null means the garden is full. [hemisphere]
+  /// decides which season's species it can be.
   factory Plant.fromSession(
     FocusSession session, {
     required String id,
     GardenPlot? plot,
+    Hemisphere hemisphere = Hemisphere.northern,
   }) {
     if (!session.completed) {
       throw ArgumentError.value(
@@ -85,7 +99,11 @@ final class Plant {
       );
     }
 
-    final growth = PlantGrowth.forSession(session, progress: 1);
+    final growth = PlantGrowth.forSession(
+      session,
+      progress: 1,
+      hemisphere: hemisphere,
+    );
 
     return Plant(
       id: id,
@@ -148,10 +166,18 @@ final class Plant {
   bool get isBonus => milestone != null;
 
   /// Stored, not recomputed, so the layout is stable across launches and rule
-  /// changes. Null when the garden has no room left.
+  /// changes. Null while the plant is on the shelf (see [isShelved]).
   final GardenPlot? plot;
 
-  /// Used by the plot migration and when decor displaces a plant.
+  /// On the shelf rather than in the garden: no plot, or one outside the 200
+  /// (rows from another version), which the garden can't draw.
+  bool get isShelved {
+    final plot = this.plot;
+    return plot == null || GardenPlots.orderOf(plot) == null;
+  }
+
+  /// Used by the plot migration, when decor displaces a plant, and to move a
+  /// plant to the shelf (null) or back.
   Plant inPlot(GardenPlot? plot) => Plant(
         id: id,
         sessionId: sessionId,

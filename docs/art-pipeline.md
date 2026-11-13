@@ -19,7 +19,7 @@ placeholder rasteriser) is retired and its test is skipped so it can't overwrite
 |---|---|
 | `tool/sprite_art/wash.dart` | the painter: sheet, finishes, outline helpers, PNG encoder |
 | `tool/sprite_art/parts.dart` | soil, stalk, leaf, clump, blossom, bud |
-| `tool/sprite_art/flower.dart`, `plants.dart` | the seven plant types at five stages, plus the icon seedling |
+| `tool/sprite_art/flower.dart`, `plants.dart`, `forms.dart` | the fourteen plant forms at five stages, plus the icon seedling |
 | `tool/sprite_art/decor.dart` | bench, birdbath, lantern, pond |
 
 ## Sprite format
@@ -29,9 +29,34 @@ Each sprite is two same-size PNGs plus a row in `assets/art/manifest.json`:
 - `<name>.png`: the drawing, RGBA, transparent background
 - `<name>.roles.png`: a role mask
 
-35 plants (7 `PlantType` × 5 `GrowthStage`) and 4 decor objects (`DecorKind`). The seven
-bonus plants are species of `PlantType.bonus`, and species only changes the palette, so
-they share drawings.
+70 plant rows (14 `PlantForm` × 5 `GrowthStage`) and 4 decor objects (`DecorKind`).
+
+A `PlantType` (what a session length earns) comes in two or three forms, and a form is
+one silhouette:
+
+| Type | Forms |
+|---|---|
+| wildflower | `posy`, `spire` |
+| herb | `leafy`, `sprig` |
+| flower | `rayed`, `cup` |
+| bush | `mound`, `spiked` |
+| smallTree | `orchard`, `spreading` |
+| largeTree | `broadleaf`, `weeping`, `conifer` |
+| bonus | `tassel` |
+
+Each `PlantSpecies` names its form. Species of one form share its drawings and differ
+only in colour (`lib/src/garden/plant_palettes.dart`), so a new species needs no art
+unless it needs a new shape. The seven bonus plants all use `tassel`.
+
+Forms of a type are the same plant until the young stage, so their seed and sprout rows
+point at one shared file named for the type (`herb_sprout.png`); the later stages are
+named for the form (`sprig_young.png`). That makes 56 drawings behind the 70 rows, and
+the app decodes each file once.
+
+To add a form: add the `PlantForm` member, write its painter (hand the seed and sprout
+to the type's existing painter), register it in `_painters` in
+`tool/generate_sprite_art.dart`, and run the generator. It rewrites the plant rows from
+scratch and deletes any file in `assets/art/plants/` the manifest no longer names.
 
 Sprites are 512×512, with the plant standing on the bottom edge and centred
 horizontally. The biggest anything is drawn is 264 px (timer screen at 3×). There's one
@@ -64,7 +89,7 @@ or it won't change colour with the seasons.
 {
   "plants": [
     {
-      "type": "herb",
+      "form": "leafy",
       "stage": "sprout",
       "art": "assets/art/plants/herb_sprout.png",
       "roles": "assets/art/plants/herb_sprout.roles.png",
@@ -78,7 +103,7 @@ or it won't change colour with the seasons.
 `footprint` is the bounding box of the non-transparent pixels as `[left, top, right,
 bottom]` fractions. Hit-testing uses it: plants overlap the plots behind them, so the
 full box would steal taps from the plant behind. It's stored rather than computed at
-launch to keep alpha scans off the cold start. `type`, `stage` and `kind` must match the
+launch to keep alpha scans off the cold start. `form`, `stage` and `kind` must match the
 enum names exactly, or the bundle fails to load.
 
 ## Loading
@@ -99,7 +124,7 @@ falls back to placeholders. The bundle is never half-applied.
 flutter test test/garden/art_bundle_test.dart test/garden/art_delivery_test.dart
 ```
 
-`art_bundle_test` checks that every type and stage resolves, draws something, takes the
+`art_bundle_test` checks that every form and stage resolves, draws something, takes the
 palette, and changes from one stage to the next.
 
 `art_delivery_test` checks the files themselves:
@@ -114,7 +139,7 @@ palette, and changes from one stage to the next.
   soil, so it's naturally wider than the first shoot)
 - total size against the release-size headroom
 
-Nothing checks that two plant types look different. That one still needs eyes.
+Nothing checks that two plant forms look different. That one still needs eyes.
 
 ## Things to check on a device
 

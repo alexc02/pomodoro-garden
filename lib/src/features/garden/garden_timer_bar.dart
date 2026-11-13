@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/headline.dart';
 import '../../design/paper_card.dart';
 import '../../design/spacing.dart';
 import '../../design/typography.dart';
@@ -35,7 +36,7 @@ class GardenTimerBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (ref.watch(decorArrangerProvider) is! NotArranging) {
+    if (ref.watch(gardenArrangerProvider) is! NotArranging) {
       return const SizedBox.shrink();
     }
 
@@ -124,14 +125,19 @@ class GardenTimerBar extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: Spacing.xs),
-                        // One line at any size; screen readers get [spoken].
-                        Text(
-                          line,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            color: colors.textPrimary,
-                            fontSize: 21,
+                        // One line at any size, scaled down to fit rather
+                        // than cut off. Screen readers get [spoken].
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            line,
+                            maxLines: 1,
+                            textScaler: Headline.scalerOf(context),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: colors.textPrimary,
+                              fontSize: 21,
+                            ),
                           ),
                         ),
                       ],
@@ -183,11 +189,17 @@ class GardenTimerBar extends ConsumerWidget {
                         ),
                         const SizedBox(width: Spacing.sm),
                         Expanded(
-                          child: Text(
-                            line,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: tabular,
+                          // Scaled down rather than cut off, so the time
+                          // left is always readable.
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Text(
+                              line,
+                              maxLines: 1,
+                              textScaler: Headline.scalerOf(context),
+                              style: tabular,
+                            ),
                           ),
                         ),
                         Icon(

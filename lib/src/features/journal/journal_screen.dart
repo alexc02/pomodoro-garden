@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/headline.dart';
 import '../../design/page_header.dart';
 import '../../design/paper_card.dart';
 import '../../design/sky_band_backdrop.dart';
@@ -247,7 +248,7 @@ class _PressedPlant extends ConsumerWidget {
     return CustomPaint(
       painter: PlantPainter(
         sprite: ref.watch(plantSpriteRegistryProvider).spriteFor(
-              type: plant.type,
+              form: plant.species.form,
               stage: plant.stage,
             ),
         palette: plantPaletteFor(context, plant.species),
@@ -431,7 +432,7 @@ class _JournalCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
+                  child: Headline(
                     heading,
                     // Handwritten face; only used here and on plant labels.
                     style: GardenTypography.journalHeading.copyWith(
@@ -513,7 +514,7 @@ class _FirstPage extends StatelessWidget {
                   color: colors.foliage,
                 ),
                 const SizedBox(height: Spacing.md),
-                Text(
+                Headline(
                   'Nothing pressed between these pages yet.',
                   textAlign: TextAlign.center,
                   style: GardenTypography.journalHeading.copyWith(

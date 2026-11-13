@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import 'tab.dart';
 
-/// Custom line icon for a tab (sprout, hourglass, notebook, sliders), drawn
-/// on a 24-unit grid with round caps.
+/// Custom line icon for a tab (sprout, shelf, hourglass, notebook, sliders),
+/// drawn on a 24-unit grid with round caps.
 ///
 /// Sized and coloured from [IconTheme] like an [Icon]. Selected is a heavier
 /// stroke rather than a fill. Excluded from semantics; the label says it.
@@ -80,6 +80,21 @@ class TabGlyphPainter extends CustomPainter {
           ..close()
           ..moveTo(6, 21)
           ..lineTo(18, 21),
+        // Two planks: a seedling on the upper one, a pot on the lower.
+        AppTab.shelf => Path()
+          ..moveTo(3, 12)
+          ..lineTo(21, 12)
+          ..moveTo(3, 21)
+          ..lineTo(21, 21)
+          ..moveTo(9, 12)
+          ..lineTo(9, 8)
+          ..cubicTo(9, 5, 11, 3, 14, 3)
+          ..cubicTo(14, 6, 12, 8, 9, 8)
+          ..moveTo(12, 16)
+          ..lineTo(18, 16)
+          ..lineTo(17, 21)
+          ..moveTo(13, 21)
+          ..lineTo(12, 16),
         AppTab.timer => Path()
           ..moveTo(7, 3)
           ..lineTo(17, 3)

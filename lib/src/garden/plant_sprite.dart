@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
-/// One plant image: a [PlantType] at a [GrowthStage].
+/// One plant image: a [PlantForm] at a [GrowthStage].
 ///
 /// Every plant on screen (timer and garden) goes through a
 /// [PlantSpriteRegistry], never an image a widget names itself, so the art set
@@ -51,16 +51,17 @@ final class PlantPalette {
   int get hashCode => Object.hash(foliage, bloom, soil);
 }
 
-/// Where a [PlantSprite] is found, keyed by type and growth stage.
+/// Where a [PlantSprite] is found, keyed by form and growth stage.
 ///
-/// No species key: the art is one drawing per type and stage, and species only
-/// changes colour via [PlantPalette]. Milestone plants are extra [PlantType]
-/// members, so a registry built from `PlantType.values` picks them up.
+/// No species key: the art is one drawing per form and stage, a type has a
+/// few forms, and species of a form differ only in colour via [PlantPalette].
+/// Milestone plants have a form of their own, so a registry built from
+/// `PlantForm.values` picks them up.
 abstract interface class PlantSpriteRegistry {
-  /// Total: every type/stage combination resolves, so no plant can fail to
+  /// Total: every form/stage combination resolves, so no plant can fail to
   /// draw.
   PlantSprite spriteFor({
-    required PlantType type,
+    required PlantForm form,
     required GrowthStage stage,
   });
 }

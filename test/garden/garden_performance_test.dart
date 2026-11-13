@@ -109,7 +109,7 @@ void main() {
   test('200 plants fill 200 plots', () {
     expect(garden.plotCount, 200);
     expect(garden.plants, hasLength(200));
-    expect(garden.unplaced, isEmpty);
+    expect(garden.shelved, isEmpty);
   });
 
   test('atlas bake is a one-off cost', () {

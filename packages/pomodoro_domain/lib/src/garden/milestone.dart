@@ -46,6 +46,14 @@ enum Milestone {
         reachedBy(completedSessions).where((m) => !awarded.contains(m)),
       );
 
+  /// The milestone that awards [species]. Null for anything a session grows.
+  static Milestone? awarding(PlantSpecies species) {
+    for (final milestone in values) {
+      if (milestone.species == species) return milestone;
+    }
+    return null;
+  }
+
   /// Null for unknown counts (rows from another version) instead of throwing.
   static Milestone? withSessions(int sessions) {
     for (final milestone in values) {
