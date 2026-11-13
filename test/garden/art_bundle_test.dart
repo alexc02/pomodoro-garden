@@ -80,7 +80,7 @@ void main() {
       final manifest = ArtManifest.parse(jsonEncode({
         'plants': [
           {
-            'type': 'herb',
+            'form': 'leafy',
             'stage': 'sprout',
             'art': 'a.png',
             'roles': 'a.roles.png',
@@ -90,7 +90,7 @@ void main() {
         'decor': <Object?>[],
       }));
 
-      final entry = manifest.plants[(PlantType.herb, GrowthStage.sprout)]!;
+      final entry = manifest.plants[(PlantForm.leafy, GrowthStage.sprout)]!;
       expect(entry.art, 'a.png');
       expect(entry.roles, 'a.roles.png');
       expect(entry.footprint, const ui.Rect.fromLTRB(0.1, 0.2, 0.8, 1));
@@ -111,14 +111,14 @@ void main() {
       final manifest = ArtManifest.parse(jsonEncode({
         'plants': [
           {
-            'type': 'herb',
+            'form': 'leafy',
             'stage': 'sprout',
             'art': 'a.png',
             'roles': 'shared.png',
             'footprint': [0, 0, 1, 1],
           },
           {
-            'type': 'herb',
+            'form': 'leafy',
             'stage': 'young',
             'art': 'b.png',
             'roles': 'shared.png',
@@ -139,7 +139,7 @@ void main() {
       expect(
         () => ArtManifest.parse(jsonEncode({
           'plants': [
-            {'type': 'herb', 'stage': 'sprout', 'art': 'a.png'},
+            {'form': 'leafy', 'stage': 'sprout', 'art': 'a.png'},
           ],
           'decor': <Object?>[],
         })),
@@ -147,12 +147,12 @@ void main() {
       );
     });
 
-    test('rejects an unknown plant type', () {
+    test('rejects an unknown plant form', () {
       expect(
         () => ArtManifest.parse(jsonEncode({
           'plants': [
             {
-              'type': 'triffid',
+              'form': 'triffid',
               'stage': 'sprout',
               'art': 'a.png',
               'footprint': [0, 0, 1, 1],
@@ -180,7 +180,7 @@ void main() {
         ArtBundle.manifestAsset: _text(jsonEncode({
           'plants': [
             {
-              'type': 'herb',
+              'form': 'leafy',
               'stage': 'sprout',
               'art': 'a.png',
               'footprint': [0, 0, 1, 1],
@@ -208,7 +208,7 @@ void main() {
         ArtBundle.manifestAsset: _text(jsonEncode({
           'plants': [
             {
-              'type': 'herb',
+              'form': 'leafy',
               'stage': 'sprout',
               'art': 'missing.png',
               'footprint': [0, 0, 1, 1],
@@ -237,14 +237,14 @@ void main() {
     setUpAll(() async => art = await ArtBundle.load(rootBundle));
     tearDownAll(() => art.dispose());
 
-    test('covers every plant type at every stage', () {
-      // Against the real asset bundle: 35 combinations.
-      for (final type in PlantType.values) {
+    test('covers every plant form at every stage', () {
+      // Against the real asset bundle: 70 combinations.
+      for (final form in PlantForm.values) {
         for (final stage in GrowthStage.values) {
           expect(
-            () => art.plants.spriteFor(type: type, stage: stage),
+            () => art.plants.spriteFor(form: form, stage: stage),
             returnsNormally,
-            reason: '${type.name} at ${stage.name} has no art',
+            reason: '${form.name} at ${stage.name} has no art',
           );
         }
       }
@@ -258,16 +258,16 @@ void main() {
 
     test('every sprite paints something', () async {
       // A sprite that paints nothing would pass every other test here.
-      for (final type in PlantType.values) {
+      for (final form in PlantForm.values) {
         for (final stage in GrowthStage.values) {
           final pixels = await _pixels(
-            art.plants.spriteFor(type: type, stage: stage),
+            art.plants.spriteFor(form: form, stage: stage),
             _green,
           );
           expect(
             _inked(pixels),
             greaterThan(0),
-            reason: '${type.name} at ${stage.name} painted nothing',
+            reason: '${form.name} at ${stage.name} painted nothing',
           );
         }
       }
@@ -277,7 +277,7 @@ void main() {
       // The point of the mask: fixed art still changes with season, theme and
       // species.
       final sprite = art.plants.spriteFor(
-        type: PlantType.largeTree,
+        form: PlantForm.broadleaf,
         stage: GrowthStage.mature,
       );
 
@@ -300,9 +300,11 @@ void main() {
       clock.stop();
       second.dispose();
 
+      final sprites = PlantForm.values.length * GrowthStage.values.length +
+          DecorKind.values.length;
       debugPrint(
-        'art baseline | decoding ${PlantType.values.length * GrowthStage.values.length + DecorKind.values.length} '
-        'sprites: ${clock.elapsedMilliseconds} ms',
+        'art baseline | decoding $sprites sprites: '
+        '${clock.elapsedMilliseconds} ms',
       );
       expect(clock.elapsedMilliseconds, lessThan(1500));
     });
@@ -310,7 +312,7 @@ void main() {
     test('footprint matches the sprite', () {
       // Manifest footprint vs the sprite's own, scaled. Used by hit-testing.
       final sprite = art.plants.spriteFor(
-        type: PlantType.wildflower,
+        form: PlantForm.posy,
         stage: GrowthStage.mature,
       );
 
@@ -326,13 +328,13 @@ void main() {
     test('mature fills more than seed', () async {
       // Can't judge the silhouettes, but the five stages should differ and get
       // bigger.
-      for (final type in PlantType.values) {
+      for (final form in PlantForm.values) {
         final inked = <int>[];
         final drawings = <String>{};
 
         for (final stage in GrowthStage.values) {
           final pixels = await _pixels(
-            art.plants.spriteFor(type: type, stage: stage),
+            art.plants.spriteFor(form: form, stage: stage),
             _green,
             side: 128,
           );
@@ -343,14 +345,14 @@ void main() {
         expect(
           inked.last,
           greaterThan(inked.first),
-          reason: '${type.name} does not end up bigger than it started',
+          reason: '${form.name} does not end up bigger than it started',
         );
 
         // Compare pictures, not areas; two stages could share a pixel count.
         expect(
           drawings,
           hasLength(GrowthStage.values.length),
-          reason: '${type.name} draws the same picture at two stages',
+          reason: '${form.name} draws the same picture at two stages',
         );
       }
     });

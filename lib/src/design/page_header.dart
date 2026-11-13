@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../shell/torn_edge.dart';
 import 'garden_colors.dart';
+import 'headline.dart';
 import 'spacing.dart';
 import 'typography.dart';
 
@@ -52,7 +53,7 @@ class PageHeader extends StatelessWidget {
           ],
           Semantics(
             header: true,
-            child: Text(
+            child: Headline(
               headline,
               style: theme.textTheme.displayLarge
                   ?.copyWith(color: colors.textPrimary),

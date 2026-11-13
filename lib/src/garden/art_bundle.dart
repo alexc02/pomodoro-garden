@@ -58,11 +58,11 @@ final class ArtBundle {
     };
 
     // Check totality here so `spriteFor` can stay a map read with `!`.
-    for (final type in PlantType.values) {
+    for (final form in PlantForm.values) {
       for (final stage in GrowthStage.values) {
-        if (!plants.containsKey((type, stage))) {
+        if (!plants.containsKey((form, stage))) {
           throw ArtBundleException(
-            'no art for ${type.name} at ${stage.name}',
+            'no art for ${form.name} at ${stage.name}',
           );
         }
       }
@@ -81,11 +81,15 @@ final class ArtBundle {
 
   /// Releases every texture. Never called in the shipping app.
   void dispose() {
-    for (final sprite in plants.sprites) {
-      sprite.art.dispose();
-    }
-    for (final sprite in decor.sprites) {
-      sprite.art.dispose();
+    // Collected first: forms can share a drawing, and an image disposes once.
+    final images = <ui.Image>{
+      for (final sprite in [...plants.sprites, ...decor.sprites]) ...[
+        sprite.art,
+        ?sprite.roles,
+      ],
+    };
+    for (final image in images) {
+      image.dispose();
     }
   }
 
@@ -150,7 +154,7 @@ final class ArtManifest {
     required this.decor,
   });
 
-  final Map<(PlantType, GrowthStage), ArtEntry> plants;
+  final Map<(PlantForm, GrowthStage), ArtEntry> plants;
   final Map<DecorKind, ArtEntry> decor;
 
   /// Every distinct image path the manifest names, drawings and masks together.
@@ -173,11 +177,13 @@ final class ArtManifest {
       throw const ArtBundleException('the manifest is not an object');
     }
 
-    final plants = <(PlantType, GrowthStage), ArtEntry>{};
+    // Rows may share a drawing: forms of one type start from the same seed
+    // and sprout, and [imagePaths] decodes each file once.
+    final plants = <(PlantForm, GrowthStage), ArtEntry>{};
     for (final row in _rows(decoded, 'plants')) {
-      final type = _enumBy(PlantType.values, row, 'type', (it) => it.name);
+      final form = _enumBy(PlantForm.values, row, 'form', (it) => it.name);
       final stage = _enumBy(GrowthStage.values, row, 'stage', (it) => it.name);
-      plants[(type, stage)] = _entry(row);
+      plants[(form, stage)] = _entry(row);
     }
 
     final decor = <DecorKind, ArtEntry>{};

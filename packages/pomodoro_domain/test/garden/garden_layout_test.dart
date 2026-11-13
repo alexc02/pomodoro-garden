@@ -118,7 +118,7 @@ void main() {
 
       expect(layout.plotCount, 200);
       expect(layout.plants, hasLength(200));
-      expect(layout.unplaced, hasLength(2));
+      expect(layout.shelved, hasLength(2));
       expect(layout.isFull, isTrue);
     });
 
@@ -127,6 +127,66 @@ void main() {
         GardenLayout.of(plants: _garden(199), completedSessions: 199).isFull,
         isFalse,
       );
+    });
+  });
+
+  group('a garden with plants on the shelf', () {
+    test('keeps a plot for each of them, so shelving leaves soil behind', () {
+      // 31 plants fill 31 plots. Lift the outermost one out.
+      final planted = _garden(31);
+      final layout = GardenLayout.of(
+        plants: [...planted.take(30), planted.last.inPlot(null)],
+        completedSessions: 31,
+      );
+
+      expect(GardenPlots.unlockedAfter(31), 24);
+      expect(layout.plotCount, 31, reason: 'the garden did not shrink');
+      expect(layout.emptyPlots, 1);
+      expect(layout.isEmpty(GardenPlots.inPlacementOrder[30]), isTrue);
+      expect(layout.shelved.single.id, planted.last.id);
+    });
+
+    test('has room for everything even with the whole garden shelved', () {
+      final layout = GardenLayout.of(
+        plants: [for (var n = 0; n < 40; n++) _plant(n)],
+        completedSessions: 40,
+      );
+
+      expect(layout.plotCount, 40);
+      expect(layout.emptyPlots, 40);
+      expect(layout.plants, isEmpty);
+      expect(layout.shelved, hasLength(40));
+    });
+
+    test('is no bigger for them while the unlocked plots already cover it',
+        () {
+      final layout = GardenLayout.of(
+        plants: [..._garden(5), _plant(5), _plant(6)],
+        completedSessions: 7,
+      );
+
+      expect(layout.plotCount, 12);
+      expect(layout.emptyPlots, 7);
+    });
+
+    test('still stops at two hundred plots', () {
+      final layout = GardenLayout.of(
+        plants: [for (var n = 0; n < 260; n++) _plant(n)],
+        completedSessions: 260,
+      );
+
+      expect(layout.plotCount, 200);
+      expect(layout.isFull, isTrue);
+    });
+
+    test('shelves a plant whose plot is outside the two hundred', () {
+      final layout = GardenLayout.of(
+        plants: [_plant(1, plot: const GardenPlot(50, 50))],
+        completedSessions: 1,
+      );
+
+      expect(layout.plants, isEmpty);
+      expect(layout.shelved, hasLength(1));
     });
   });
 
@@ -183,7 +243,7 @@ void main() {
       expect(GardenPlots.unlockedAfter(10), 16);
       expect(layout.plotCount, 17);
       expect(layout.plants, hasLength(17));
-      expect(layout.unplaced, isEmpty);
+      expect(layout.shelved, isEmpty);
     });
 
     test('keeps an award it has no plot for, rather than dropping it', () {
@@ -192,8 +252,8 @@ void main() {
         completedSessions: 5000,
       );
 
-      expect(layout.unplaced.single.milestone, Milestone.ten);
-      // In `unplaced`, not `bonusPlants`.
+      expect(layout.shelved.single.milestone, Milestone.ten);
+      // In `shelved`, not `bonusPlants`.
       expect(layout.bonusPlants, isEmpty);
     });
 

@@ -110,7 +110,7 @@ class GardenResetController extends Notifier<Resetting> {
     // The arranger too: the garden tab stays alive, and an open arranging
     // bar could be holding an item that no longer exists.
     ref.invalidate(decorProvider);
-    ref.invalidate(decorArrangerProvider);
+    ref.invalidate(gardenArrangerProvider);
     // `gardenLayoutProvider` reads this for capacity, so this resets the
     // plot count back to twelve.
     ref.invalidate(completedSessionsProvider);

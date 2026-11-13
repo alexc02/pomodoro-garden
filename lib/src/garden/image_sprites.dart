@@ -168,7 +168,7 @@ final class ImageDecorSprite implements DecorSprite {
 final class ImagePlantSpriteRegistry implements PlantSpriteRegistry {
   const ImagePlantSpriteRegistry(this._sprites);
 
-  final Map<(PlantType, GrowthStage), ImagePlantSprite> _sprites;
+  final Map<(PlantForm, GrowthStage), ImagePlantSprite> _sprites;
 
   /// For `ArtBundle.dispose`.
   Iterable<ImageSpriteArt> get sprites =>
@@ -177,10 +177,10 @@ final class ImagePlantSpriteRegistry implements PlantSpriteRegistry {
   /// Totality is checked when the bundle loads, so the `!` is safe.
   @override
   PlantSprite spriteFor({
-    required PlantType type,
+    required PlantForm form,
     required GrowthStage stage,
   }) =>
-      _sprites[(type, stage)]!;
+      _sprites[(form, stage)]!;
 }
 
 /// Image-backed [DecorSpriteRegistry].

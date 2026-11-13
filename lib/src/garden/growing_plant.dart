@@ -259,7 +259,10 @@ class _GrowingPlantState extends ConsumerState<GrowingPlant>
           painter: PlantPainter(
             sprite: growth == null
                 ? null
-                : registry.spriteFor(type: growth.type, stage: growth.stage),
+                : registry.spriteFor(
+                    form: growth.species.form,
+                    stage: growth.stage,
+                  ),
             palette: growth == null
                 ? bareSoilPalette(context)
                 : plantPaletteFor(context, growth.species),

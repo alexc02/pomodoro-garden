@@ -155,7 +155,7 @@ final class GardenAtlas {
       // The only place that picks a plant's picture; rect and footprint
       // both come from this sprite.
       final sprite = recipe.registry
-          .spriteFor(type: species[index].type, stage: GrowthStage.mature);
+          .spriteFor(form: species[index].form, stage: GrowthStage.mature);
       final square = Rect.fromLTWH(0, 0, cell.width, cell.height);
 
       canvas.save();

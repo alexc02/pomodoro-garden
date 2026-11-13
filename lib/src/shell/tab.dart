@@ -1,6 +1,7 @@
-/// The app's four top-level destinations, in bar order.
+/// The app's five top-level destinations, in bar order.
 enum AppTab {
   garden(label: 'Garden'),
+  shelf(label: 'Shelf'),
   timer(label: 'Timer'),
   journal(label: 'Journal'),
   settings(label: 'Settings');

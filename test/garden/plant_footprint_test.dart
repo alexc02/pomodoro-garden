@@ -10,6 +10,10 @@ import 'package:pip_garden/src/garden/plant_sprite.dart';
 
 const _registry = PlaceholderPlantSpriteRegistry();
 
+/// The placeholders draw every form of a type alike, so any form will do.
+PlantSprite _spriteFor(PlantType type, GrowthStage stage) =>
+    _registry.spriteFor(form: PlantForm.of(type).first, stage: stage);
+
 const _palette = PlantPalette(
   foliage: Color(0xFF6B8E5A),
   bloom: Color(0xFFE89B9B),
@@ -58,7 +62,7 @@ void main() {
     // A footprint smaller than the drawing leaves an untappable edge.
     for (final type in PlantType.values) {
       for (final stage in GrowthStage.values) {
-        final sprite = _registry.spriteFor(type: type, stage: stage);
+        final sprite = _spriteFor(type, stage);
         final ink = await _inkedBounds(sprite);
         expect(ink, isNotNull, reason: '${type.name} at ${stage.name}');
 
@@ -80,7 +84,7 @@ void main() {
     // behind.
     for (final type in PlantType.values) {
       for (final stage in GrowthStage.values.skip(1)) {
-        final sprite = _registry.spriteFor(type: type, stage: stage);
+        final sprite = _spriteFor(type, stage);
         final ink = (await _inkedBounds(sprite))!;
         final claimed = sprite.footprintIn(_bounds);
 
@@ -103,9 +107,7 @@ void main() {
   test('footprint reaches the soil', () async {
     // The bottom edge has to reach the ground so a tap at the base works.
     for (final type in PlantType.values) {
-      final claimed = _registry
-          .spriteFor(type: type, stage: GrowthStage.mature)
-          .footprintIn(_bounds);
+      final claimed = _spriteFor(type, GrowthStage.mature).footprintIn(_bounds);
 
       expect(claimed.bottom, greaterThanOrEqualTo(_bounds.bottom));
       expect(claimed.center.dx, closeTo(_bounds.center.dx, 0.001));
@@ -113,8 +115,7 @@ void main() {
   });
 
   test('bigger plant has a bigger footprint', () async {
-    Rect mature(PlantType type) => _registry
-        .spriteFor(type: type, stage: GrowthStage.mature)
+    Rect mature(PlantType type) => _spriteFor(type, GrowthStage.mature)
         .footprintIn(_bounds);
 
     expect(
@@ -130,8 +131,7 @@ void main() {
   test('empty box claims nothing', () {
     // A collapsed layout shouldn't crash or swallow every tap.
     expect(
-      _registry
-          .spriteFor(type: PlantType.largeTree, stage: GrowthStage.mature)
+      _spriteFor(PlantType.largeTree, GrowthStage.mature)
           .footprintIn(Rect.zero),
       Rect.zero,
     );

@@ -13,6 +13,8 @@ void main() {
           'session_abandoned',
           'session_paused',
           'plant_grown',
+          'plant_shelved',
+          'plant_replanted',
           'garden_viewed',
           'ambient_sound_toggled',
           'settings_changed',

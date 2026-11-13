@@ -6,7 +6,8 @@ import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'plant_sprite.dart';
 
 /// Fallback [PlantSpriteRegistry] for builds without art: every type and
-/// stage drawn from circles and lines.
+/// stage drawn from circles and lines. Forms of one type share a drawing
+/// here; telling them apart is what the real art is for.
 ///
 /// Crude, but a longer session has to visibly grow something bigger, and each
 /// stage change has to be visible.
@@ -14,18 +15,18 @@ final class PlaceholderPlantSpriteRegistry implements PlantSpriteRegistry {
   const PlaceholderPlantSpriteRegistry();
 
   /// Built once; this is looked up per plant per frame.
-  static final Map<(PlantType, GrowthStage), PlantSprite> _sprites = {
-    for (final type in PlantType.values)
+  static final Map<(PlantForm, GrowthStage), PlantSprite> _sprites = {
+    for (final form in PlantForm.values)
       for (final stage in GrowthStage.values)
-        (type, stage): PlaceholderPlantSprite(type: type, stage: stage),
+        (form, stage): PlaceholderPlantSprite(type: form.type, stage: stage),
   };
 
   @override
   PlantSprite spriteFor({
-    required PlantType type,
+    required PlantForm form,
     required GrowthStage stage,
   }) =>
-      _sprites[(type, stage)]!;
+      _sprites[(form, stage)]!;
 }
 
 /// The basic silhouette of a fully grown plant.

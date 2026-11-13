@@ -32,7 +32,12 @@ final class GardenPainter extends CustomPainter {
     required this.projection,
     required this.atlas,
     this.sway,
+    this.held,
+    this.heldOutline = const Color(0x00000000),
   }) : super(repaint: sway);
+
+  /// How far the held thing is raised, as a fraction of a tile's height.
+  static const double heldLift = 0.22;
 
   final GardenLayout layout;
 
@@ -48,6 +53,13 @@ final class GardenPainter extends CustomPainter {
   /// only, with no rebuild or relayout of [GardenView].
   final Animation<double>? sway;
 
+  /// The plot whose plant or decor is in hand while arranging, or null. It's
+  /// drawn raised by [heldLift], with its tile outlined in [heldOutline].
+  /// Nothing animates, so it reads the same under reduce-motion.
+  final GardenPlot? held;
+
+  final Color heldOutline;
+
   @override
   void paint(Canvas canvas, Size size) {
     final batch = batchFor(size);
@@ -56,6 +68,32 @@ final class GardenPainter extends CustomPainter {
       transforms: batch.transforms,
       rects: batch.rects,
       colors: batch.colors,
+    );
+    _outlineHeld(canvas);
+  }
+
+  /// Drawn after the batch rather than in it, since the atlas colours are
+  /// baked in, and so a nearer plant overlapping the plot can't hide it.
+  void _outlineHeld(Canvas canvas) {
+    final plot = held;
+    if (plot == null || !layout.hasPlot(plot)) return;
+
+    final corners = projection.tileCorners(plot);
+    final diamond = Path()
+      ..moveTo(corners[0].dx, corners[0].dy)
+      ..lineTo(corners[1].dx, corners[1].dy)
+      ..lineTo(corners[2].dx, corners[2].dy)
+      ..lineTo(corners[3].dx, corners[3].dy)
+      ..close();
+
+    canvas.drawPath(
+      diamond,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeJoin = StrokeJoin.round
+        // Thinner zoomed out, but never a hairline.
+        ..strokeWidth = (2.5 * projection.scale).clamp(1.5, 4.0)
+        ..color = heldOutline,
     );
   }
 
@@ -93,6 +131,11 @@ final class GardenPainter extends CustomPainter {
       final plant = layout.plantIn(plot);
       final item = plant == null ? layout.decorIn(plot) : null;
       final occupied = plant != null || item != null;
+      // Only what stands on the tile is raised, not the tile itself.
+      final base = plot == held
+          ? centre.dy -
+              GardenProjection.tile.height * projection.scale * heldLift
+          : centre.dy;
       final ground = occupied ? atlas.plantedSoil : atlas.emptySoil;
 
     // Ground tile, anchored at the middle of its diamond.
@@ -127,7 +170,7 @@ final class GardenPainter extends CustomPainter {
           anchorX: atlas.plantCell / 2,
           anchorY: atlas.plantCell,
           translateX: centre.dx,
-          translateY: centre.dy,
+          translateY: base,
         ));
         rects.add(atlas.glowHalo);
         colors?.add(untouched);
@@ -144,7 +187,7 @@ final class GardenPainter extends CustomPainter {
         anchorX: atlas.plantCell / 2,
         anchorY: atlas.plantCell,
         translateX: centre.dx,
-        translateY: centre.dy,
+        translateY: base,
       ));
       rects.add(picture);
       colors?.add(plant == null
@@ -161,5 +204,7 @@ final class GardenPainter extends CustomPainter {
       !identical(old.layout, layout) ||
       old.projection != projection ||
       !identical(old.atlas, atlas) ||
-      old.sway != sway;
+      old.sway != sway ||
+      old.held != held ||
+      old.heldOutline != heldOutline;
 }
