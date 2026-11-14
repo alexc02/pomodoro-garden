@@ -72,13 +72,13 @@ class PlantCard extends StatelessWidget {
               style: theme.textTheme.labelSmall,
             ),
             const SizedBox(height: Spacing.lg),
-            _Fact(label: 'Planted', value: _plantedOn(plant.plantedAt)),
+            _Fact(label: 'Planted', value: plantedOn(plant.plantedAt)),
               // Bonus plants show their milestone instead of a session
               // length; a plant never has both.
             if (plant.milestone case final milestone?)
               _Fact(label: 'Awarded at', value: milestone.label)
             else if (plant.sessionDuration case final duration?)
-              _Fact(label: 'Session', value: _sessionLength(duration)),
+              _Fact(label: 'Session', value: sessionLengthInWords(duration)),
             _Fact(label: 'Growth', value: plant.stage.label),
             const SizedBox(height: Spacing.lg),
             _Quote(PlantQuotes.forPlant(plant.id)),
@@ -104,7 +104,7 @@ class PlantPortrait extends ConsumerWidget {
         child: CustomPaint(
           painter: PlantPainter(
             sprite: ref.watch(plantSpriteRegistryProvider).spriteFor(
-                  type: plant.type,
+                  form: plant.species.form,
                   stage: plant.stage,
                 ),
             palette: plantPaletteFor(context, plant.species),
@@ -184,7 +184,7 @@ class _Quote extends StatelessWidget {
 
 /// Planted date in local time (stored as UTC), e.g. "11 August 2026". See
 /// [Plant.plantedAt]. Hand-rolled rather than pulling in `intl` for one format.
-String _plantedOn(DateTime plantedAt) {
+String plantedOn(DateTime plantedAt) {
   final local = plantedAt.toLocal();
   return '${local.day} ${_months[local.month - 1]} ${local.year}';
 }
@@ -205,7 +205,7 @@ const List<String> _months = [
 ];
 
 /// Session length in words. Sessions are 5 min to 2 h, so no days or seconds.
-String _sessionLength(Duration duration) {
+String sessionLengthInWords(Duration duration) {
   final hours = duration.inHours;
   final minutes = duration.inMinutes % 60;
 

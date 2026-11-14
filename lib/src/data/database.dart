@@ -99,8 +99,9 @@ class Plants extends Table {
   /// flag.
   IntColumn get milestoneSessions => integer().nullable()();
 
-  /// Grid position, picked once at planting so the garden looks the same on
-  /// every launch. Both null when the garden is full.
+  /// Grid position, picked at planting so the garden looks the same on every
+  /// launch, and only changed when the user moves the plant. Both null while
+  /// it's on the shelf.
   IntColumn get plotX => integer().nullable()();
   IntColumn get plotY => integer().nullable()();
 

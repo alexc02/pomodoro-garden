@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/headline.dart';
 import '../../design/page_header.dart';
 import '../../design/paper_card.dart';
 import '../../design/sky_band_backdrop.dart';
@@ -1007,7 +1008,10 @@ class _Section extends StatelessWidget {
             left: Spacing.xs,
             bottom: Spacing.sm,
           ),
-          child: Text(title, style: Theme.of(context).textTheme.headlineMedium),
+          child: Headline(
+            title,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
         ),
         PaperCard(
           child: Padding(

@@ -314,7 +314,7 @@ void main() {
       // As tall as the largest session plant but wider, so it stands out.
       const registry = PlaceholderPlantSpriteRegistry();
       Rect footprint(PlantType type) => registry
-          .spriteFor(type: type, stage: GrowthStage.mature)
+          .spriteFor(form: PlantForm.of(type).first, stage: GrowthStage.mature)
           .footprintIn(const Rect.fromLTWH(0, 0, 100, 100));
 
       final bonus = footprint(PlantType.bonus);

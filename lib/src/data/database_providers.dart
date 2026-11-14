@@ -5,6 +5,7 @@ import 'database.dart';
 import 'drift_analytics_event_log.dart';
 import 'drift_cycle_store.dart';
 import 'drift_decor_repository.dart';
+import 'drift_garden_arrangement.dart';
 import 'drift_garden_reset.dart';
 import 'drift_journal_repository.dart';
 import 'drift_plant_repository.dart';
@@ -33,6 +34,11 @@ final plantRepositoryProvider = Provider<PlantRepository>(
 
 final decorRepositoryProvider = Provider<DecorRepository>(
   (ref) => DriftDecorRepository(ref.watch(databaseProvider)),
+);
+
+/// Moves and swaps, across the plants and decor tables in one transaction.
+final gardenArrangementProvider = Provider<GardenArrangement>(
+  (ref) => DriftGardenArrangement(ref.watch(databaseProvider)),
 );
 
 /// Aggregates over the sessions and plants tables.

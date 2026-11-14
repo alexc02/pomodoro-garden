@@ -4,6 +4,7 @@ import 'package:pip_garden/src/features/garden/garden_header.dart';
 import 'package:pip_garden/src/features/garden/garden_screen.dart';
 import 'package:pip_garden/src/features/journal/journal_screen.dart';
 import 'package:pip_garden/src/features/settings/settings_screen.dart';
+import 'package:pip_garden/src/features/shelf/shelf_screen.dart';
 import 'package:pip_garden/src/features/timer/timer_screen.dart';
 import 'package:pip_garden/src/shell/tab.dart';
 import 'package:pip_garden/src/shell/tab_glyph.dart';
@@ -19,6 +20,10 @@ void _expectShowing(WidgetTester tester, AppTab tab) {
     AppTab.garden => find.descendant(
         of: find.byType(GardenHeader),
         matching: find.text(GardenHeader.headline(0)),
+      ),
+    AppTab.shelf => find.descendant(
+        of: find.byType(ShelfScreen),
+        matching: find.text('Nothing found yet.'),
       ),
     AppTab.timer => find.descendant(
         of: find.byType(TimerScreen),
@@ -45,17 +50,17 @@ void main() {
     _expectShowing(tester, AppTab.garden);
   });
 
-  testWidgets('offers exactly the four tabs, in order', (tester) async {
+  testWidgets('offers exactly the five tabs, in order', (tester) async {
     await pumpApp(tester);
 
     final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
 
-    expect(bar.destinations, hasLength(4));
+    expect(bar.destinations, hasLength(5));
     expect(
       bar.destinations
           .cast<NavigationDestination>()
           .map((destination) => destination.label),
-      ['Garden', 'Timer', 'Journal', 'Settings'],
+      ['Garden', 'Shelf', 'Timer', 'Journal', 'Settings'],
     );
   });
 
@@ -111,6 +116,7 @@ void main() {
 
     // Offstage tabs stay in the tree under the stack.
     expect(find.byType(GardenScreen, skipOffstage: false), findsOneWidget);
+    expect(find.byType(ShelfScreen, skipOffstage: false), findsOneWidget);
     expect(find.byType(TimerScreen, skipOffstage: false), findsOneWidget);
     expect(find.byType(JournalScreen, skipOffstage: false), findsOneWidget);
     expect(find.byType(SettingsScreen, skipOffstage: false), findsOneWidget);

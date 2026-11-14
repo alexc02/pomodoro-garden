@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/headline.dart';
 import '../../design/sky_band_backdrop.dart';
 import '../../design/spacing.dart';
 import '../../design/typography.dart';
@@ -160,29 +161,29 @@ class _TimerBody extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
+        // A wrap, not a row: at large text the plant's name drops under the
+        // heading instead of squeezing it into breaking mid-word.
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.end,
+          spacing: Spacing.sm,
           children: [
-            Expanded(
-              child: Text(
-                switch (snapshot.phase) {
-                  SessionPhase.idle => 'Ready to focus',
-                  SessionPhase.running => 'Focusing',
-                  SessionPhase.paused => 'Paused',
-                  SessionPhase.completed => 'Session complete',
-                  // Name the long break; it's what the cycle counts towards.
-                  SessionPhase.onBreak => snapshot.breakKind == BreakKind.long
-                      ? 'Long break'
-                      : 'On a break',
-                  SessionPhase.breakOver => 'Break over',
-                },
-                style: theme.textTheme.headlineMedium
-                    ?.copyWith(color: garden.textPrimary),
-              ),
+            Headline(
+              switch (snapshot.phase) {
+                SessionPhase.idle => 'Ready to focus',
+                SessionPhase.running => 'Focusing',
+                SessionPhase.paused => 'Paused',
+                SessionPhase.completed => 'Session complete',
+                // Name the long break; it's what the cycle counts towards.
+                SessionPhase.onBreak => snapshot.breakKind == BreakKind.long
+                    ? 'Long break'
+                    : 'On a break',
+                SessionPhase.breakOver => 'Break over',
+              },
+              style: theme.textTheme.headlineMedium
+                  ?.copyWith(color: garden.textPrimary),
             ),
-            if (_growingNow(snapshot) case final growth?) ...[
-              const SizedBox(width: Spacing.sm),
+            if (_growingNow(snapshot) case final growth?)
               Text(
                 growth.species.label,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -190,7 +191,6 @@ class _TimerBody extends ConsumerWidget {
                   fontWeight: GardenTypography.headingWeight,
                 ),
               ),
-            ],
           ],
         ),
         Semantics(
@@ -324,10 +324,19 @@ class _StripTimes extends StatelessWidget {
       maintainSize: true,
       maintainAnimation: true,
       maintainState: true,
+      // One line at any text size: each end takes up to half the strip and
+      // shrinks to fit, rather than one clipping or pushing the other off.
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: Spacing.md,
         children: [
-          Expanded(child: Text(ends?.$1 ?? ' ', style: style, maxLines: 1)),
-          Text(ends?.$2 ?? ' ', style: style, maxLines: 1),
+          for (final end in [ends?.$1, ends?.$2])
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(end ?? ' ', style: style, maxLines: 1),
+              ),
+            ),
         ],
       ),
     );

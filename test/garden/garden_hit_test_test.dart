@@ -314,5 +314,33 @@ void main() {
 
       expect((target! as PlantTarget).plant, tree);
     });
+
+    test('between plants the one on top is picked up', () {
+      // Two trees in one column, as in 'nearer plant wins a real overlap'.
+      final far = _plant('far', PlantType.largeTree, behind);
+      final near = _plant('near', PlantType.largeTree, const GardenPlot(1, 1));
+      final overlapping = _hitTest(_garden([far, near]));
+
+      // In the far tree's plot, but under the near tree's picture.
+      final point = tap.translate(0, -20);
+      expect(_camera.plotUnder(point), behind);
+
+      final target = overlapping.at(point, arranging: true);
+      expect((target! as PlantTarget).plant, near);
+      expect(target.plot, near.plot);
+    });
+
+    test('a canopy is picked up where it hangs over nothing', () {
+      // Above the tree's own tile, off every unlocked plot.
+      final tree =
+          _plant('tree', PlantType.largeTree, const GardenPlot(-1, -1));
+      final alone = _hitTest(_garden([tree]));
+      final canopy = _camera.centreOf(tree.plot!).translate(0, -60);
+      expect(alone.at(canopy), isA<PlantTarget>());
+
+      final target = alone.at(canopy, arranging: true);
+
+      expect((target! as PlantTarget).plant, tree);
+    });
   });
 }

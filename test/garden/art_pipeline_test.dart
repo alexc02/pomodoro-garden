@@ -99,15 +99,15 @@ void main() {
       final registry = _read(tester, plantSpriteRegistryProvider);
       const box = Rect.fromLTWH(0, 0, 100, 100);
 
-      for (final type in PlantType.values) {
+      for (final form in PlantForm.values) {
         for (final stage in GrowthStage.values) {
           final footprint =
-              registry.spriteFor(type: type, stage: stage).footprintIn(box);
+              registry.spriteFor(form: form, stage: stage).footprintIn(box);
 
           expect(footprint.isEmpty, isFalse,
-              reason: '${type.name}/${stage.name} claims to fill nothing');
+              reason: '${form.name}/${stage.name} claims to fill nothing');
           expect(footprint.width, lessThanOrEqualTo(box.width + 0.01),
-              reason: '${type.name}/${stage.name} claims to overflow its box');
+              reason: '${form.name}/${stage.name} claims to overflow its box');
         }
       }
     });

@@ -6,6 +6,7 @@ import 'package:pip_garden/src/data/database.dart';
 import 'package:pip_garden/src/data/drift_decor_repository.dart';
 import 'package:pip_garden/src/data/drift_plant_repository.dart';
 import 'package:pip_garden/src/features/garden/decor_picker.dart';
+import 'package:pip_garden/src/features/garden/garden_view.dart';
 import 'package:pip_garden/src/features/garden/plant_card.dart';
 import 'package:pip_garden/src/garden/garden_painter.dart';
 import 'package:pip_garden/src/shell/tab.dart';
@@ -113,7 +114,7 @@ void main() {
     });
 
     testWidgets("no picker for a plant's plot", (tester) async {
-      // Plants can't be moved, removed or covered.
+      // Plants can't be covered: the tap picks the plant up instead.
       await openGarden(tester);
       await startArranging(tester);
 
@@ -280,12 +281,13 @@ void main() {
       expect(_painter(tester).layout.decorIn(plot)?.kind, DecorKind.bench);
     });
 
-    testWidgets('tapping a plant still does nothing', (tester) async {
+    testWidgets('tapping a plant picks it up, with no remove', (tester) async {
       await openCrowdedGarden(tester, sessions: 9, kind: DecorKind.pond);
 
       await _tapPlot(tester, _emptyPlot(0));
 
       expect(find.byType(PlantCard), findsNothing);
+      expect(find.byKey(DecorKeys.putDown), findsOneWidget);
       expect(find.byKey(DecorKeys.remove), findsNothing);
     });
   });
@@ -336,6 +338,91 @@ void main() {
 
       expect(find.byKey(DecorKeys.guidance), findsNothing);
       expect(await DriftDecorRepository(database).decor(), isEmpty);
+    });
+
+    testWidgets('arranging can\'t begin while a session is running or paused',
+        (tester) async {
+      // It used to open, then close on the timer's next tick.
+      IconButton arrange() =>
+          tester.widget<IconButton>(find.byKey(DecorKeys.arrange));
+
+      await openGarden(tester);
+      expect(arrange().onPressed, isNotNull);
+
+      await startSession(tester);
+      await tapTab(tester, AppTab.garden);
+      expect(arrange().onPressed, isNull);
+
+      await tapTab(tester, AppTab.timer);
+      await pauseSession(tester);
+      await tapTab(tester, AppTab.garden);
+      expect(arrange().onPressed, isNull);
+      expect(find.byKey(DecorKeys.guidance), findsNothing);
+    });
+  });
+
+  group('the view while arranging', () {
+    testWidgets('a move keeps the camera where the user put it',
+        (tester) async {
+      await openGarden(tester);
+      await startArranging(tester);
+
+      // Pinch out, so the camera is somewhere a refit would undo.
+      final centre = tester.getCenter(_paint);
+      final first = await tester.startGesture(
+        centre - const Offset(30, 0),
+        pointer: 1,
+      );
+      final second = await tester.startGesture(
+        centre + const Offset(30, 0),
+        pointer: 2,
+      );
+      await first.moveBy(const Offset(-30, 0));
+      await second.moveBy(const Offset(30, 0));
+      await first.up();
+      await second.up();
+      await settle(tester);
+
+      final view = tester.state(find.byType(GardenView));
+      final zoomed = _painter(tester).projection.scale;
+
+      await _tapPlot(tester, _emptyPlot(0));
+      await _tapPlot(tester, _emptyPlot(5));
+
+      expect(
+        (await DriftPlantRepository(database).plants())
+            .map((plant) => plant.plot),
+        contains(_emptyPlot(5)),
+        reason: 'the plant moved',
+      );
+      expect(tester.state(find.byType(GardenView)), same(view));
+      expect(_painter(tester).projection.scale, zoomed);
+    });
+
+    testWidgets('the bar leaves most of the garden free at the largest text',
+        (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 3.1;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await seedGarden(database, sessions: 3);
+      await pumpApp(
+        tester,
+        database: database,
+        surface: const Size(320, 568),
+      );
+      await startArranging(tester);
+
+      final bar = find
+          .ancestor(
+            of: find.byKey(DecorKeys.guidance),
+            matching: find.byType(Material),
+          )
+          .first;
+      expect(
+        tester.getSize(bar).height,
+        lessThanOrEqualTo(tester.getSize(_paint).height * ArrangeBar.maxShare),
+      );
+      // The way out stays on screen however long the guidance is.
+      expect(find.byKey(DecorKeys.done).hitTestable(), findsOneWidget);
     });
   });
 

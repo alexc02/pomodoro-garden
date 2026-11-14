@@ -210,6 +210,13 @@ Future<void> paintSmallTree(Sheet sheet, GrowthStage stage) =>
 Future<void> paintLargeTree(Sheet sheet, GrowthStage stage) =>
     _tree(sheet, stage, _largeTree);
 
+/// The spreading tree (maple, olive, ginkgo): a bare trunk forking low under
+/// wide, flat tiers of leaf, and no blossom.
+Future<void> paintSpreadingTree(Sheet sheet, GrowthStage stage) =>
+    _early(stage)
+        ? paintSmallTree(sheet, stage)
+        : _tree(sheet, stage, _spreadingTree);
+
 /// The bonus plant, one drawing for all seven milestone species: a
 /// tree hung with long tassels of blossom, unlike anything a session grows.
 Future<void> paintBonus(Sheet sheet, GrowthStage stage) =>
@@ -255,6 +262,22 @@ const _smallTree = _TreePlan(
     (256, 210, 84, 62),
   ],
   flowers: 14,
+);
+
+const _spreadingTree = _TreePlan(
+  trunkTop: Offset(256, 322),
+  trunkWidth: 22,
+  branches: [Offset(168, 262), Offset(346, 256), Offset(256, 204)],
+  crown: [
+    (256, 166, 98, 42),
+    (172, 226, 106, 42),
+    (342, 220, 106, 42),
+    (256, 250, 134, 46),
+    (144, 282, 82, 32),
+    (370, 278, 82, 32),
+    (256, 208, 110, 40),
+  ],
+  flowers: 0,
 );
 
 const _largeTree = _TreePlan(
@@ -378,6 +401,157 @@ Future<void> _tree(Sheet sheet, GrowthStage stage, _TreePlan plan) async {
       seed: 800 + i * 10,
       turn: random.nextDouble(),
     );
+  }
+}
+
+/// The seed and the sprout, which every form of a type shares.
+bool _early(GrowthStage stage) =>
+    stage == GrowthStage.seed || stage == GrowthStage.sprout;
+
+/// Young is a sapling, maturing half-grown, mature the whole drawing.
+double _treeScale(GrowthStage stage) => switch (stage) {
+      GrowthStage.young => 0.42,
+      GrowthStage.maturing => 0.72,
+      _ => 1.0,
+    };
+
+/// The weeping tree (willow): a small crown on a heavy trunk, and long
+/// curtains of leaf falling from it almost to the ground.
+Future<void> paintWeepingTree(Sheet sheet, GrowthStage stage) async {
+  if (_early(stage)) return paintLargeTree(sheet, stage);
+  await soil(sheet, stage);
+
+  final scale = _treeScale(stage);
+  final s = scaleOf(sheet);
+  Offset placed(double x, double y) =>
+      Offset(256 + (x - 256) * scale, 500 - (500 - y) * scale);
+
+  const ground = Offset(256, 500);
+  final trunkTop = placed(256, 190);
+  await stalk(sheet, ground, trunkTop,
+      width: 34 * scale + 3,
+      taper: 34 * scale * 0.4,
+      seed: 21,
+      role: Role.soil,
+      depth: 0.3);
+  for (final (i, end) in [placed(176, 150), placed(336, 146)].indexed) {
+    await stalk(sheet, Offset.lerp(ground, trunkTop, 0.85)!, end,
+        width: 34 * scale * 0.45 + 2,
+        taper: 34 * scale * 0.3,
+        seed: 40 + i,
+        role: Role.soil,
+        depth: 0.3,
+        bend: i.isEven ? 0.08 : -0.08);
+  }
+
+  // One falling strand: thin where it leaves the crown, fullest low down.
+  Future<void> strand(int i, double x, double top, double bottom) async {
+    final out = (x - 256) / 170;
+    final from = placed(x, top) * s;
+    final to = placed(x + out * 30, bottom) * s;
+    await sheet.wash(
+      wobbly(
+        along(from, to,
+            width: petalProfile((36 - 6 * out.abs()) * scale * s),
+            bend: -0.1 * out),
+        seed: 900 + i,
+        amplitude: wobbleOf(sheet, 1.6),
+      ),
+      role: Role.foliage,
+      seed: 900 + i,
+      depth: 0.07 + 0.03 * (i % 3),
+      rim: 0.5,
+    );
+  }
+
+  // Strands behind the crown first, outermost last, so each lies over its
+  // inner neighbour. A sapling has every other one.
+  const strands = 13;
+  final every = stage == GrowthStage.young ? 2 : 1;
+  final order = [
+    for (var i = 0; i < strands; i += every) i,
+  ]..sort((a, b) => ((a - 6).abs()).compareTo((b - 6).abs()));
+  final random = math.Random(940);
+  final falls = [for (var i = 0; i < strands; i++) random.nextDouble()];
+  for (final i in order) {
+    final x = 100 + 312 * i / (strands - 1);
+    final out = ((x - 256) / 156).abs();
+    // The middle ones stop short, so the trunk shows under the crown.
+    final bottom = (out < 0.2 ? 290.0 : 404 + 50 * out) + falls[i] * 22;
+    await strand(i, x, 120 + 44 * out, bottom);
+  }
+
+  const crown = [
+    (256.0, 104.0, 112.0, 68.0),
+    (176.0, 142.0, 86.0, 58.0),
+    (336.0, 138.0, 86.0, 58.0),
+    (256.0, 150.0, 116.0, 54.0),
+  ];
+  for (final (i, (x, y, rx, ry)) in crown.indexed) {
+    await clump(sheet, placed(x, y),
+        rx: rx * scale, ry: ry * scale, seed: 500 + i, lobes: 11);
+  }
+}
+
+/// The conifer (pine, spruce, sequoia): a straight trunk and tiers of
+/// drooping boughs that narrow to a point.
+Future<void> paintConifer(Sheet sheet, GrowthStage stage) async {
+  if (_early(stage)) return paintLargeTree(sheet, stage);
+  await soil(sheet, stage);
+
+  final scale = _treeScale(stage);
+  Offset placed(double x, double y) =>
+      Offset(256 + (x - 256) * scale, 500 - (500 - y) * scale);
+
+  await stalk(sheet, const Offset(256, 500), placed(256, 96),
+      width: 30 * scale + 3,
+      taper: 30 * scale + 1,
+      seed: 21,
+      role: Role.soil,
+      depth: 0.3);
+
+  // (height on the trunk, length of a bough), lowest first, so each tier
+  // lies over the one below it.
+  const tiers = [
+    (424.0, 168.0),
+    (372.0, 152.0),
+    (320.0, 134.0),
+    (268.0, 114.0),
+    (218.0, 94.0),
+    (172.0, 72.0),
+    (130.0, 50.0),
+  ];
+  // A sapling has every other tier.
+  final every = stage == GrowthStage.young ? 2 : 1;
+  for (var i = 0; i < tiers.length; i += every) {
+    final (y, length) = tiers[i];
+    for (final side in [-1, 1]) {
+      await leaf(sheet, placed(256 - side * 10, y - length * 0.16),
+          side: side,
+          // Below the horizontal: the boughs hang.
+          angle: -0.3,
+          length: length * scale,
+          width: length * 0.5 * scale,
+          seed: 500 + i * 2 + (side + 1) ~/ 2);
+    }
+    // Hides where the two boughs meet on the trunk.
+    await clump(sheet, placed(256, y - length * 0.12),
+        rx: length * 0.34 * scale,
+        ry: length * 0.2 * scale,
+        seed: 540 + i,
+        lobes: 7);
+  }
+
+  // The leader.
+  final tip = placed(256, 122);
+  for (final side in [-1, 1]) {
+    await leaf(sheet, tip,
+        side: side,
+        angle: 1.5,
+        length: 76 * scale,
+        width: 30 * scale,
+        seed: 560 + (side + 1) ~/ 2,
+        rib: false);
   }
 }
 

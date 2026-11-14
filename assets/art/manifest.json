@@ -3,7 +3,7 @@
   "side": 512,
   "plants": [
     {
-      "type": "wildflower",
+      "form": "posy",
       "stage": "seed",
       "art": "assets/art/plants/wildflower_seed.png",
       "roles": "assets/art/plants/wildflower_seed.roles.png",
@@ -15,7 +15,7 @@
       ]
     },
     {
-      "type": "wildflower",
+      "form": "posy",
       "stage": "sprout",
       "art": "assets/art/plants/wildflower_sprout.png",
       "roles": "assets/art/plants/wildflower_sprout.roles.png",
@@ -27,10 +27,10 @@
       ]
     },
     {
-      "type": "wildflower",
+      "form": "posy",
       "stage": "young",
-      "art": "assets/art/plants/wildflower_young.png",
-      "roles": "assets/art/plants/wildflower_young.roles.png",
+      "art": "assets/art/plants/posy_young.png",
+      "roles": "assets/art/plants/posy_young.roles.png",
       "footprint": [
         0.4296875,
         0.68359375,
@@ -39,10 +39,10 @@
       ]
     },
     {
-      "type": "wildflower",
+      "form": "posy",
       "stage": "maturing",
-      "art": "assets/art/plants/wildflower_maturing.png",
-      "roles": "assets/art/plants/wildflower_maturing.roles.png",
+      "art": "assets/art/plants/posy_maturing.png",
+      "roles": "assets/art/plants/posy_maturing.roles.png",
       "footprint": [
         0.388671875,
         0.580078125,
@@ -51,10 +51,10 @@
       ]
     },
     {
-      "type": "wildflower",
+      "form": "posy",
       "stage": "mature",
-      "art": "assets/art/plants/wildflower_mature.png",
-      "roles": "assets/art/plants/wildflower_mature.roles.png",
+      "art": "assets/art/plants/posy_mature.png",
+      "roles": "assets/art/plants/posy_mature.roles.png",
       "footprint": [
         0.330078125,
         0.4765625,
@@ -63,7 +63,67 @@
       ]
     },
     {
-      "type": "herb",
+      "form": "spire",
+      "stage": "seed",
+      "art": "assets/art/plants/wildflower_seed.png",
+      "roles": "assets/art/plants/wildflower_seed.roles.png",
+      "footprint": [
+        0.43359375,
+        0.958984375,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "spire",
+      "stage": "sprout",
+      "art": "assets/art/plants/wildflower_sprout.png",
+      "roles": "assets/art/plants/wildflower_sprout.roles.png",
+      "footprint": [
+        0.43359375,
+        0.890625,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "spire",
+      "stage": "young",
+      "art": "assets/art/plants/spire_young.png",
+      "roles": "assets/art/plants/spire_young.roles.png",
+      "footprint": [
+        0.419921875,
+        0.71484375,
+        0.578125,
+        1.0
+      ]
+    },
+    {
+      "form": "spire",
+      "stage": "maturing",
+      "art": "assets/art/plants/spire_maturing.png",
+      "roles": "assets/art/plants/spire_maturing.roles.png",
+      "footprint": [
+        0.396484375,
+        0.5625,
+        0.6015625,
+        1.0
+      ]
+    },
+    {
+      "form": "spire",
+      "stage": "mature",
+      "art": "assets/art/plants/spire_mature.png",
+      "roles": "assets/art/plants/spire_mature.roles.png",
+      "footprint": [
+        0.37109375,
+        0.421875,
+        0.625,
+        1.0
+      ]
+    },
+    {
+      "form": "leafy",
       "stage": "seed",
       "art": "assets/art/plants/herb_seed.png",
       "roles": "assets/art/plants/herb_seed.roles.png",
@@ -75,7 +135,7 @@
       ]
     },
     {
-      "type": "herb",
+      "form": "leafy",
       "stage": "sprout",
       "art": "assets/art/plants/herb_sprout.png",
       "roles": "assets/art/plants/herb_sprout.roles.png",
@@ -87,10 +147,10 @@
       ]
     },
     {
-      "type": "herb",
+      "form": "leafy",
       "stage": "young",
-      "art": "assets/art/plants/herb_young.png",
-      "roles": "assets/art/plants/herb_young.roles.png",
+      "art": "assets/art/plants/leafy_young.png",
+      "roles": "assets/art/plants/leafy_young.roles.png",
       "footprint": [
         0.419921875,
         0.7421875,
@@ -99,10 +159,10 @@
       ]
     },
     {
-      "type": "herb",
+      "form": "leafy",
       "stage": "maturing",
-      "art": "assets/art/plants/herb_maturing.png",
-      "roles": "assets/art/plants/herb_maturing.roles.png",
+      "art": "assets/art/plants/leafy_maturing.png",
+      "roles": "assets/art/plants/leafy_maturing.roles.png",
       "footprint": [
         0.384765625,
         0.64453125,
@@ -111,10 +171,10 @@
       ]
     },
     {
-      "type": "herb",
+      "form": "leafy",
       "stage": "mature",
-      "art": "assets/art/plants/herb_mature.png",
-      "roles": "assets/art/plants/herb_mature.roles.png",
+      "art": "assets/art/plants/leafy_mature.png",
+      "roles": "assets/art/plants/leafy_mature.roles.png",
       "footprint": [
         0.3515625,
         0.48828125,
@@ -123,7 +183,67 @@
       ]
     },
     {
-      "type": "flower",
+      "form": "sprig",
+      "stage": "seed",
+      "art": "assets/art/plants/herb_seed.png",
+      "roles": "assets/art/plants/herb_seed.roles.png",
+      "footprint": [
+        0.43359375,
+        0.958984375,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "sprig",
+      "stage": "sprout",
+      "art": "assets/art/plants/herb_sprout.png",
+      "roles": "assets/art/plants/herb_sprout.roles.png",
+      "footprint": [
+        0.43359375,
+        0.890625,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "sprig",
+      "stage": "young",
+      "art": "assets/art/plants/sprig_young.png",
+      "roles": "assets/art/plants/sprig_young.roles.png",
+      "footprint": [
+        0.43359375,
+        0.744140625,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "sprig",
+      "stage": "maturing",
+      "art": "assets/art/plants/sprig_maturing.png",
+      "roles": "assets/art/plants/sprig_maturing.roles.png",
+      "footprint": [
+        0.38671875,
+        0.626953125,
+        0.61328125,
+        1.0
+      ]
+    },
+    {
+      "form": "sprig",
+      "stage": "mature",
+      "art": "assets/art/plants/sprig_mature.png",
+      "roles": "assets/art/plants/sprig_mature.roles.png",
+      "footprint": [
+        0.337890625,
+        0.509765625,
+        0.662109375,
+        1.0
+      ]
+    },
+    {
+      "form": "rayed",
       "stage": "seed",
       "art": "assets/art/plants/flower_seed.png",
       "roles": "assets/art/plants/flower_seed.roles.png",
@@ -135,7 +255,7 @@
       ]
     },
     {
-      "type": "flower",
+      "form": "rayed",
       "stage": "sprout",
       "art": "assets/art/plants/flower_sprout.png",
       "roles": "assets/art/plants/flower_sprout.roles.png",
@@ -147,10 +267,10 @@
       ]
     },
     {
-      "type": "flower",
+      "form": "rayed",
       "stage": "young",
-      "art": "assets/art/plants/flower_young.png",
-      "roles": "assets/art/plants/flower_young.roles.png",
+      "art": "assets/art/plants/rayed_young.png",
+      "roles": "assets/art/plants/rayed_young.roles.png",
       "footprint": [
         0.41796875,
         0.529296875,
@@ -159,10 +279,10 @@
       ]
     },
     {
-      "type": "flower",
+      "form": "rayed",
       "stage": "maturing",
-      "art": "assets/art/plants/flower_maturing.png",
-      "roles": "assets/art/plants/flower_maturing.roles.png",
+      "art": "assets/art/plants/rayed_maturing.png",
+      "roles": "assets/art/plants/rayed_maturing.roles.png",
       "footprint": [
         0.38671875,
         0.30859375,
@@ -171,10 +291,10 @@
       ]
     },
     {
-      "type": "flower",
+      "form": "rayed",
       "stage": "mature",
-      "art": "assets/art/plants/flower_mature.png",
-      "roles": "assets/art/plants/flower_mature.roles.png",
+      "art": "assets/art/plants/rayed_mature.png",
+      "roles": "assets/art/plants/rayed_mature.roles.png",
       "footprint": [
         0.365234375,
         0.216796875,
@@ -183,7 +303,67 @@
       ]
     },
     {
-      "type": "bush",
+      "form": "cup",
+      "stage": "seed",
+      "art": "assets/art/plants/flower_seed.png",
+      "roles": "assets/art/plants/flower_seed.roles.png",
+      "footprint": [
+        0.43359375,
+        0.958984375,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "cup",
+      "stage": "sprout",
+      "art": "assets/art/plants/flower_sprout.png",
+      "roles": "assets/art/plants/flower_sprout.roles.png",
+      "footprint": [
+        0.43359375,
+        0.8203125,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "cup",
+      "stage": "young",
+      "art": "assets/art/plants/cup_young.png",
+      "roles": "assets/art/plants/cup_young.roles.png",
+      "footprint": [
+        0.392578125,
+        0.529296875,
+        0.599609375,
+        1.0
+      ]
+    },
+    {
+      "form": "cup",
+      "stage": "maturing",
+      "art": "assets/art/plants/cup_maturing.png",
+      "roles": "assets/art/plants/cup_maturing.roles.png",
+      "footprint": [
+        0.34375,
+        0.30859375,
+        0.64453125,
+        1.0
+      ]
+    },
+    {
+      "form": "cup",
+      "stage": "mature",
+      "art": "assets/art/plants/cup_mature.png",
+      "roles": "assets/art/plants/cup_mature.roles.png",
+      "footprint": [
+        0.326171875,
+        0.1796875,
+        0.658203125,
+        1.0
+      ]
+    },
+    {
+      "form": "mound",
       "stage": "seed",
       "art": "assets/art/plants/bush_seed.png",
       "roles": "assets/art/plants/bush_seed.roles.png",
@@ -195,7 +375,7 @@
       ]
     },
     {
-      "type": "bush",
+      "form": "mound",
       "stage": "sprout",
       "art": "assets/art/plants/bush_sprout.png",
       "roles": "assets/art/plants/bush_sprout.roles.png",
@@ -207,10 +387,10 @@
       ]
     },
     {
-      "type": "bush",
+      "form": "mound",
       "stage": "young",
-      "art": "assets/art/plants/bush_young.png",
-      "roles": "assets/art/plants/bush_young.roles.png",
+      "art": "assets/art/plants/mound_young.png",
+      "roles": "assets/art/plants/mound_young.roles.png",
       "footprint": [
         0.392578125,
         0.8046875,
@@ -219,10 +399,10 @@
       ]
     },
     {
-      "type": "bush",
+      "form": "mound",
       "stage": "maturing",
-      "art": "assets/art/plants/bush_maturing.png",
-      "roles": "assets/art/plants/bush_maturing.roles.png",
+      "art": "assets/art/plants/mound_maturing.png",
+      "roles": "assets/art/plants/mound_maturing.roles.png",
       "footprint": [
         0.333984375,
         0.607421875,
@@ -231,10 +411,10 @@
       ]
     },
     {
-      "type": "bush",
+      "form": "mound",
       "stage": "mature",
-      "art": "assets/art/plants/bush_mature.png",
-      "roles": "assets/art/plants/bush_mature.roles.png",
+      "art": "assets/art/plants/mound_mature.png",
+      "roles": "assets/art/plants/mound_mature.roles.png",
       "footprint": [
         0.279296875,
         0.443359375,
@@ -243,7 +423,67 @@
       ]
     },
     {
-      "type": "smallTree",
+      "form": "spiked",
+      "stage": "seed",
+      "art": "assets/art/plants/bush_seed.png",
+      "roles": "assets/art/plants/bush_seed.roles.png",
+      "footprint": [
+        0.43359375,
+        0.958984375,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "spiked",
+      "stage": "sprout",
+      "art": "assets/art/plants/bush_sprout.png",
+      "roles": "assets/art/plants/bush_sprout.roles.png",
+      "footprint": [
+        0.43359375,
+        0.884765625,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "spiked",
+      "stage": "young",
+      "art": "assets/art/plants/spiked_young.png",
+      "roles": "assets/art/plants/spiked_young.roles.png",
+      "footprint": [
+        0.357421875,
+        0.71875,
+        0.642578125,
+        1.0
+      ]
+    },
+    {
+      "form": "spiked",
+      "stage": "maturing",
+      "art": "assets/art/plants/spiked_maturing.png",
+      "roles": "assets/art/plants/spiked_maturing.roles.png",
+      "footprint": [
+        0.283203125,
+        0.591796875,
+        0.712890625,
+        1.0
+      ]
+    },
+    {
+      "form": "spiked",
+      "stage": "mature",
+      "art": "assets/art/plants/spiked_mature.png",
+      "roles": "assets/art/plants/spiked_mature.roles.png",
+      "footprint": [
+        0.2109375,
+        0.447265625,
+        0.798828125,
+        1.0
+      ]
+    },
+    {
+      "form": "orchard",
       "stage": "seed",
       "art": "assets/art/plants/smallTree_seed.png",
       "roles": "assets/art/plants/smallTree_seed.roles.png",
@@ -255,7 +495,7 @@
       ]
     },
     {
-      "type": "smallTree",
+      "form": "orchard",
       "stage": "sprout",
       "art": "assets/art/plants/smallTree_sprout.png",
       "roles": "assets/art/plants/smallTree_sprout.roles.png",
@@ -267,10 +507,10 @@
       ]
     },
     {
-      "type": "smallTree",
+      "form": "orchard",
       "stage": "young",
-      "art": "assets/art/plants/smallTree_young.png",
-      "roles": "assets/art/plants/smallTree_young.roles.png",
+      "art": "assets/art/plants/orchard_young.png",
+      "roles": "assets/art/plants/orchard_young.roles.png",
       "footprint": [
         0.376953125,
         0.630859375,
@@ -279,10 +519,10 @@
       ]
     },
     {
-      "type": "smallTree",
+      "form": "orchard",
       "stage": "maturing",
-      "art": "assets/art/plants/smallTree_maturing.png",
-      "roles": "assets/art/plants/smallTree_maturing.roles.png",
+      "art": "assets/art/plants/orchard_maturing.png",
+      "roles": "assets/art/plants/orchard_maturing.roles.png",
       "footprint": [
         0.291015625,
         0.369140625,
@@ -291,10 +531,10 @@
       ]
     },
     {
-      "type": "smallTree",
+      "form": "orchard",
       "stage": "mature",
-      "art": "assets/art/plants/smallTree_mature.png",
-      "roles": "assets/art/plants/smallTree_mature.roles.png",
+      "art": "assets/art/plants/orchard_mature.png",
+      "roles": "assets/art/plants/orchard_mature.roles.png",
       "footprint": [
         0.2109375,
         0.1328125,
@@ -303,7 +543,67 @@
       ]
     },
     {
-      "type": "largeTree",
+      "form": "spreading",
+      "stage": "seed",
+      "art": "assets/art/plants/smallTree_seed.png",
+      "roles": "assets/art/plants/smallTree_seed.roles.png",
+      "footprint": [
+        0.43359375,
+        0.958984375,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "spreading",
+      "stage": "sprout",
+      "art": "assets/art/plants/smallTree_sprout.png",
+      "roles": "assets/art/plants/smallTree_sprout.roles.png",
+      "footprint": [
+        0.43359375,
+        0.83203125,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "spreading",
+      "stage": "young",
+      "art": "assets/art/plants/spreading_young.png",
+      "roles": "assets/art/plants/spreading_young.roles.png",
+      "footprint": [
+        0.34375,
+        0.66796875,
+        0.658203125,
+        1.0
+      ]
+    },
+    {
+      "form": "spreading",
+      "stage": "maturing",
+      "art": "assets/art/plants/spreading_maturing.png",
+      "roles": "assets/art/plants/spreading_maturing.roles.png",
+      "footprint": [
+        0.2265625,
+        0.447265625,
+        0.77734375,
+        1.0
+      ]
+    },
+    {
+      "form": "spreading",
+      "stage": "mature",
+      "art": "assets/art/plants/spreading_mature.png",
+      "roles": "assets/art/plants/spreading_mature.roles.png",
+      "footprint": [
+        0.12109375,
+        0.2421875,
+        0.8828125,
+        1.0
+      ]
+    },
+    {
+      "form": "broadleaf",
       "stage": "seed",
       "art": "assets/art/plants/largeTree_seed.png",
       "roles": "assets/art/plants/largeTree_seed.roles.png",
@@ -315,7 +615,7 @@
       ]
     },
     {
-      "type": "largeTree",
+      "form": "broadleaf",
       "stage": "sprout",
       "art": "assets/art/plants/largeTree_sprout.png",
       "roles": "assets/art/plants/largeTree_sprout.roles.png",
@@ -327,10 +627,10 @@
       ]
     },
     {
-      "type": "largeTree",
+      "form": "broadleaf",
       "stage": "young",
-      "art": "assets/art/plants/largeTree_young.png",
-      "roles": "assets/art/plants/largeTree_young.roles.png",
+      "art": "assets/art/plants/broadleaf_young.png",
+      "roles": "assets/art/plants/broadleaf_young.roles.png",
       "footprint": [
         0.3359375,
         0.564453125,
@@ -339,10 +639,10 @@
       ]
     },
     {
-      "type": "largeTree",
+      "form": "broadleaf",
       "stage": "maturing",
-      "art": "assets/art/plants/largeTree_maturing.png",
-      "roles": "assets/art/plants/largeTree_maturing.roles.png",
+      "art": "assets/art/plants/broadleaf_maturing.png",
+      "roles": "assets/art/plants/broadleaf_maturing.roles.png",
       "footprint": [
         0.205078125,
         0.2734375,
@@ -351,10 +651,10 @@
       ]
     },
     {
-      "type": "largeTree",
+      "form": "broadleaf",
       "stage": "mature",
-      "art": "assets/art/plants/largeTree_mature.png",
-      "roles": "assets/art/plants/largeTree_mature.roles.png",
+      "art": "assets/art/plants/broadleaf_mature.png",
+      "roles": "assets/art/plants/broadleaf_mature.roles.png",
       "footprint": [
         0.08984375,
         0.0,
@@ -363,7 +663,127 @@
       ]
     },
     {
-      "type": "bonus",
+      "form": "weeping",
+      "stage": "seed",
+      "art": "assets/art/plants/largeTree_seed.png",
+      "roles": "assets/art/plants/largeTree_seed.roles.png",
+      "footprint": [
+        0.43359375,
+        0.958984375,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "weeping",
+      "stage": "sprout",
+      "art": "assets/art/plants/largeTree_sprout.png",
+      "roles": "assets/art/plants/largeTree_sprout.roles.png",
+      "footprint": [
+        0.43359375,
+        0.83203125,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "weeping",
+      "stage": "young",
+      "art": "assets/art/plants/weeping_young.png",
+      "roles": "assets/art/plants/weeping_young.roles.png",
+      "footprint": [
+        0.3359375,
+        0.595703125,
+        0.6640625,
+        1.0
+      ]
+    },
+    {
+      "form": "weeping",
+      "stage": "maturing",
+      "art": "assets/art/plants/weeping_maturing.png",
+      "roles": "assets/art/plants/weeping_maturing.roles.png",
+      "footprint": [
+        0.220703125,
+        0.32421875,
+        0.779296875,
+        1.0
+      ]
+    },
+    {
+      "form": "weeping",
+      "stage": "mature",
+      "art": "assets/art/plants/weeping_mature.png",
+      "roles": "assets/art/plants/weeping_mature.roles.png",
+      "footprint": [
+        0.111328125,
+        0.0703125,
+        0.888671875,
+        1.0
+      ]
+    },
+    {
+      "form": "conifer",
+      "stage": "seed",
+      "art": "assets/art/plants/largeTree_seed.png",
+      "roles": "assets/art/plants/largeTree_seed.roles.png",
+      "footprint": [
+        0.43359375,
+        0.958984375,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "conifer",
+      "stage": "sprout",
+      "art": "assets/art/plants/largeTree_sprout.png",
+      "roles": "assets/art/plants/largeTree_sprout.roles.png",
+      "footprint": [
+        0.43359375,
+        0.83203125,
+        0.568359375,
+        1.0
+      ]
+    },
+    {
+      "form": "conifer",
+      "stage": "young",
+      "art": "assets/art/plants/conifer_young.png",
+      "roles": "assets/art/plants/conifer_young.roles.png",
+      "footprint": [
+        0.375,
+        0.603515625,
+        0.623046875,
+        1.0
+      ]
+    },
+    {
+      "form": "conifer",
+      "stage": "maturing",
+      "art": "assets/art/plants/conifer_maturing.png",
+      "roles": "assets/art/plants/conifer_maturing.roles.png",
+      "footprint": [
+        0.287109375,
+        0.337890625,
+        0.712890625,
+        1.0
+      ]
+    },
+    {
+      "form": "conifer",
+      "stage": "mature",
+      "art": "assets/art/plants/conifer_mature.png",
+      "roles": "assets/art/plants/conifer_mature.roles.png",
+      "footprint": [
+        0.205078125,
+        0.087890625,
+        0.794921875,
+        1.0
+      ]
+    },
+    {
+      "form": "tassel",
       "stage": "seed",
       "art": "assets/art/plants/bonus_seed.png",
       "roles": "assets/art/plants/bonus_seed.roles.png",
@@ -375,7 +795,7 @@
       ]
     },
     {
-      "type": "bonus",
+      "form": "tassel",
       "stage": "sprout",
       "art": "assets/art/plants/bonus_sprout.png",
       "roles": "assets/art/plants/bonus_sprout.roles.png",
@@ -387,10 +807,10 @@
       ]
     },
     {
-      "type": "bonus",
+      "form": "tassel",
       "stage": "young",
-      "art": "assets/art/plants/bonus_young.png",
-      "roles": "assets/art/plants/bonus_young.roles.png",
+      "art": "assets/art/plants/tassel_young.png",
+      "roles": "assets/art/plants/tassel_young.roles.png",
       "footprint": [
         0.330078125,
         0.5703125,
@@ -399,10 +819,10 @@
       ]
     },
     {
-      "type": "bonus",
+      "form": "tassel",
       "stage": "maturing",
-      "art": "assets/art/plants/bonus_maturing.png",
-      "roles": "assets/art/plants/bonus_maturing.roles.png",
+      "art": "assets/art/plants/tassel_maturing.png",
+      "roles": "assets/art/plants/tassel_maturing.roles.png",
       "footprint": [
         0.208984375,
         0.279296875,
@@ -411,10 +831,10 @@
       ]
     },
     {
-      "type": "bonus",
+      "form": "tassel",
       "stage": "mature",
-      "art": "assets/art/plants/bonus_mature.png",
-      "roles": "assets/art/plants/bonus_mature.roles.png",
+      "art": "assets/art/plants/tassel_mature.png",
+      "roles": "assets/art/plants/tassel_mature.roles.png",
       "footprint": [
         0.09765625,
         0.0078125,

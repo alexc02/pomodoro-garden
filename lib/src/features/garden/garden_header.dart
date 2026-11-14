@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/headline.dart';
 import '../../design/spacing.dart';
 import '../../design/typography.dart';
 import '../../journal/journal_providers.dart';
@@ -23,6 +24,36 @@ class GardenHeader extends ConsumerWidget {
     final colors = GardenColors.of(context);
     final today = ref.watch(todayProvider);
 
+    // At night the light text can end up over the moon, or over the plants
+    // when large text makes the header tall. The shadow keeps it readable
+    // and doesn't show against the dark sky.
+    final shadows = colors.textPrimary.computeLuminance() > 0.5
+        ? const [Shadow(color: Color(0xB3000000), blurRadius: 10)]
+        : null;
+
+    final date = Text(
+      dateLine(today),
+      // Scales with the headline under it.
+      textScaler: Headline.scalerOf(context),
+      style: theme.textTheme.bodySmall?.copyWith(
+        color: colors.textPrimary,
+        fontWeight: GardenTypography.headingWeight,
+        shadows: shadows,
+      ),
+    );
+    final title = Semantics(
+      header: true,
+      child: Headline(
+        headline(plants),
+        style: theme.textTheme.displayLarge
+            ?.copyWith(color: colors.textPrimary, shadows: shadows),
+      ),
+    );
+
+    // At large text the headline gets the full width. Next to the buttons it
+    // wraps to twice as many lines and runs down over the plants.
+    final large = systemTextScale(context) > largeTextFrom;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         Spacing.lg,
@@ -30,46 +61,50 @@ class GardenHeader extends ConsumerWidget {
         Spacing.sm,
         Spacing.sm,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: Spacing.sm),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    dateLine(today),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colors.textPrimary,
-                      fontWeight: GardenTypography.headingWeight,
+      child: large
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: Spacing.sm),
+                        child: date,
+                      ),
+                    ),
+                    ...actions,
+                  ],
+                ),
+                title,
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: Spacing.sm),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        date,
+                        const SizedBox(height: Spacing.xs),
+                        title,
+                      ],
                     ),
                   ),
-                  const SizedBox(height: Spacing.xs),
-                  Semantics(
-                    header: true,
-                    // Max two lines so it doesn't reach into the garden at
-                    // large text. Screen readers still get all of it.
-                    child: Text(
-                      headline(plants),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.displayLarge
-                          ?.copyWith(color: colors.textPrimary),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                ...actions,
+              ],
             ),
-          ),
-          ...actions,
-        ],
-      ),
     );
   }
+
+  /// System text size past which the headline goes under the buttons rather
+  /// than beside them.
+  static const double largeTextFrom = 1.3;
 
   /// "Tuesday, 11 August". Hand-built because `MaterialLocalizations`'s full
   /// date includes the year.

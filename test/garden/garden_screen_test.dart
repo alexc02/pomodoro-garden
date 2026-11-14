@@ -4,7 +4,9 @@ import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'package:pip_garden/src/data/database.dart';
 import 'package:pip_garden/src/data/drift_plant_repository.dart';
 import 'package:pip_garden/src/data/drift_session_repository.dart';
+import 'package:pip_garden/src/features/garden/garden_screen.dart';
 import 'package:pip_garden/src/features/garden/garden_view.dart';
+import 'package:pip_garden/src/features/shelf/shelf_screen.dart';
 import 'package:pip_garden/src/garden/garden_painter.dart';
 import 'package:pip_garden/src/garden/garden_projection.dart';
 import 'package:pip_garden/src/shell/tab.dart';
@@ -126,11 +128,41 @@ void main() {
       expect(layout.plotCount, 200);
       // Two session plants past the cap and four bonus plants (10, 25, 50,
       // 100). All recorded, none placed.
-      expect(layout.unplaced, hasLength(6));
+      expect(layout.shelved, hasLength(6));
       expect(
-        find.text('Your garden is full. 6 more plants are waiting for space.'),
+        find.text('Your garden is full. 6 plants are on your shelf.'),
         findsOneWidget,
       );
+    });
+
+    testWidgets('the full-garden caption opens the shelf', (tester) async {
+      final database = AppDatabase.forTesting();
+      addTearDown(database.close);
+      await seedGarden(database, sessions: 202);
+      await pumpApp(tester, database: database, surface: const Size(400, 800));
+
+      await tester.tap(find.byKey(GardenScreen.fullCaption));
+      await settle(tester);
+
+      expect(find.byType(ShelfScreen).hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('plants shelved with soil to spare raise no caption',
+        (tester) async {
+      // Shelving is a choice, not a full garden: nothing to announce.
+      final database = AppDatabase.forTesting();
+      addTearDown(database.close);
+      await seedGarden(database, sessions: 30);
+      final garden = DriftPlantRepository(database);
+      final plants = await garden.plants();
+      await garden.save(plants.first.inPlot(null));
+
+      await pumpApp(tester, database: database, surface: const Size(400, 800));
+
+      final layout = _painter(tester).layout;
+      expect(layout.shelved, hasLength(1));
+      expect(layout.emptyPlots, greaterThan(0));
+      expect(find.byKey(GardenScreen.fullCaption), findsNothing);
     });
   });
 

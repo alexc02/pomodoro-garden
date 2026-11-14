@@ -23,9 +23,9 @@ Future<bool> confirmGardenReset(BuildContext context) async {
       key: ResetGardenKeys.firstConfirmation,
       title: const Text('Reset your garden?'),
       content: const Text(
-        'Every plant you\'ve grown, and every session and stat behind them, '
-        'will be cleared.\n\nYour settings stay: your lengths, your theme and '
-        'your sounds.',
+        'Every plant you\'ve grown, in your garden and on your shelf, and '
+        'every session and stat behind them, will be cleared.\n\nYour '
+        'settings stay: your lengths, your theme and your sounds.',
       ),
       actions: [
         TextButton(

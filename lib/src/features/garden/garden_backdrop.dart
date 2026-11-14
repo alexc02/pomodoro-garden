@@ -148,8 +148,9 @@ class GardenBackdropPainter extends CustomPainter {
   /// Centre of the sun or moon. Starts and ends below the hill line.
   Offset discCentre(Size size) {
     final low = size.height * 0.5 + size.width * _disc;
-    // Peak is at 0.26 so the disc stays under the header text.
-    final high = size.height * 0.26;
+    // Peak is at 0.32 so the disc stays under the header text, including a
+    // headline that wraps to two lines.
+    final high = size.height * 0.32;
 
     return Offset(
       size.width * lerpDouble(0.14, 0.86, daylight.arc)!,

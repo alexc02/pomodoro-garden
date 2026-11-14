@@ -86,10 +86,14 @@ final class FakeMicroSounds implements MicroSounds {
 final class FakeHaptics implements Haptics {
   int completions = 0;
   int growths = 0;
+  int arrangings = 0;
 
   @override
   Future<void> sessionComplete() async => completions++;
 
   @override
   Future<void> plantGrew() async => growths++;
+
+  @override
+  Future<void> arranged() async => arrangings++;
 }

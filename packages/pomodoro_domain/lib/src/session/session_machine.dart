@@ -1,5 +1,6 @@
 import '../garden/growth_stage.dart';
 import '../garden/plant.dart';
+import '../garden/season.dart';
 import '../time/clock.dart';
 import 'focus_session.dart';
 import 'id_source.dart';
@@ -126,7 +127,15 @@ final class SessionSnapshot {
 final class SessionMachine {
   /// Positional because named params can't initialise private fields.
   /// [_cyclePosition] restores the cycle from a previous launch.
-  SessionMachine(this._clock, this._ids, {this._cyclePosition = 0});
+  SessionMachine(
+    this._clock,
+    this._ids, {
+    this._cyclePosition = 0,
+    this.hemisphere = Hemisphere.northern,
+  });
+
+  /// Decides which season's species a session grows.
+  final Hemisphere hemisphere;
 
   /// Growth rate while paused, relative to focusing.
   static const double pausedGrowthRate = 0.5;
@@ -342,6 +351,7 @@ final class SessionMachine {
       dueAt: session.startedAt.add(planned + paused),
       growing: PlantGrowth.forSession(
         session,
+        hemisphere: hemisphere,
         progress: phase == SessionPhase.completed
             ? growthProgress
             : growthProgress.clamp(0.0, GrowthStage.maturing.threshold).toDouble(),

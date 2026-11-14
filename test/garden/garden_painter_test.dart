@@ -239,4 +239,74 @@ void main() {
       );
     });
   });
+
+  group('held', () {
+    const projection = GardenProjection(pan: Offset(2000, 2000));
+    final layout = _garden(3);
+    final held = GardenPlots.inPlacementOrder[1];
+
+    GardenBatch batch({GardenPlot? holding}) => GardenPainter(
+          layout: layout,
+          projection: projection,
+          atlas: atlas,
+          held: holding,
+        ).batchFor(_window);
+
+    test('raises only what stands in the held plot', () {
+      final resting = batch();
+      final lifted = batch(holding: held);
+
+      expect(lifted.rects, resting.rects, reason: 'same quads, same order');
+
+      final lift = GardenProjection.tile.height * GardenPainter.heldLift;
+      final moved = <int>[
+        for (var n = 0; n < resting.transforms.length; n++)
+          if (resting.transforms[n].ty != lifted.transforms[n].ty) n,
+      ];
+
+      // One plant quad; its soil tile and every other plot stay put.
+      expect(moved, hasLength(1));
+      final quad = moved.single;
+      expect(resting.rects[quad], atlas.rectFor(PlantSpecies.oak));
+      expect(
+        resting.transforms[quad].ty - lifted.transforms[quad].ty,
+        // RSTransform keeps 32-bit floats.
+        closeTo(lift, 1e-3),
+      );
+      expect(lifted.transforms[quad].tx, resting.transforms[quad].tx);
+    });
+
+    test('an empty held plot raises nothing', () {
+      final empty = GardenPlots.inPlacementOrder[8];
+      expect(layout.isEmpty(empty), isTrue);
+
+      final resting = batch();
+      final lifted = batch(holding: empty);
+
+      expect(
+        [for (final quad in lifted.transforms) quad.ty],
+        [for (final quad in resting.transforms) quad.ty],
+      );
+    });
+
+    test('repaints when the hold changes', () {
+      GardenPainter painter({GardenPlot? holding, Color? outline}) =>
+          GardenPainter(
+            layout: layout,
+            projection: projection,
+            atlas: atlas,
+            held: holding,
+            heldOutline: outline ?? const Color(0xFFE89B9B),
+          );
+
+      expect(painter().shouldRepaint(painter()), isFalse);
+      expect(painter(holding: held).shouldRepaint(painter()), isTrue);
+      expect(painter().shouldRepaint(painter(holding: held)), isTrue);
+      expect(
+        painter(holding: held, outline: const Color(0xFF000000))
+            .shouldRepaint(painter(holding: held)),
+        isTrue,
+      );
+    });
+  });
 }

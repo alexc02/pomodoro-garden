@@ -8,6 +8,7 @@ import '../analytics/analytics_providers.dart';
 import '../data/database_providers.dart';
 import '../garden/decor_providers.dart';
 import '../garden/plant_providers.dart';
+import '../garden/season_providers.dart';
 import '../journal/journal_providers.dart';
 import '../settings/settings_providers.dart';
 import '../time/clock_provider.dart';
@@ -96,6 +97,7 @@ class SessionController extends Notifier<SessionSnapshot> {
         ref.read(clockProvider),
         ref.read(idSourceProvider),
         cyclePosition: ref.read(restoredCyclePositionProvider).value ?? 0,
+        hemisphere: ref.read(hemisphereProvider),
       );
       _restore(machine);
     }
@@ -365,6 +367,8 @@ class SessionController extends Notifier<SessionSnapshot> {
         session,
         id: ref.read(idSourceProvider).newId(),
         plot: plot,
+        // The machine's, so the plant is the one the timer showed growing.
+        hemisphere: _machine.hemisphere,
       );
       await garden.save(plant);
       // Only after a successful, non-duplicate write.

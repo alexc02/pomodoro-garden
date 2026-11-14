@@ -20,7 +20,7 @@ abstract final class CoachMarkTargets {
   static GlobalKey? forTab(AppTab tab) => switch (tab) {
         AppTab.garden => garden,
         AppTab.journal => journal,
-        AppTab.timer || AppTab.settings => null,
+        AppTab.shelf || AppTab.timer || AppTab.settings => null,
       };
 
   static GlobalKey of(CoachMark mark) => switch (mark) {

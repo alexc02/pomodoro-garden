@@ -1,8 +1,9 @@
 import 'decor.dart';
 import 'garden_plot.dart';
 
-/// Stores decor. Separate from [PlantRepository] since decor moves and plants
-/// don't.
+/// Stores decor. Separate from [PlantRepository] since decor is placed and
+/// removed by hand and plants never are. Moving either one goes through
+/// [GardenArrangement].
 abstract interface class DecorRepository {
   /// In placement order.
   Future<List<Decor>> decor();

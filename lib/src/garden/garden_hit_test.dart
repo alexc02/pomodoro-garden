@@ -65,14 +65,25 @@ final class GardenHitTest {
   /// What is at [point] (garden paint coordinates), or null for the sky or a
   /// locked plot.
   ///
-  /// Plants are skipped while [arranging]. They can't be picked up, and a
-  /// tall one would otherwise swallow taps meant for decor behind it.
+  /// While [arranging], a plant never blocks soil or decor behind it:
+  ///
+  /// 1. Decor whose picture covers the point, front to back.
+  /// 2. The plot under the point, if it's empty or holds decor, even with a
+  ///    canopy drawn over it.
+  /// 3. Then plants as usual: the one visibly on top, then the plot's own.
+  ///
+  /// Otherwise decor behind a tall plant couldn't be picked up (so couldn't be
+  /// removed), and the soil there couldn't be planted on or moved to.
   GardenTarget? at(Offset point, {bool arranging = false}) {
+    if (arranging) {
+      final clear = _decorOrSoilAt(point);
+      if (clear != null) return clear;
+    }
+
     // `layout.plots` is in paint order, so reversed is nearest first.
     for (final plot in layout.plots.reversed) {
       final plant = layout.plantIn(plot);
       if (plant != null) {
-        if (arranging) continue;
         final picture = _pictureIn(plot, atlas.footprintFor(plant.species));
         if (picture.contains(point)) return PlantTarget(plot, plant);
         continue;
@@ -94,6 +105,23 @@ final class GardenHitTest {
     if (item != null) return DecorTarget(under, item);
 
     return SoilTarget(under);
+  }
+
+  /// Steps 1 and 2 of arranging: what's at [point] ignoring every plant's
+  /// picture. Null when a plant has the plot under the point, or nothing does.
+  GardenTarget? _decorOrSoilAt(Offset point) {
+    for (final plot in layout.plots.reversed) {
+      final item = layout.decorIn(plot);
+      if (item == null) continue;
+      final picture = _pictureIn(plot, atlas.footprintForDecor(item.kind));
+      if (picture.contains(point)) return DecorTarget(plot, item);
+    }
+
+    final under = projection.plotUnder(point);
+    if (!layout.hasPlot(under) || layout.plantIn(under) != null) return null;
+
+    final item = layout.decorIn(under);
+    return item == null ? SoilTarget(under) : DecorTarget(under, item);
   }
 
   /// The plant at [point], or null for anything else. Decor in front of a

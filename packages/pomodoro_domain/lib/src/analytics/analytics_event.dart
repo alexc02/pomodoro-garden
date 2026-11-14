@@ -12,6 +12,8 @@ enum AnalyticsEventName {
   sessionAbandoned('session_abandoned'),
   sessionPaused('session_paused'),
   plantGrown('plant_grown'),
+  plantShelved('plant_shelved'),
+  plantReplanted('plant_replanted'),
   gardenViewed('garden_viewed'),
   ambientSoundToggled('ambient_sound_toggled'),
   settingsChanged('settings_changed'),
@@ -220,6 +222,40 @@ final class PlantGrown extends AnalyticsEvent {
   Map<String, Object?> get parameters => {
         'species': species.name,
         'stage_reached': stageReached.name,
+      };
+}
+
+/// The user moved a plant from the garden to the shelf. Not recorded for
+/// plants that go there because the garden is full.
+final class PlantShelved extends AnalyticsEvent {
+  const PlantShelved({required this.species});
+
+  final PlantSpecies species;
+
+  @override
+  AnalyticsEventName get name => AnalyticsEventName.plantShelved;
+
+  @override
+  Map<String, Object?> get parameters => {'species': species.name};
+}
+
+/// The user planted a shelved plant back in the garden.
+final class PlantReplanted extends AnalyticsEvent {
+  const PlantReplanted({required this.species, required this.pickedPlot});
+
+  final PlantSpecies species;
+
+  /// True from the arrange picker, where the user chose the plot. False from
+  /// the shelf, which takes the nearest free one.
+  final bool pickedPlot;
+
+  @override
+  AnalyticsEventName get name => AnalyticsEventName.plantReplanted;
+
+  @override
+  Map<String, Object?> get parameters => {
+        'species': species.name,
+        'picked_plot': pickedPlot,
       };
 }
 

@@ -123,6 +123,19 @@ void main() {
       }
     });
 
+    test('the disc never rises into a two-line headline', () {
+      // Tallest phone header: safe area, date line, two lines of headline.
+      const headerBottom = 205.0;
+      const phone = Size(402, 874);
+      final radius = phone.width * 0.1;
+
+      for (var minutes = 0; minutes < 24 * 60; minutes += 10) {
+        final top =
+            _painter(Duration(minutes: minutes)).discCentre(phone).dy - radius;
+        expect(top, greaterThan(headerBottom), reason: 'at $minutes min');
+      }
+    });
+
     test('shouldRepaint', () {
       expect(
         noon.shouldRepaint(_painter(const Duration(hours: 12))),

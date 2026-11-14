@@ -56,6 +56,54 @@ void main() {
       expect(species.length, greaterThan(1));
     });
 
+    test('a session grows what is in season where it started', () {
+      // Mid-month at noon, so the local date is in the same month anywhere.
+      Set<PlantSpecies> grownOn(DateTime start, Hemisphere hemisphere) => {
+            for (var id = 0; id < 300; id++)
+              PlantGrowth.forSession(
+                FocusSession(
+                  id: 'session-$id',
+                  startedAt: start,
+                  plannedDuration: const Duration(minutes: 10),
+                ),
+                progress: 1,
+                hemisphere: hemisphere,
+              ).species,
+          };
+
+      final january = DateTime.utc(2026, 1, 15, 12);
+      final north = grownOn(january, Hemisphere.northern);
+      final south = grownOn(january, Hemisphere.southern);
+
+      expect(north, contains(PlantSpecies.snowdrop));
+      expect(north, isNot(contains(PlantSpecies.lupin)));
+      expect(south, contains(PlantSpecies.lupin));
+      expect(south, isNot(contains(PlantSpecies.snowdrop)));
+    });
+
+    test('the plant kept is the one the session was growing', () {
+      for (var id = 0; id < 50; id++) {
+        final session = FocusSession(
+          id: 'session-$id',
+          startedAt: DateTime.utc(2026, 1, 15, 12),
+          plannedDuration: const Duration(minutes: 10),
+        ).completedAt(DateTime.utc(2026, 1, 15, 12, 10));
+
+        expect(
+          Plant.fromSession(
+            session,
+            id: 'plant-$id',
+            hemisphere: Hemisphere.southern,
+          ).species,
+          PlantGrowth.forSession(
+            session,
+            progress: 0.5,
+            hemisphere: Hemisphere.southern,
+          ).species,
+        );
+      }
+    });
+
     test('growth compares by value, so an unchanged plant does not repaint',
         () {
       final session = _session();

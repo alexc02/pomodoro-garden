@@ -1,14 +1,19 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pomodoro_domain/pomodoro_domain.dart';
 
 import '../../design/garden_colors.dart';
+import '../../design/headline.dart';
 import '../../design/spacing.dart';
 import '../../garden/daylight_providers.dart';
 import '../../garden/decor_providers.dart';
 import '../../garden/garden_providers.dart';
 import '../../garden/garden_transition.dart';
 import '../../garden/season_weather.dart';
+import '../../session/session_providers.dart';
+import '../../shell/shell_providers.dart';
 import '../../shell/tab.dart';
 import '../../shell/tab_glyph.dart';
 import 'decor_picker.dart';
@@ -26,6 +31,12 @@ import 'seasonal_garden.dart';
 class GardenScreen extends ConsumerWidget {
   const GardenScreen({super.key});
 
+  /// The "garden is full" caption, which opens the shelf.
+  static const Key fullCaption = Key('garden.fullCaption');
+
+  /// The caption for a garden whose plants are all on the shelf. Opens it too.
+  static const Key shelvedCaption = Key('garden.shelvedCaption');
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final garden = ref.watch(gardenLayoutProvider);
@@ -42,6 +53,9 @@ class GardenScreen extends ConsumerWidget {
             const GardenBackdrop(),
             SafeArea(
               child: garden.when(
+                // Otherwise every move or new plant rebuilds [GardenView]
+                // from scratch, which resets the camera and logs a visit.
+                skipLoadingOnReload: true,
                 // Blank sky rather than a spinner; the query is small and the
                 // garden fades in anyway.
                 loading: () => const SizedBox.expand(),
@@ -101,14 +115,20 @@ class GardenScreen extends ConsumerWidget {
         : '$growing $placed things you placed stand among them.';
   }
 
-  /// Shown once the garden is full. The extra plants are kept, just not placed.
-  static String _holdingMessage(int waiting) => waiting == 1
-      ? 'Your garden is full. One more plant is waiting for space.'
-      : 'Your garden is full. $waiting more plants are waiting for space.';
+  /// Shown once every plot holds a plant. Anything grown after that goes to
+  /// the shelf, and tapping the caption opens it.
+  static String _fullMessage(int shelved) => shelved == 1
+      ? 'Your garden is full. 1 plant is on your shelf.'
+      : 'Your garden is full. $shelved plants are on your shelf.';
+
+  /// Having plants on the shelf doesn't mean the garden is full; the user can
+  /// shelve plants with plenty of soil to spare.
+  static bool _isFull(GardenLayout garden) =>
+      garden.shelved.isNotEmpty && garden.plants.length >= GardenPlots.maximum;
 }
 
 /// The garden, its weather, then the caption and timer bar along the bottom.
-class _GardenStage extends StatelessWidget {
+class _GardenStage extends ConsumerWidget {
   const _GardenStage({required this.layout, required this.skin});
 
   final GardenLayout layout;
@@ -116,7 +136,7 @@ class _GardenStage extends StatelessWidget {
   final GardenTransition skin;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -131,8 +151,15 @@ class _GardenStage extends StatelessWidget {
         // wins.
         LayoutBuilder(
           builder: (context, constraints) {
-            final roomy =
-                constraints.maxHeight >= GardenScreen._roomForCaption;
+            // The room needed grows with the text size. No caption while
+            // arranging either, or it shows through under the arrange bar.
+            final textScale = math.max(1.0, systemTextScale(context));
+            final roomy = constraints.maxHeight >=
+                    GardenScreen._roomForCaption * textScale &&
+                ref.watch(gardenArrangerProvider) is NotArranging;
+            void openShelf() =>
+                ref.read(selectedTabProvider.notifier).select(AppTab.shelf);
+
             return Align(
               alignment: Alignment.bottomCenter,
               child: Column(
@@ -140,13 +167,22 @@ class _GardenStage extends StatelessWidget {
                 children: [
                   if (!roomy)
                     const SizedBox.shrink()
-                  else if (layout.plants.isEmpty)
+                  else if (layout.plants.isEmpty && layout.shelved.isEmpty)
                     const _Caption('Finish a session and your first plant goes '
                         'in here.')
-                  else if (layout.unplaced.isNotEmpty)
-                    _Caption(GardenScreen._holdingMessage(
-                      layout.unplaced.length,
-                    )),
+                  // Everything grown so far was put away.
+                  else if (layout.plants.isEmpty)
+                    _Caption(
+                      'Every plant you\'ve grown is on your shelf.',
+                      key: GardenScreen.shelvedCaption,
+                      onTap: openShelf,
+                    )
+                  else if (GardenScreen._isFull(layout))
+                    _Caption(
+                      GardenScreen._fullMessage(layout.shelved.length),
+                      key: GardenScreen.fullCaption,
+                      onTap: openShelf,
+                    ),
                   const GardenTimerBar(),
                 ],
               ),
@@ -194,49 +230,73 @@ class _Arrange extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final arranging = ref.watch(decorArrangerProvider) is! NotArranging;
-    final arranger = ref.read(decorArrangerProvider.notifier);
+    final arranging = ref.watch(gardenArrangerProvider) is! NotArranging;
+    final arranger = ref.read(gardenArrangerProvider.notifier);
+    final held = ref.watch(
+      sessionControllerProvider
+          .select((session) => sessionHoldsTheGarden(session.phase)),
+    );
 
+    if (arranging) {
+      return IconButton(
+        key: DecorKeys.arrange,
+        icon: const Icon(Icons.close),
+        tooltip: 'Stop arranging',
+        onPressed: arranger.end,
+      );
+    }
     return IconButton(
       key: DecorKeys.arrange,
-      icon: Icon(arranging ? Icons.close : Icons.chair_outlined),
-      tooltip: arranging ? 'Stop arranging' : 'Arrange your garden',
-      onPressed: arranging ? arranger.end : arranger.begin,
+      icon: const Icon(Icons.chair_outlined),
+      tooltip: held
+          ? 'Arrange your garden once your session ends'
+          : 'Arrange your garden',
+      onPressed: held ? null : arranger.begin,
     );
   }
 }
 
 class _Caption extends StatelessWidget {
-  const _Caption(this.message);
+  const _Caption(this.message, {this.onTap, super.key});
 
   final String message;
+
+  /// Makes the caption a button. Null for one that only says something.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        Spacing.lg,
-        Spacing.lg,
-        Spacing.lg,
-        Spacing.xs,
-      ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.82),
-          borderRadius: Radii.pillAll,
+    // Has to be a direct child of the stage's column. At large text on a
+    // small phone the caption and the timer bar don't both fit, and this way
+    // the caption scrolls instead of the column overflowing.
+    return Flexible(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          Spacing.lg,
+          Spacing.lg,
+          Spacing.lg,
+          Spacing.xs,
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.md,
-            vertical: Spacing.sm,
-          ),
-          child: Text(
-            message,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: GardenColors.of(context).textSecondary),
+        child: Material(
+          color: theme.colorScheme.surface.withValues(alpha: 0.82),
+          shape: const StadiumBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Spacing.md,
+                vertical: Spacing.sm,
+              ),
+              child: Text(
+                message,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: GardenColors.of(context).textSecondary),
+              ),
+            ),
           ),
         ),
       ),

@@ -35,14 +35,14 @@ GardenAtlasRecipe _recipe({
 
 /// Hands out solid-block sprites and records what was asked for.
 final class _RecordingRegistry implements PlantSpriteRegistry {
-  final List<(PlantType, GrowthStage)> asked = [];
+  final List<(PlantForm, GrowthStage)> asked = [];
 
   @override
   PlantSprite spriteFor({
-    required PlantType type,
+    required PlantForm form,
     required GrowthStage stage,
   }) {
-    asked.add((type, stage));
+    asked.add((form, stage));
     return const _SolidSprite();
   }
 }
@@ -99,8 +99,8 @@ void main() {
 
     expect(
       registry.asked.map((asked) => asked.$1).toSet(),
-      PlantType.values.toSet(),
-      reason: 'every type of plant that can be in a garden was drawn',
+      PlantForm.values.toSet(),
+      reason: 'every shape of plant that can be in a garden was drawn',
     );
     expect(
       registry.asked.map((asked) => asked.$2).toSet(),

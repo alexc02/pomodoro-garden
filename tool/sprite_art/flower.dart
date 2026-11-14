@@ -6,31 +6,17 @@ import 'package:pomodoro_domain/pomodoro_domain.dart';
 import 'parts.dart';
 import 'wash.dart';
 
-/// Flower type (sunflower, tulip, daisy) at each stage. Leaves keep their
-/// position and seed across stages and just get bigger, so it reads as one
-/// plant growing. Species differ only by palette.
+/// The rayed flower (sunflower, daisy, chrysanthemum) at each stage. Leaves
+/// keep their position and seed across stages and just get bigger, so it
+/// reads as one plant growing. Species of a form differ only by palette.
 Future<void> paintFlower(Sheet sheet, GrowthStage stage) async {
   final s = sheet.side / 512;
-  final ground = Offset(256 * s, 512 * s);
 
   await soil(sheet, stage);
   if (stage == GrowthStage.seed) return;
 
   final plan = _plans[stage]!;
-  final base = ground + Offset(0, -10 * s);
-  final top = Offset(256 * s + plan.lean * s, plan.top * s);
-
-  await sheet.wash(
-    wobbly(
-      along(base, top, width: (t) => (plan.stem - 2.5 * t) * s, bend: 0.025),
-      seed: 21,
-      amplitude: 0.7 * s * sheet.finish.wobble,
-    ),
-    role: Role.foliage,
-    seed: 21,
-    depth: 0.24,
-    rim: 0.3,
-  );
+  final (base, top) = await _stem(sheet, plan);
 
   for (final it in plan.leaves) {
     await leaf(
@@ -55,6 +41,117 @@ Future<void> paintFlower(Sheet sheet, GrowthStage stage) async {
       await _bud(sheet, top, s, size: 1.6, coloured: 0.7);
     case GrowthStage.mature:
       await _bloom(sheet, top, s);
+  }
+}
+
+/// The cup (tulip, crocus, rose, peony): the same stem as [paintFlower], but
+/// with long leaves rising from its foot and a closed cup of three petals
+/// where the rayed flower opens flat.
+Future<void> paintCupFlower(Sheet sheet, GrowthStage stage) async {
+  // The seed and the sprout are the flower's own.
+  if (stage == GrowthStage.seed || stage == GrowthStage.sprout) {
+    return paintFlower(sheet, stage);
+  }
+  final s = sheet.side / 512;
+  await soil(sheet, stage);
+
+  final plan = _plans[stage]!;
+  final (base, top) = await _stem(sheet, plan);
+
+  // Strap leaves, as long as most of the stem.
+  final reach = (base - top).distance / s;
+  for (final (i, side, angle, share, width) in [
+    (0, -1, 1.12, 0.62, 0.17),
+    (1, 1, 1.18, 0.56, 0.16),
+    (2, 1, 0.82, 0.36, 0.13),
+    (3, -1, 0.78, 0.32, 0.12),
+  ]) {
+    await leaf(
+      sheet,
+      Offset.lerp(base, top, 0.04 + 0.02 * i)! / s,
+      side: side,
+      angle: angle,
+      length: reach * share,
+      width: reach * width,
+      seed: 220 + i,
+    );
+  }
+
+  switch (stage) {
+    case GrowthStage.young:
+      await _bud(sheet, top, s, size: 1, coloured: 0.25);
+    case GrowthStage.maturing:
+      await _bud(sheet, top, s, size: 1.6, coloured: 0.7);
+    default:
+      await _cup(sheet, top, s);
+  }
+}
+
+/// Draws the stem for [plan] and returns its foot and tip, in sheet pixels.
+Future<(Offset, Offset)> _stem(Sheet sheet, _Plan plan) async {
+  final s = sheet.side / 512;
+  final base = Offset(256 * s, 512 * s) + Offset(0, -10 * s);
+  final top = Offset(256 * s + plan.lean * s, plan.top * s);
+
+  await sheet.wash(
+    wobbly(
+      along(base, top, width: (t) => (plan.stem - 2.5 * t) * s, bend: 0.025),
+      seed: 21,
+      amplitude: 0.7 * s * sheet.finish.wobble,
+    ),
+    role: Role.foliage,
+    seed: 21,
+    depth: 0.24,
+    rim: 0.3,
+  );
+  return (base, top);
+}
+
+/// Three petals closed into a goblet: two behind, leaning apart, and one in
+/// front.
+Future<void> _cup(Sheet sheet, Offset top, double s) async {
+  final foot = top + Offset(0, 8 * s);
+
+  for (final (i, lean, rise, width, depth) in [
+    (0, -34.0, 82.0, 56.0, 0.24),
+    (1, 34.0, 82.0, 56.0, 0.24),
+    (2, 0.0, 90.0, 66.0, 0.1),
+  ]) {
+    final tip = foot + Offset(lean * s, -rise * s);
+    await sheet.wash(
+      wobbly(
+        along(foot, tip,
+            width: petalProfile(width * s), bend: 0.1 * lean.sign),
+        seed: 440 + i,
+        amplitude: 1.4 * s * sheet.finish.wobble,
+      ),
+      role: Role.bloom,
+      seed: 440 + i,
+      depth: depth,
+      rim: 0.45,
+      // Darker toward the foot, where the petals fold into each other.
+      shade: (x, y) {
+        final p = Offset(x, y) * sheet.side.toDouble();
+        final up = ((foot.dy - p.dy) / (rise * s)).clamp(0.0, 1.0);
+        return 0.2 * (1 - up);
+      },
+    );
+  }
+
+  // The green cup the petals sit in.
+  for (final side in [-1, 1]) {
+    await sheet.wash(
+      wobbly(
+        along(top + Offset(0, 10 * s), foot + Offset(side * 15 * s, -18 * s),
+            width: leafProfile(13 * s), bend: 0.2 * side),
+        seed: 460 + side,
+        amplitude: 0.7 * s * sheet.finish.wobble,
+      ),
+      role: Role.foliage,
+      seed: 460 + side,
+      depth: 0.16,
+      rim: 0.45,
+    );
   }
 }
 
